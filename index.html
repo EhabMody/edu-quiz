@@ -249,68 +249,45 @@
 
 <div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox"></div></div>
 
-<script>
+<script type="module">
 /* ============================================================
-   ============ Web Crypto API - تشفير كلمات المرور ============
+   ============ Firebase - Dynamic Import ============
    ============================================================ */
-// استخدام PBKDF2 مع SHA-256 و 100,000 دورة - نفس المعيار الذي تستخدمه مكتبات مثل @qcksys/web-crypto-auth [citation:3][citation:9]
-async function hashPassword(password) {
-  const salt = crypto.getRandomValues(new Uint8Array(16));
-  const keyMaterial = await crypto.subtle.importKey(
-    'raw', new TextEncoder().encode(password), { name: 'PBKDF2' }, false, ['deriveBits']
-  );
-  const derivedBits = await crypto.subtle.deriveBits(
-    { name: 'PBKDF2', salt: salt, iterations: 100000, hash: 'SHA-256' },
-    keyMaterial, 256
-  );
-  const hashArray = new Uint8Array(derivedBits);
-  const saltB64 = btoa(String.fromCharCode(...salt));
-  const hashB64 = btoa(String.fromCharCode(...hashArray));
-  return `pbkdf2_sha256$100000$${saltB64}$${hashB64}`;
-}
+let firebaseApp = null, firebaseDB = null, firebaseAuth = null, firebaseEnabled = false, firebaseAuthEnabled = false;
 
-async function verifyPassword(storedHash, password) {
-  try {
-    const parts = storedHash.split('$');
-    if (parts.length !== 4 || parts[0] !== 'pbkdf2_sha256') return false;
-    const iterations = parseInt(parts[1]);
-    const salt = Uint8Array.from(atob(parts[2]), c => c.charCodeAt(0));
-    const expectedHash = parts[3];
-    const keyMaterial = await crypto.subtle.importKey(
-      'raw', new TextEncoder().encode(password), { name: 'PBKDF2' }, false, ['deriveBits']
-    );
-    const derivedBits = await crypto.subtle.deriveBits(
-      { name: 'PBKDF2', salt: salt, iterations: iterations, hash: 'SHA-256' },
-      keyMaterial, 256
-    );
-    const hashArray = new Uint8Array(derivedBits);
-    const computedHash = btoa(String.fromCharCode(...hashArray));
-    // مقارنة بسيطة (في الإنتاج يُفضل استخدام مقارنة ثابتة الزمن)
-    return computedHash === expectedHash;
-  } catch { return false; }
-}
-
-/* ============================================================
-   ============ Firebase Setup ============
-   ============================================================ */
-let firebaseDB = null, firebaseEnabled = false;
 function loadFirebaseConfig() { try { const c = localStorage.getItem('edu_firebase_config'); return c ? JSON.parse(c) : null; } catch { return null; } }
 function saveFirebaseConfig(c) { localStorage.setItem('edu_firebase_config', JSON.stringify(c)); }
+
 async function initFirebase() {
   const config = loadFirebaseConfig();
-  if (!config || !config.apiKey || !config.databaseURL) { firebaseEnabled = false; updateFirebaseStatus(); return; }
+  if (!config || !config.apiKey || !config.databaseURL) { firebaseEnabled = false; firebaseAuthEnabled = false; updateFirebaseStatus(); return; }
   try {
     const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
     const { getDatabase, ref, set, onValue, get } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
-    const app = initializeApp(config);
-    firebaseDB = { db: getDatabase(app), ref, set, onValue, get };
-    firebaseEnabled = true; updateFirebaseStatus(); console.log('✅ Firebase متصل');
-  } catch (err) { console.error('❌ Firebase:', err); firebaseEnabled = false; updateFirebaseStatus('فشل الاتصال: ' + err.message); }
+    firebaseApp = initializeApp(config);
+    firebaseDB = { db: getDatabase(firebaseApp), ref, set, onValue, get };
+    firebaseEnabled = true;
+
+    // محاولة تحميل Firebase Auth (اختياري - يعمل فقط إذا كان مفعلاً في Console)
+    try {
+      const { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } =
+        await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+      firebaseAuth = { auth: getAuth(firebaseApp), createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged };
+      firebaseAuthEnabled = true;
+      console.log('✅ Firebase + Auth متصل');
+    } catch (authErr) { console.warn('⚠️ Firebase Auth غير متاح، سيتم استخدام الحسابات المحلية:', authErr.message); firebaseAuthEnabled = false; }
+
+    updateFirebaseStatus();
+  } catch (err) { console.error('❌ Firebase:', err); firebaseEnabled = false; firebaseAuthEnabled = false; updateFirebaseStatus('فشل الاتصال: ' + err.message); }
 }
+
 function updateFirebaseStatus(error) {
   const el = document.getElementById('firebaseStatus'); if (!el) return;
   if (error) { el.innerHTML = `<div class="container"><div class="alert alert-error">${escapeHtml(error)}</div></div>`; return; }
-  el.innerHTML = firebaseEnabled ? `<div class="container"><div class="alert alert-success">✅ Firebase متصل - مزامنة سحابية مفعلة</div></div>` : '';
+  if (firebaseEnabled) {
+    const authStatus = firebaseAuthEnabled ? ' + Auth' : ' (بدون Auth)';
+    el.innerHTML = `<div class="container"><div class="alert alert-success">✅ Firebase متصل${authStatus} - مزامنة سحابية مفعلة</div></div>`;
+  } else { el.innerHTML = ''; }
 }
 
 /* ============================================================
@@ -334,6 +311,29 @@ const DB = {
     if (firebaseEnabled && firebaseDB) { try { await firebaseDB.set(firebaseDB.ref(firebaseDB.db, key), value); } catch (e) { console.warn('FB set:', e); } }
   }
 };
+
+/* ============================================================
+   ============ Web Crypto - PBKDF2 Fallback ============
+   ============================================================ */
+async function hashPassword(password) {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const keyMaterial = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), { name: 'PBKDF2' }, false, ['deriveBits']);
+  const derivedBits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: salt, iterations: 100000, hash: 'SHA-256' }, keyMaterial, 256);
+  const hashArray = new Uint8Array(derivedBits);
+  return `pbkdf2_sha256$100000$${btoa(String.fromCharCode(...salt))}$${btoa(String.fromCharCode(...hashArray))}`;
+}
+async function verifyPassword(storedHash, password) {
+  try {
+    const parts = storedHash.split('$');
+    if (parts.length !== 4 || parts[0] !== 'pbkdf2_sha256') return false;
+    const iterations = parseInt(parts[1]);
+    const salt = Uint8Array.from(atob(parts[2]), c => c.charCodeAt(0));
+    const keyMaterial = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), { name: 'PBKDF2' }, false, ['deriveBits']);
+    const derivedBits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations, hash: 'SHA-256' }, keyMaterial, 256);
+    const computedHash = btoa(String.fromCharCode(...new Uint8Array(derivedBits)));
+    return computedHash === parts[3];
+  } catch { return false; }
+}
 
 /* ============================================================
    ============ بيانات ثابتة ============
@@ -371,53 +371,156 @@ function loadDarkMode() { if(localStorage.getItem('edu_dark_mode')==='1'){ docum
 function openFirebaseConfig() {
   const cfg = loadFirebaseConfig() || {};
   openModal(`<div class="modal-header"><h3 class="modal-title">⚙️ إعداد Firebase</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-    <div class="firebase-banner">💡 <span>للمزامنة بين الأجهزة، أنشئ مشروعاً على <a href="https://console.firebase.google.com" target="_blank" style="color:var(--primary);font-weight:800;">Firebase Console</a> ثم أضف المفاتيح. <strong>مهم:</strong> فعّل Authentication واضبط Security Rules لحماية البيانات [citation:4].</span></div>
+    <div class="firebase-banner">💡 <span>للمزامنة بين الأجهزة، أنشئ مشروعاً على <a href="https://console.firebase.google.com" target="_blank" style="color:var(--primary);font-weight:800;">Firebase Console</a> ثم أضف المفاتيح. <strong>مهم:</strong> فعّل Authentication (Email/Password) واضبط Security Rules.</span></div>
     <div class="form-group"><label class="form-label">API Key</label><input type="text" class="form-input" id="fbApiKey" value="${escapeHtml(cfg.apiKey||'')}" placeholder="AIza..."></div>
     <div class="form-group"><label class="form-label">Database URL</label><input type="text" class="form-input" id="fbDatabaseURL" value="${escapeHtml(cfg.databaseURL||'')}" placeholder="https://xxx-default-rtdb.firebaseio.com"></div>
     <div class="form-group"><label class="form-label">Project ID</label><input type="text" class="form-input" id="fbProjectId" value="${escapeHtml(cfg.projectId||'')}" placeholder="your-project-id"></div>
-    <div style="display:flex;gap:8px;margin-top:20px;"><button class="btn btn-danger" onclick="clearFirebaseConfig()" style="flex:1;">🗑 حذف</button><button class="btn btn-primary" onclick="applyFirebaseConfig()" style="flex:2;">💾 حفظ وتوصيل</button></div>`);
+    <div class="form-group"><label class="form-label">Auth Domain (اختياري)</label><input type="text" class="form-input" id="fbAuthDomain" value="${escapeHtml(cfg.authDomain||'')}" placeholder="xxx.firebaseapp.com"></div>
+    <div style="display:flex;gap:8px;margin-top:20px;"><button class="btn btn-danger" onclick="clearFirebaseConfig()" style="flex:1;">🗑 حذف</button><button class="btn btn-primary" onclick="applyFirebaseConfig()" style="flex:2;">💾 حفظ وإعادة تحميل</button></div>`);
 }
-async function applyFirebaseConfig() { const c={apiKey:document.getElementById('fbApiKey').value.trim(),databaseURL:document.getElementById('fbDatabaseURL').value.trim(),projectId:document.getElementById('fbProjectId').value.trim()}; if(!c.apiKey||!c.databaseURL){alert('يجب إدخال API Key و Database URL');return;} saveFirebaseConfig(c); closeModal(); await initFirebase(); }
-function clearFirebaseConfig() { if(!confirm('حذف إعدادات Firebase؟'))return; localStorage.removeItem('edu_firebase_config'); firebaseEnabled=false; firebaseDB=null; closeModal(); updateFirebaseStatus(); }
+async function applyFirebaseConfig() {
+  const c = { apiKey: document.getElementById('fbApiKey').value.trim(), databaseURL: document.getElementById('fbDatabaseURL').value.trim(), projectId: document.getElementById('fbProjectId').value.trim(), authDomain: document.getElementById('fbAuthDomain').value.trim() };
+  if (!c.apiKey || !c.databaseURL) { alert('يجب إدخال API Key و Database URL'); return; }
+  saveFirebaseConfig(c); closeModal(); alert('تم الحفظ. سيتم إعادة تحميل الصفحة لتطبيق الإعدادات.'); location.reload();
+}
+function clearFirebaseConfig() { if(!confirm('حذف إعدادات Firebase؟'))return; localStorage.removeItem('edu_firebase_config'); alert('تم الحذف. سيتم إعادة تحميل الصفحة.'); location.reload(); }
 
 /* ============================================================
-   ============ Auth ============
+   ============ Auth - التبويبات والأدوار ============
    ============================================================ */
 function switchAuthTab(tab) { document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.tab').forEach(t=>{if(t.textContent.includes(tab==='login'?'دخول':'حساب'))t.classList.add('active');}); document.getElementById('loginForm').style.display=tab==='login'?'block':'none'; document.getElementById('registerForm').style.display=tab==='register'?'block':'none'; document.getElementById('authAlert').innerHTML=''; }
 function pickRole(role) { selectedRole=role; document.querySelectorAll('.role-option').forEach(o=>o.classList.remove('active')); document.querySelector(`.role-option[data-role="${role}"]`).classList.add('active'); document.getElementById('studentFields').style.display=role==='student'?'block':'none'; document.getElementById('teacherFields').style.display=role==='teacher'?'block':'none'; if(role==='teacher'){ document.getElementById('regSubject').innerHTML='<option value="">اختر المادة</option>'+SUBJECTS.map(s=>`<option value="${s.id}">${s.emoji} ${s.name}</option>`).join(''); } }
 document.getElementById('regStage').addEventListener('change', function() { document.getElementById('regGrade').innerHTML='<option value="">اختر السنة</option>'+(STAGES[this.value]||[]).map(g=>`<option value="${g}">${g}</option>`).join(''); });
 
+/* ============================================================
+   ============ Auth - التسجيل ============
+   ============================================================ */
 async function handleRegister(e) {
   e.preventDefault();
-  const name=document.getElementById('regName').value.trim(), email=document.getElementById('regEmail').value.trim().toLowerCase(), password=document.getElementById('regPassword').value;
-  if(!selectedRole){showAlert('اختر دورك');return;}
-  const users=await DB.get('users');
-  if(users.find(u=>u.email===email)){showAlert('البريد مسجل');return;}
-  const user={id:uid(),name,email,role:selectedRole,createdAt:Date.now()};
-  // تشفير كلمة المرور قبل التخزين
-  user.passwordHash = await hashPassword(password);
-  if(selectedRole==='student'){ const stage=document.getElementById('regStage').value, grade=document.getElementById('regGrade').value; if(!stage||!grade){showAlert('اختر المرحلة والسنة');return;} user.stage=stage; user.grade=grade; }
-  else { const subject=document.getElementById('regSubject').value; if(!subject){showAlert('اختر المادة');return;} user.subject=subject; }
-  users.push(user); await DB.set('users', users);
-  // إشعار للمدرس الجديد (اختياري)
-  currentUser=user; localStorage.setItem('edu_session',user.id); showAlert('تم إنشاء الحساب!','success'); setTimeout(()=>enterDashboard(),500);
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim().toLowerCase();
+  const password = document.getElementById('regPassword').value;
+
+  if (!selectedRole) { showAlert('اختر دورك'); return; }
+
+  // بناء الملف الشخصي
+  const profile = { name, email, role: selectedRole, createdAt: Date.now() };
+  if (selectedRole === 'student') {
+    const stage = document.getElementById('regStage').value;
+    const grade = document.getElementById('regGrade').value;
+    if (!stage || !grade) { showAlert('اختر المرحلة والسنة'); return; }
+    profile.stage = stage; profile.grade = grade;
+  } else {
+    const subject = document.getElementById('regSubject').value;
+    if (!subject) { showAlert('اختر المادة'); return; }
+    profile.subject = subject;
+  }
+
+  const users = await DB.get('users');
+  if (users.find(u => u.email === email)) { showAlert('هذا البريد مسجل بالفعل'); return; }
+
+  // استخدام Firebase Auth إذا متاح
+  if (firebaseAuthEnabled) {
+    try {
+      const cred = await firebaseAuth.createUserWithEmailAndPassword(firebaseAuth.auth, email, password);
+      profile.id = cred.user.uid;
+      users.push(profile);
+      await DB.set('users', users);
+      currentUser = profile;
+      localStorage.setItem('edu_session', profile.id);
+      showAlert('تم إنشاء الحساب!', 'success');
+      setTimeout(() => enterDashboard(), 500);
+    } catch (err) {
+      const msgs = { 'auth/email-already-in-use': 'البريد مسجل بالفعل', 'auth/weak-password': 'كلمة المرور ضعيفة', 'auth/invalid-email': 'البريد غير صالح', 'auth/operation-not-allowed': 'تسجيل البريد غير مفعّل في Firebase Console' };
+      showAlert(msgs[err.code] || err.message);
+    }
+    return;
+  }
+
+  // Fallback: حساب محلي مع PBKDF2
+  profile.id = uid();
+  profile.passwordHash = await hashPassword(password);
+  users.push(profile);
+  await DB.set('users', users);
+  currentUser = profile;
+  localStorage.setItem('edu_session', profile.id);
+  showAlert('تم إنشاء الحساب (محلي)!', 'success');
+  setTimeout(() => enterDashboard(), 500);
 }
 
+/* ============================================================
+   ============ Auth - تسجيل الدخول ============
+   ============================================================ */
 async function handleLogin(e) {
   e.preventDefault();
-  const email=document.getElementById('loginEmail').value.trim().toLowerCase(), password=document.getElementById('loginPassword').value;
-  const users=await DB.get('users');
-  const user=users.find(u=>u.email===email);
-  if(!user){showAlert('البريد أو كلمة المرور غير صحيحة');return;}
-  // التحقق من كلمة المرور المشفرة
-  let valid=false;
-  if(user.passwordHash){ valid=await verifyPassword(user.passwordHash, password); }
-  else if(user.password){ valid=(user.password===password); } // توافق مع الحسابات القديمة
-  if(!valid){showAlert('البريد أو كلمة المرور غير صحيحة');return;}
-  currentUser=user; localStorage.setItem('edu_session',user.id); enterDashboard();
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const password = document.getElementById('loginPassword').value;
+
+  // Firebase Auth إذا متاح
+  if (firebaseAuthEnabled) {
+    try {
+      const cred = await firebaseAuth.signInWithEmailAndPassword(firebaseAuth.auth, email, password);
+      const users = await DB.get('users');
+      const user = users.find(u => u.id === cred.user.uid || u.email === email);
+      if (!user) { showAlert('لم يتم العثور على الملف الشخصي'); await firebaseAuth.signOut(firebaseAuth.auth); return; }
+      currentUser = user;
+      localStorage.setItem('edu_session', user.id);
+      enterDashboard();
+    } catch (err) {
+      const msgs = { 'auth/user-not-found': 'لا يوجد حساب بهذا البريد', 'auth/wrong-password': 'كلمة المرور غير صحيحة', 'auth/invalid-credential': 'بيانات الدخول غير صحيحة', 'auth/too-many-requests': 'محاولات كثيرة، حاول لاحقاً' };
+      showAlert(msgs[err.code] || 'البريد أو كلمة المرور غير صحيحة');
+    }
+    return;
+  }
+
+  // Fallback: تحقق محلي
+  const users = await DB.get('users');
+  const user = users.find(u => u.email === email);
+  if (!user) { showAlert('البريد أو كلمة المرور غير صحيحة'); return; }
+  let valid = false;
+  if (user.passwordHash) { valid = await verifyPassword(user.passwordHash, password); }
+  else if (user.password) { valid = (user.password === password); }
+  if (!valid) { showAlert('البريد أو كلمة المرور غير صحيحة'); return; }
+  currentUser = user;
+  localStorage.setItem('edu_session', user.id);
+  enterDashboard();
 }
-function logout(){ currentUser=null; localStorage.removeItem('edu_session'); showScreen('auth'); document.getElementById('loginForm').reset(); document.getElementById('registerForm').reset(); }
-async function checkSession(){ const id=localStorage.getItem('edu_session'); if(!id)return false; const users=await DB.get('users'); const u=users.find(x=>x.id===id); if(u){currentUser=u;enterDashboard();return true;} return false; }
+
+/* ============================================================
+   ============ Auth - الخروج والجلسة ============
+   ============================================================ */
+async function logout() {
+  if (firebaseAuthEnabled && firebaseAuth) { try { await firebaseAuth.signOut(firebaseAuth.auth); } catch {} }
+  currentUser = null;
+  localStorage.removeItem('edu_session');
+  showScreen('auth');
+  document.getElementById('loginForm').reset();
+  document.getElementById('registerForm').reset();
+}
+
+async function checkSession() {
+  // إذا Firebase Auth متاح، استخدم onAuthStateChanged
+  if (firebaseAuthEnabled && firebaseAuth) {
+    return new Promise((resolve) => {
+      const unsubscribe = firebaseAuth.onAuthStateChanged(firebaseAuth.auth, async (user) => {
+        unsubscribe();
+        if (user) {
+          const users = await DB.get('users');
+          const profile = users.find(u => u.id === user.uid || u.email === user.email);
+          if (profile) { currentUser = profile; enterDashboard(); resolve(true); return; }
+        }
+        resolve(false);
+      });
+    });
+  }
+  // Fallback: جلسة محلية
+  const id = localStorage.getItem('edu_session');
+  if (!id) return false;
+  const users = await DB.get('users');
+  const u = users.find(x => x.id === id);
+  if (u) { currentUser = u; enterDashboard(); return true; }
+  return false;
+}
 
 /* ============================================================
    ============ Dashboard ============
@@ -441,16 +544,15 @@ async function renderTeacherDashboard() {
       <div class="stat-card"><div class="stat-icon info">👥</div><div class="stat-info"><h4>${students.length}</h4><p>طلاب</p></div></div>
     </div>
     <div class="chart-container"><canvas id="teacherChart"></canvas></div>
-    <div class="section-header"><div><h2 class="section-title">اختباراتي</h2><p class="section-subtitle">إدارة الاختبارات</p></div><div style="display:flex;gap:8px;"><button class="btn btn-outline btn-sm" onclick="exportResults()">📥 تصدير</button><button class="btn btn-primary" onclick="openNewQuizModal()">➕ اختبار جديد</button></div></div>
+    <div class="section-header"><div><h2 class="section-title">اختباراتي</h2><p class="section-subtitle">إدارة الاختبارات</p></div><div style="display:flex;gap:8px;"><button class="btn btn-outline btn-sm" onclick="exportResults()">📥 تصدير النتائج</button><button class="btn btn-primary" onclick="openNewQuizModal()">➕ اختبار جديد</button></div></div>
     ${quizzes.length===0?`<div class="card"><div class="empty-state"><div class="empty-state-icon">📚</div><h3>لا توجد اختبارات</h3></div></div>`:`<div class="cards-grid">${quizzes.map(renderQuizCard).join('')}</div>`}
     <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">إدارة الطلاب</h2><p class="section-subtitle">${students.length} طالب مسجل</p></div><button class="btn btn-outline btn-sm" onclick="exportStudents()">📥 تصدير الطلاب</button></div>
     ${students.length===0?`<div class="card"><div class="empty-state"><h3>لا يوجد طلاب</h3></div></div>`:renderStudentsList(students, allAttempts)}
     <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">آخر النتائج</h2></div></div>
     ${attempts.length===0?`<div class="card"><div class="empty-state"><h3>لا نتائج</h3></div></div>`:await renderAttemptsList(attempts.sort((a,b)=>b.createdAt-a.createdAt).slice(0,20))}
   `;
-  // رسم بياني
   const ctx=document.getElementById('teacherChart')?.getContext('2d');
-  if(ctx){ const quizNames=quizzes.map(q=>q.title.length>15?q.title.slice(0,15)+'...':q.title); const avgScores=quizzes.map(q=>{const at=attempts.filter(a=>a.quizId===q.id);return at.length?Math.round(at.reduce((s,a)=>s+(a.score/a.total)*100,0)/at.length):0;}); new Chart(ctx,{type:'bar',data:{labels:quizNames,datasets:[{label:'متوسط النتائج %',data:avgScores,backgroundColor:'rgba(79,70,229,0.7)',borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100}}}}); }
+  if(ctx && quizzes.length>0){ const quizNames=quizzes.map(q=>q.title.length>15?q.title.slice(0,15)+'...':q.title); const avgScores=quizzes.map(q=>{const at=attempts.filter(a=>a.quizId===q.id);return at.length?Math.round(at.reduce((s,a)=>s+(a.score/a.total)*100,0)/at.length):0;}); new Chart(ctx,{type:'bar',data:{labels:quizNames,datasets:[{label:'متوسط النتائج %',data:avgScores,backgroundColor:'rgba(79,70,229,0.7)',borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100}}}}); }
 }
 
 function renderQuizCard(quiz) {
@@ -493,7 +595,7 @@ async function renderStudentDashboard() {
     ${myAttempts.length===0?`<div class="card"><div class="empty-state"><h3>لا نتائج</h3></div></div>`:await renderMyAttempts(myAttempts.sort((a,b)=>b.createdAt-a.createdAt))}
   `;
   const ctx=document.getElementById('studentChart')?.getContext('2d');
-  if(ctx&&myAttempts.length>0){ const labels=myAttempts.slice(0,10).reverse().map(a=>{const q=allQuizzes.find(x=>x.id===a.quizId);return q?q.title.slice(0,10):'اختبار';}); const data=myAttempts.slice(0,10).reverse().map(a=>Math.round((a.score/a.total)*100)); new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'درجاتك %',data,borderColor:'#4f46e5',backgroundColor:'rgba(79,70,229,0.1)',fill:true,tension:0.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100}}}}); }
+  if(ctx && myAttempts.length>0){ const labels=myAttempts.slice(0,10).reverse().map(a=>{const q=allQuizzes.find(x=>x.id===a.quizId);return q?q.title.slice(0,10):'اختبار';}); const data=myAttempts.slice(0,10).reverse().map(a=>Math.round((a.score/a.total)*100)); new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'درجاتك %',data,borderColor:'#4f46e5',backgroundColor:'rgba(79,70,229,0.1)',fill:true,tension:0.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100}}}}); }
 }
 
 function renderStudentQuizCard(quiz, myAttempts) {
@@ -518,7 +620,6 @@ async function updateNotifBadge() {
 async function openNotifications() {
   const notifs=(await DB.get('notifications')).filter(n=>n.userId===currentUser.id).sort((a,b)=>b.createdAt-a.createdAt);
   const unread=notifs.filter(n=>!n.read);
-  // تعليم الكل كمقروء
   if(unread.length>0){ const all=await DB.get('notifications'); all.forEach(n=>{if(n.userId===currentUser.id)n.read=true;}); await DB.set('notifications',all); updateNotifBadge(); }
   openModal(`<div class="modal-header"><h3 class="modal-title">🔔 الإشعارات</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
     ${notifs.length===0?`<div class="empty-state"><div class="empty-state-icon">🔔</div><h3>لا إشعارات</h3></div>`:notifs.map(n=>`<div class="history-item" style="${n.read?'opacity:0.6':''}"><div class="history-info"><h4>${escapeHtml(n.title)}</h4><p>${escapeHtml(n.body)}</p><p style="font-size:11px;margin-top:4px;">${new Date(n.createdAt).toLocaleString('ar-EG')}</p></div></div>`).join('')}`);
@@ -540,9 +641,8 @@ async function exportResults() {
   if(attempts.length===0){alert('لا توجد نتائج للتصدير');return;}
   const rows=attempts.map(a=>{const quiz=quizzes.find(q=>q.id===a.quizId), student=users.find(u=>u.id===a.studentId); return {'الطالب':student?.name||'','الاختبار':quiz?.title||'','المادة':getSubjectName(quiz?.subject),'السنة':quiz?.grade||'','الدرجة':a.score,'الإجمالي':a.total,'النسبة %':Math.round((a.score/a.total)*100),'التاريخ':new Date(a.createdAt).toLocaleDateString('ar-EG')};});
   const ws=XLSX.utils.json_to_sheet(rows); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'النتائج'); XLSX.writeFile(wb,'نتائج_الطلاب.xlsx');
-  // PDF
   const {jsPDF}=window.jspdf; const doc=new jsPDF({orientation:'landscape'}); doc.setFontSize(16); doc.text('نتائج الطلاب',14,15);
-  doc.autoTable({head:[['الطالب','الاختبار','المادة','الدرجة','النسبة','التاريخ']],body:rows.map(r=>[r['الطالب'],r['الاختبار'],r['المادة'],`${r['الدرجة']}/${r['الإجمالي']}`,`${r['النسبة %']}%`,r['التاريخ']]),startY:25,styles:{font:'helvetica',fontSize:9},headStyles:{fillColor:[79,70,229]}});
+  doc.autoTable({head:[['الطالب','الاختبار','المادة','الدرجة','النسبة','التاريخ']],body:rows.map(r=>[r['الطالب'],r['الاختبار'],r['المادة'],`${r['الدرجة']}/${r['الإجمالي']}`,`${r['النسبة %']}%`,r['التاريخ']]),startY:25,styles:{fontSize:9},headStyles:{fillColor:[79,70,229]}});
   doc.save('نتائج_الطلاب.pdf');
 }
 async function exportStudents() {
@@ -619,7 +719,7 @@ async function saveQuiz(){
   if(!newQuizData.questions.length)return;
   const quiz={id:uid(),teacherId:currentUser.id,title:newQuizData.title,subject:newQuizData.subject,grade:newQuizData.grade,timePerQuestion:newQuizData.timePerQuestion,questions:newQuizData.questions,createdAt:Date.now()};
   const quizzes=await DB.get('quizzes'); quizzes.push(quiz); await DB.set('quizzes',quizzes);
-  await notifyStudents(quiz); // إشعار الطلاب
+  await notifyStudents(quiz);
   newQuizData=null; closeModal(); renderTeacherDashboard();
 }
 
@@ -687,10 +787,52 @@ async function finishQuiz() {
 function exitQuiz() { clearInterval(timerInterval); currentQuiz=null; currentAnswers=[]; currentQuestionIndex=0; selectedAnswerIndex=null; tfSelected=null; enterDashboard(); }
 
 /* ============================================================
-   ============ Start App ============
+   ============ بدء التطبيق ============
    ============================================================ */
-window.addEventListener('DOMContentLoaded', async () => { loadDarkMode(); await initFirebase(); const ok=await checkSession(); if(!ok)showScreen('auth'); });
+window.addEventListener('DOMContentLoaded', async () => {
+  loadDarkMode();
+  await initFirebase();
+  const ok = await checkSession();
+  if (!ok) showScreen('auth');
+});
 document.getElementById('modalOverlay').addEventListener('click', (e) => { if(e.target.id==='modalOverlay')closeModal(); });
+
+/* ============================================================
+   ============ إتاحة الدوال عالمياً (لأن type=module) ============
+   ============================================================ */
+window.switchAuthTab = switchAuthTab;
+window.pickRole = pickRole;
+window.handleRegister = handleRegister;
+window.handleLogin = handleLogin;
+window.logout = logout;
+window.toggleDarkMode = toggleDarkMode;
+window.openFirebaseConfig = openFirebaseConfig;
+window.applyFirebaseConfig = applyFirebaseConfig;
+window.clearFirebaseConfig = clearFirebaseConfig;
+window.openNotifications = openNotifications;
+window.closeModal = closeModal;
+window.openNewQuizModal = openNewQuizModal;
+window.continueToQuestions = continueToQuestions;
+window.showQuestionsEditor = showQuestionsEditor;
+window.openAddQuestionForm = openAddQuestionForm;
+window.changeQType = changeQType;
+window.pickTFAnswer = pickTFAnswer;
+window.handleImageUpload = handleImageUpload;
+window.clearImage = clearImage;
+window.addQuestion = addQuestion;
+window.removeQuestion = removeQuestion;
+window.saveQuiz = saveQuiz;
+window.openQuizManage = openQuizManage;
+window.deleteQuiz = deleteQuiz;
+window.startQuiz = startQuiz;
+window.selectMcqAnswer = selectMcqAnswer;
+window.selectTfAnswer = selectTfAnswer;
+window.onFillInput = onFillInput;
+window.onEssayInput = onEssayInput;
+window.nextQuizQuestion = nextQuizQuestion;
+window.exitQuiz = exitQuiz;
+window.exportResults = exportResults;
+window.exportStudents = exportStudents;
 </script>
 </body>
 </html>
