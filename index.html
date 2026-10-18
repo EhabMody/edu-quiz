@@ -148,8 +148,6 @@
   .option-btn { width: 100%; background: var(--card); border: 2px solid var(--border); padding: 16px 20px; border-radius: 12px; font-family: inherit; font-size: 15px; font-weight: 600; text-align: right; cursor: pointer; transition: all 0.2s; margin-bottom: 10px; display: flex; gap: 12px; align-items: center; color: var(--text); }
   .option-btn:hover { border-color: var(--primary); background: var(--primary-light); transform: translateX(-4px); }
   .option-btn.selected { background: var(--primary); border-color: var(--primary); color: #fff; }
-  .option-btn.shake { animation: shake 0.4s; }
-  @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 50% { transform: translateX(8px); } 75% { transform: translateX(-4px); } }
   .option-letter { width: 32px; height: 32px; border-radius: 8px; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0; }
   .option-btn.selected .option-letter { background: rgba(255,255,255,0.25); color: #fff; }
   .question-item { background: var(--bg); border-radius: 14px; padding: 16px; margin-bottom: 12px; border-right: 4px solid var(--primary); transition: all 0.2s; }
@@ -190,7 +188,6 @@
   .student-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: var(--bg); border-radius: 12px; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; transition: all 0.2s; }
   .student-row:hover { background: var(--primary-light); }
 
-  /* ===== التصحيح المقالي ===== */
   .grading-card { background: var(--card); border: 2px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
   .grading-question { font-size: 16px; font-weight: 800; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 2px solid var(--border); }
   .grading-answer { background: var(--info-light); padding: 16px; border-radius: 12px; margin-bottom: 16px; line-height: 1.7; color: var(--text); font-size: 14px; }
@@ -200,18 +197,15 @@
   .grade-chip:hover { border-color: var(--primary); transform: translateY(-2px); }
   .grade-chip.active { background: var(--primary); border-color: var(--primary); color: #fff; }
 
-  /* ===== Pending badge ===== */
   .pending-badge { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; background: var(--warning-light); color: var(--warning); border-radius: 10px; font-size: 12px; font-weight: 800; }
   .pending-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--warning); animation: blink 1.5s infinite; }
   @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-  /* ===== Loading Overlay ===== */
   .loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(2px); }
   .loading-overlay.active { display: flex; }
   .spinner { width: 48px; height: 48px; border: 4px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ===== Remember me / Forgot password ===== */
   .auth-options { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 8px; }
   .checkbox-label { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer; user-select: none; }
   .checkbox-label input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
@@ -219,11 +213,9 @@
   .link-btn:hover { opacity: 0.7; text-decoration: underline; }
   .link-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  /* ===== Divider ===== */
   .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: var(--text-light); font-size: 13px; font-weight: 700; }
   .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-  /* ===== Developer Footer ===== */
   .dev-footer { text-align: center; padding: 24px 20px 32px; font-size: 13px; color: var(--text-light); font-weight: 600; }
   .dev-footer .dev-brand { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; background: var(--card); border: 1px solid var(--border); border-radius: 999px; box-shadow: var(--shadow-sm); transition: all 0.2s; text-decoration: none; color: var(--text); }
   .dev-footer .dev-brand:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow); }
@@ -231,7 +223,6 @@
   body.dark-mode .dev-footer .dev-brand strong { color: var(--primary); }
   .dev-footer .dev-copy { margin-top: 12px; font-size: 11px; opacity: 0.7; }
 
-  /* ===== Leaderboard ===== */
   .leaderboard-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--bg); border-radius: 14px; margin-bottom: 10px; transition: all 0.2s; }
   .leaderboard-item:hover { transform: translateX(-4px); box-shadow: var(--shadow-sm); }
   .leaderboard-item.rank-1 { background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid var(--gold); }
@@ -249,7 +240,6 @@
   .leaderboard-info p { font-size: 13px; color: var(--text-light); font-weight: 600; }
   .leaderboard-score { font-size: 24px; font-weight: 900; color: var(--primary); }
 
-  /* ===== Confetti ===== */
   .confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 3000; overflow: hidden; }
   .confetti { position: absolute; width: 10px; height: 10px; background: var(--primary); animation: confettiFall 3s linear forwards; }
   @keyframes confettiFall {
@@ -257,13 +247,10 @@
     100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
   }
 
-  /* ===== Admin Badge ===== */
   .admin-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; background: linear-gradient(135deg, #f59e0b, #f97316); color: #fff; border-radius: 999px; font-size: 11px; font-weight: 900; box-shadow: 0 4px 10px rgba(245,158,11,0.4); }
 
-  /* ===== Edit Mode ===== */
   .edit-warning { background: var(--warning-light); border: 2px solid var(--warning); color: var(--warning); padding: 14px; border-radius: 12px; margin-bottom: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
 
-  /* ===== Broadcast notification ===== */
   .broadcast-option { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--bg); border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
   .broadcast-option:hover { border-color: var(--primary); }
   .broadcast-option input[type="radio"] { width: 20px; height: 20px; accent-color: var(--primary); }
@@ -279,10 +266,7 @@
 </head>
 <body>
 
-<!-- Loading overlay -->
 <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
-
-<!-- Confetti container -->
 <div class="confetti-container" id="confettiContainer"></div>
 
 <!-- ============= شاشة تسجيل الدخول ============= -->
@@ -416,7 +400,6 @@ const DEFAULT_FIREBASE_CONFIG = {
   appId: "1:777175350499:web:4ef115a9609f62da7959d6"
 };
 
-// ✅ بريد الأدمن - عدّله إلى بريدك الحقيقي
 const ADMIN_EMAIL = "admin@emaa.tech";
 
 /* ============================================================
@@ -483,7 +466,7 @@ async function initFirebase() {
 }
 
 /* ============================================================
-   ============ إدارة البيانات ============
+   ============ إدارة البيانات (محسّنة) ============
    ============================================================ */
 const DB = {
   _toArray(data) {
@@ -519,7 +502,7 @@ const DB = {
           try { localStorage.setItem('edu_' + key, JSON.stringify(arr)); } catch {}
           return arr;
         }
-      } catch (e) {}
+      } catch (e) { console.warn('FB get error:', e); }
     }
     return this._toArray(localData);
   },
@@ -529,16 +512,27 @@ const DB = {
     try { localStorage.setItem('edu_' + key, JSON.stringify(arr)); } catch {}
 
     if (firebaseEnabled && fbDB) {
-      try {
-        const asObject = {};
-        arr.forEach((item, idx) => {
-          if (!item) return;
-          const itemId = item.id || ('idx_' + idx + '_' + Date.now());
-          asObject[itemId] = item;
-        });
-        await fbDB.set(fbDB.ref(fbDB.db, key), asObject);
-      } catch (e) {}
+      let lastErr = null;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          const asObject = {};
+          arr.forEach((item, idx) => {
+            if (!item) return;
+            const itemId = item.id || ('idx_' + idx + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6));
+            asObject[itemId] = item;
+          });
+          await fbDB.set(fbDB.ref(fbDB.db, key), asObject);
+          return true;
+        } catch (e) {
+          lastErr = e;
+          console.warn(`DB.set attempt ${attempt}/3 failed:`, e.message);
+          await new Promise(r => setTimeout(r, 500 * attempt));
+        }
+      }
+      console.warn('DB.set failed after 3 attempts:', lastErr);
+      return false;
     }
+    return true;
   },
 
   subscribe(key, callback) {
@@ -550,6 +544,43 @@ const DB = {
     } catch (e) { return () => {}; }
   }
 };
+
+/* ============================================================
+   ============ ensureUserProfile ============
+   ============================================================ */
+async function ensureUserProfile(fbUser, existingProfile) {
+  if (existingProfile) return existingProfile;
+
+  const fallbackProfile = {
+    id: fbUser.uid,
+    email: fbUser.email,
+    name: fbUser.displayName || (fbUser.email || '').split('@')[0] || 'مستخدم',
+    role: 'student',
+    provider: fbUser.providerData && fbUser.providerData[0] ? fbUser.providerData[0].providerId : 'email',
+    photoURL: fbUser.photoURL || null,
+    createdAt: Date.now(),
+    needsProfileCompletion: true
+  };
+
+  if (fbUser.email && fbUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+    fallbackProfile.role = 'admin';
+    fallbackProfile.approved = true;
+    fallbackProfile.needsProfileCompletion = false;
+  }
+
+  try {
+    const users = await DB.get('users');
+    const alreadyExists = users.find(u => u.id === fbUser.uid || u.email === fbUser.email);
+    if (alreadyExists) return alreadyExists;
+    users.push(fallbackProfile);
+    const saved = await DB.set('users', users);
+    if (!saved) console.warn('تعذر حفظ الملف الشخصي في Firebase');
+  } catch (e) {
+    console.warn('ensureUserProfile save error:', e);
+  }
+
+  return fallbackProfile;
+}
 
 /* ============================================================
    ============ Loading ============
@@ -658,7 +689,7 @@ function isMobileDevice() {
 function isAdmin(user) { return user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase(); }
 
 /* ============================================================
-   ============ Session helpers ============
+   ============ Session ============
    ============================================================ */
 const SESSION_KEY = 'edu_session';
 const REMEMBER_KEY = 'edu_remember';
@@ -749,7 +780,6 @@ async function handleRegister(e) {
     profile.approved = false;
   }
 
-  // ✅ إذا كان البريد هو بريد الأدمن، اجعله أدمن معتمد
   if (email === ADMIN_EMAIL.toLowerCase()) {
     profile.role = 'admin';
     profile.approved = true;
@@ -757,15 +787,22 @@ async function handleRegister(e) {
 
   showLoading();
   try {
-    const users = await DB.get('users');
-    if (users.find(u => u.email === email)) { showAlert('هذا البريد مسجل بالفعل'); return; }
-
     if (firebaseAuthEnabled) {
       try {
         const cred = await fbAuth.createUserWithEmailAndPassword(fbAuth.auth, email, password);
         profile.id = cred.user.uid;
-        users.push(profile);
-        await DB.set('users', users);
+
+        const freshUsers = await DB.get('users');
+        if (freshUsers.find(u => u.email === email || u.id === profile.id)) {
+          showAlert('هذا البريد مسجل بالفعل'); return;
+        }
+        freshUsers.push(profile);
+
+        const saved = await DB.set('users', freshUsers);
+        if (!saved) {
+          showAlert('تم إنشاء الحساب لكن تعذر حفظ الملف الشخصي. تحقق من الإنترنت ثم أعد تسجيل الدخول.', 'warning');
+        }
+
         currentUser = profile;
         saveSession(profile.id, true);
         showAlert('تم إنشاء الحساب!', 'success');
@@ -783,6 +820,8 @@ async function handleRegister(e) {
       return;
     }
 
+    const users = await DB.get('users');
+    if (users.find(u => u.email === email)) { showAlert('هذا البريد مسجل بالفعل'); return; }
     profile.id = uid();
     profile.passwordHash = await hashPassword(password);
     users.push(profile);
@@ -810,19 +849,24 @@ async function handleLogin(e) {
         if (fbAuth.setPersistence) {
           try {
             await fbAuth.setPersistence(fbAuth.auth, remember ? fbAuth.browserLocalPersistence : fbAuth.browserSessionPersistence);
-          } catch (e) {}
+          } catch (e) { console.warn('setPersistence:', e); }
         }
         const cred = await fbAuth.signInWithEmailAndPassword(fbAuth.auth, email, password);
-        const users = await DB.get('users');
-        let user = users.find(u => u.id === cred.user.uid || u.email === email);
-        if (!user) { showAlert('الملف الشخصي غير موجود'); await fbAuth.signOut(fbAuth.auth); return; }
 
-        // ✅ تحويل تلقائي لأدمن إذا كان البريد يطابق ADMIN_EMAIL
+        const users = await DB.get('users');
+        let user = users.find(u => u.id === cred.user.uid) ||
+                   users.find(u => u.email && cred.user.email && u.email.toLowerCase() === cred.user.email.toLowerCase());
+
+        if (!user) {
+          user = await ensureUserProfile(cred.user, null);
+        }
+
         if (email === ADMIN_EMAIL.toLowerCase() && user.role !== 'admin') {
           user.role = 'admin';
           user.approved = true;
           const idx = users.findIndex(u => u.id === user.id);
-          if (idx >= 0) { users[idx] = user; await DB.set('users', users); }
+          if (idx >= 0) { users[idx] = user; } else { users.push(user); }
+          await DB.set('users', users);
         }
 
         currentUser = user;
@@ -833,7 +877,8 @@ async function handleLogin(e) {
           'auth/user-not-found': 'لا يوجد حساب بهذا البريد',
           'auth/wrong-password': 'كلمة المرور غير صحيحة',
           'auth/invalid-credential': 'بيانات الدخول غير صحيحة',
-          'auth/too-many-requests': 'محاولات كثيرة، حاول لاحقاً'
+          'auth/too-many-requests': 'محاولات كثيرة، حاول لاحقاً',
+          'auth/network-request-failed': 'تعذر الاتصال بالشبكة'
         };
         showAlert(msgs[err.code] || 'البريد أو كلمة المرور غير صحيحة');
       }
@@ -926,9 +971,8 @@ async function processGoogleUser(googleUser) {
   }
 
   const users = await DB.get('users');
-  let existing = users.find(u => u.id === googleUser.uid || u.email === googleUser.email);
+  let existing = users.find(u => u.id === googleUser.uid || (u.email && googleUser.email && u.email.toLowerCase() === googleUser.email.toLowerCase()));
 
-  // ✅ إذا كان البريد هو بريد الأدمن، اجعله أدمن
   if (googleUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
     if (existing) {
       existing.role = 'admin';
@@ -977,7 +1021,7 @@ async function handleGoogleRedirectResult() {
 }
 
 /* ============================================================
-   ============ Google Profile Completion ============
+   ============ Profile Completion (Google) ============
    ============================================================ */
 let googleSelectedRole = null;
 
@@ -1049,7 +1093,6 @@ async function completeGoogleProfile() {
     createdAt: Date.now()
   };
 
-  // ✅ إذا كان بريد الأدمن
   if (pendingGoogleUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
     profile.role = 'admin';
     profile.approved = true;
@@ -1086,6 +1129,77 @@ async function completeGoogleProfile() {
     showAlert('تم إنشاء الحساب بنجاح!', 'success');
     launchConfetti(50);
     setTimeout(() => enterDashboard(), 400);
+  } finally {
+    hideLoading();
+  }
+}
+
+/* ============================================================
+   ============ Profile Completion (Existing User) ============
+   ============================================================ */
+function openProfileCompletionForExisting() {
+  googleSelectedRole = null;
+  openModal(`<div class="modal-header"><h3 class="modal-title">👋 مرحباً ${escapeHtml(currentUser.name)}</h3></div>
+    <div class="alert alert-warning">لم نجد ملفك الشخصي الكامل. يرجى استكمال بياناتك.</div>
+    <div class="form-group">
+      <label class="form-label">أنا...</label>
+      <div class="role-picker">
+        <button type="button" class="role-option" id="gRoleTeacher" onclick="pickGoogleRole('teacher')"><div class="role-emoji">👨‍🏫</div><div class="role-label">مدرس</div></button>
+        <button type="button" class="role-option" id="gRoleStudent" onclick="pickGoogleRole('student')"><div class="role-emoji">👨‍🎓</div><div class="role-label">طالب</div></button>
+      </div>
+    </div>
+    <div id="gStudentFields" style="display:none;">
+      <div class="form-group"><label class="form-label">المدرسة التابع لها</label><input type="text" class="form-input" id="gSchool" placeholder="اسم المدرسة"></div>
+      <div class="form-group"><label class="form-label">المرحلة الدراسية</label><select class="form-select" id="gStage"><option value="">اختر المرحلة</option><option value="ابتدائي">ابتدائي</option><option value="إعدادي">إعدادي</option><option value="ثانوي">ثانوي</option></select></div>
+      <div class="form-group"><label class="form-label">السنة الدراسية</label><select class="form-select" id="gGrade"><option value="">اختر السنة</option></select></div>
+    </div>
+    <div id="gTeacherFields" style="display:none;">
+      <div class="form-group"><label class="form-label">المادة التي تدرّسها</label><select class="form-select" id="gSubject"><option value="">اختر المادة</option></select></div>
+    </div>
+    <button class="btn btn-success btn-full" onclick="saveExistingProfile()" style="margin-top:16px;">✅ حفظ البيانات</button>`);
+
+  setTimeout(() => {
+    const stageEl = document.getElementById('gStage');
+    if (stageEl) {
+      stageEl.addEventListener('change', function() {
+        document.getElementById('gGrade').innerHTML = '<option value="">اختر السنة</option>' +
+          (STAGES[this.value] || []).map(g => `<option value="${g}">${g}</option>`).join('');
+      });
+    }
+  }, 50);
+}
+
+async function saveExistingProfile() {
+  if (!googleSelectedRole) { alert('اختر دورك'); return; }
+  const updates = { role: googleSelectedRole, needsProfileCompletion: false };
+
+  if (googleSelectedRole === 'student') {
+    const school = document.getElementById('gSchool').value.trim();
+    const stage = document.getElementById('gStage').value;
+    const grade = document.getElementById('gGrade').value;
+    if (!school || !stage || !grade) { alert('أكمل جميع الحقول'); return; }
+    updates.school = school;
+    updates.stage = stage;
+    updates.grade = grade;
+  } else {
+    const subject = document.getElementById('gSubject').value;
+    if (!subject) { alert('اختر المادة'); return; }
+    updates.subject = subject;
+    updates.approved = false;
+  }
+
+  showLoading();
+  try {
+    const users = await DB.get('users');
+    const idx = users.findIndex(u => u.id === currentUser.id);
+    if (idx >= 0) {
+      users[idx] = { ...users[idx], ...updates };
+      await DB.set('users', users);
+      currentUser = users[idx];
+      closeModal();
+      launchConfetti(30);
+      enterDashboard();
+    }
   } finally {
     hideLoading();
   }
@@ -1134,6 +1248,9 @@ async function logout() {
   document.getElementById('rememberMe').checked = false;
 }
 
+/* ============================================================
+   ============ checkSession (محسّن) ============
+   ============================================================ */
 async function checkSession() {
   await handleGoogleRedirectResult();
   if (isProcessingRedirect) return false;
@@ -1145,39 +1262,46 @@ async function checkSession() {
         if (resolved) return;
         resolved = true;
         unsub();
+
         if (user) {
           try {
             const users = await DB.get('users');
-            let profile = users.find(u => u.id === user.uid || u.email === user.email);
+            let profile = users.find(u => u.id === user.uid) ||
+                          users.find(u => u.email && user.email && u.email.toLowerCase() === user.email.toLowerCase());
 
-            // ✅ ترقية تلقائية للأدمن
-            if (profile && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() && profile.role !== 'admin') {
+            if (!profile) {
+              console.log('🔄 لم يُعثر على ملف شخصي، إنشاء تلقائي...');
+              profile = await ensureUserProfile(user, null);
+              if (!profile) {
+                showAlert('تعذر إنشاء الملف الشخصي. تحقق من اتصال الإنترنت.', 'error');
+                resolve(false);
+                return;
+              }
+            }
+
+            if (user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() && profile.role !== 'admin') {
               profile.role = 'admin';
               profile.approved = true;
               const idx = users.findIndex(u => u.id === profile.id);
-              if (idx >= 0) { users[idx] = profile; await DB.set('users', users); }
+              if (idx >= 0) { users[idx] = profile; } else { users.push(profile); }
+              await DB.set('users', users);
             }
 
-            if (profile) { currentUser = profile; enterDashboard(); resolve(true); return; }
-            if (user.providerData && user.providerData.some(p => p.providerId === 'google.com')) {
-              pendingGoogleUser = {
-                id: user.uid,
-                email: user.email,
-                name: user.displayName || user.email.split('@')[0],
-                photoURL: user.photoURL || null,
-                provider: 'google'
-              };
-              setTimeout(() => openProfileCompletionModal(), 300);
-              resolve(false);
-              return;
-            }
-          } catch (e) {}
+            currentUser = profile;
+            saveSession(profile.id, true);
+            enterDashboard();
+            resolve(true);
+            return;
+          } catch (e) {
+            console.error('checkSession error:', e);
+          }
         }
         resolve(false);
       });
-      setTimeout(() => { if (!resolved) { resolved = true; resolve(false); } }, 5000);
+      setTimeout(() => { if (!resolved) { resolved = true; resolve(false); } }, 8000);
     });
   }
+
   const id = getSessionUserId();
   if (!id) return false;
   const users = await DB.get('users');
@@ -1194,13 +1318,16 @@ function enterDashboard() {
   updateHeader();
   updateNotifBadge();
   startNotificationsListener();
+
+  if (currentUser.needsProfileCompletion && !isAdmin(currentUser)) {
+    setTimeout(() => openProfileCompletionForExisting(), 500);
+    return;
+  }
+
   if (isAdmin(currentUser)) renderAdminDashboard();
   else if (currentUser.role === 'teacher') {
-    if (currentUser.approved === false) {
-      renderPendingTeacherDashboard();
-    } else {
-      renderTeacherDashboard();
-    }
+    if (currentUser.approved === false) renderPendingTeacherDashboard();
+    else renderTeacherDashboard();
   } else renderStudentDashboard();
 }
 
@@ -1215,7 +1342,7 @@ function updateHeader() {
   let meta = '';
   if (isAdmin(currentUser)) meta = '👑 مدير المنصة';
   else if (currentUser.role === 'teacher') meta = `مدرس • ${getSubjectName(currentUser.subject)}${currentUser.approved === false ? ' • ⏳ بانتظار الاعتماد' : ''}`;
-  else meta = `طالب • ${currentUser.grade}${currentUser.school ? ' • ' + currentUser.school : ''}`;
+  else meta = `طالب • ${currentUser.grade || ''}${currentUser.school ? ' • ' + currentUser.school : ''}`;
   document.getElementById('userMeta').textContent = meta;
 }
 
@@ -1262,7 +1389,6 @@ async function renderAdminDashboard() {
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
             <div>
               <h3 style="font-size:18px; font-weight:900; color:var(--warning); margin-bottom:4px;">⏳ ${pendingTeachers.length} مدرس بانتظار الاعتماد</h3>
-              <p style="font-size:13px; color:var(--text-light); font-weight:600;">يجب اعتمادهم قبل أن يتمكنوا من استخدام المنصة</p>
             </div>
             <button class="btn btn-primary" onclick="openPendingTeachers()">👀 مراجعة</button>
           </div>
@@ -1274,7 +1400,7 @@ async function renderAdminDashboard() {
       </div>
 
       <div class="card" style="max-height:500px; overflow-y:auto;">
-        ${allUsers.sort((a,b) => b.createdAt - a.createdAt).map(u => `
+        ${allUsers.sort((a,b) => (b.createdAt||0) - (a.createdAt||0)).map(u => `
           <div class="student-row">
             <div class="student-info">
               <h4>${escapeHtml(u.name)} ${isAdmin(u) ? '<span class="admin-badge">👑 أدمن</span>' : ''} ${u.approved === false ? '<span class="badge badge-warning">⏳ معلق</span>' : ''}</h4>
@@ -1327,7 +1453,6 @@ async function approveTeacher(userId) {
       users[idx].approved = true;
       await DB.set('users', users);
 
-      // إشعار للمدرس
       const notifs = await DB.get('notifications');
       notifs.push({
         id: uid(),
@@ -1533,7 +1658,6 @@ function renderLeaderboard(users, attempts, mode) {
       if (!bySchool[key]) bySchool[key] = [];
       bySchool[key].push(s);
     });
-    // نعرض أفضل 5 مدارس بمتوسط درجاتها
     const schools = Object.entries(bySchool).map(([school, list]) => ({
       school,
       avg: Math.round(list.reduce((a, b) => a + b.avg, 0) / list.length),
@@ -1571,7 +1695,7 @@ function renderLeaderboard(users, attempts, mode) {
 }
 
 /* ============================================================
-   ============ Broadcast Notification ============
+   ============ Broadcast ============
    ============================================================ */
 function openBroadcastModal() {
   openModal(`<div class="modal-header"><h3 class="modal-title">📢 إشعار جماعي</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
@@ -1638,7 +1762,7 @@ async function sendBroadcast() {
 }
 
 /* ============================================================
-   ============ Quiz Management ============
+   ============ Attempts List ============
    ============================================================ */
 async function renderAttemptsList(attempts) {
   if (!attempts.length) return '<div class="card"><div class="empty-state"><h3>لا نتائج</h3></div></div>';
@@ -1684,7 +1808,7 @@ async function renderStudentDashboard() {
         <div class="stat-card"><div class="stat-icon warning">📊</div><div class="stat-info"><h4>${calculateAvg(myAttempts)}%</h4><p>متوسطك</p></div></div>
       </div>
       <div class="chart-container"><canvas id="studentChart"></canvas></div>
-      <div class="section-header"><div><h2 class="section-title">الاختبارات المتاحة</h2><p class="section-subtitle">${escapeHtml(currentUser.grade)} • ${escapeHtml(currentUser.stage)}${currentUser.school ? ' • ' + escapeHtml(currentUser.school) : ''}</p></div></div>
+      <div class="section-header"><div><h2 class="section-title">الاختبارات المتاحة</h2><p class="section-subtitle">${escapeHtml(currentUser.grade || '')} • ${escapeHtml(currentUser.stage || '')}${currentUser.school ? ' • ' + escapeHtml(currentUser.school) : ''}</p></div></div>
       ${myQuizzes.length === 0 ? `<div class="card"><div class="empty-state"><div class="empty-state-icon">📚</div><h3>لا اختبارات</h3></div></div>` : `<div class="cards-grid">${myQuizzes.map(q => renderStudentQuizCard(q, myAttempts)).join('')}</div>`}
       <div class="section-header" style="margin-top:32px;">
         <div><h2 class="section-title">🏆 لوحة الشرف</h2><p class="section-subtitle">ترتيبك بين زملائك</p></div>
@@ -2036,7 +2160,7 @@ function openModal(html) { document.getElementById('modalBox').innerHTML = html;
 function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
 
 /* ============================================================
-   ============ New Quiz ============
+   ============ New Quiz / Edit Quiz ============
    ============================================================ */
 function openNewQuizModal() {
   editingQuizId = null;
@@ -2143,10 +2267,8 @@ async function saveQuiz() {
   try {
     const quizzes = await DB.get('quizzes');
     if (editingQuizId) {
-      // ✅ تعديل اختبار موجود
       const idx = quizzes.findIndex(q => q.id === editingQuizId);
       if (idx >= 0) {
-        // التحقق من وجود محاولات
         const attempts = await DB.get('attempts');
         const hasAttempts = attempts.some(a => a.quizId === editingQuizId);
         if (hasAttempts) {
@@ -2165,7 +2287,6 @@ async function saveQuiz() {
         };
         await DB.set('quizzes', quizzes);
 
-        // إشعار للطلاب
         const users = await DB.get('users');
         const students = users.filter(u => u.role === 'student' && u.grade === newQuizData.grade);
         const notifs = await DB.get('notifications');
@@ -2181,7 +2302,6 @@ async function saveQuiz() {
         launchConfetti(30);
       }
     } else {
-      // ✅ إنشاء اختبار جديد
       const quiz = {
         id: uid(), teacherId: currentUser.id, title: newQuizData.title, subject: newQuizData.subject,
         grade: newQuizData.grade, timePerQuestion: newQuizData.timePerQuestion,
@@ -2200,7 +2320,7 @@ async function saveQuiz() {
 }
 
 /* ============================================================
-   ============ Manage Quiz (with Edit) ============
+   ============ Manage Quiz ============
    ============================================================ */
 async function openQuizManage(quizId) {
   showLoading();
@@ -2481,7 +2601,8 @@ const globalFns = [
   openQuizManage, editQuiz, deleteQuiz, startQuiz, selectMcqAnswer, selectTfAnswer, onFillInput, onEssayInput,
   nextQuizQuestion, exitQuiz, exportResults, exportStudents, openGradingCenter, openGradingAttempt,
   setEssayGrade, finalizeGrading, pickGoogleRole, completeGoogleProfile, cancelGoogleProfile,
-  openPendingTeachers, approveTeacher, deleteUser, openBroadcastModal, sendBroadcast
+  openPendingTeachers, approveTeacher, deleteUser, openBroadcastModal, sendBroadcast,
+  saveExistingProfile
 ];
 globalFns.forEach(fn => { try { window[fn.name] = fn; } catch(e) {} });
 </script>
