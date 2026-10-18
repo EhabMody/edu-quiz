@@ -376,6 +376,7 @@ let fbApp = null, fbDB = null, fbAuth = null, firebaseEnabled = false, firebaseA
 let FB = {};
 let pendingGoogleUser = null;
 let notifUnsubscribe = null;
+let isProcessingRedirect = false;
 
 function loadFirebaseConfig() {
   try {
@@ -419,7 +420,9 @@ async function initFirebase() {
         browserLocalPersistence: authMod.browserLocalPersistence,
         browserSessionPersistence: authMod.browserSessionPersistence,
         GoogleAuthProvider: authMod.GoogleAuthProvider,
-        signInWithPopup: authMod.signInWithPopup
+        signInWithPopup: authMod.signInWithPopup,
+        signInWithRedirect: authMod.signInWithRedirect,
+        getRedirectResult: authMod.getRedirectResult
       };
       firebaseAuthEnabled = true;
       console.log('✅ Firebase + Auth متصل');
@@ -584,7 +587,7 @@ const QUESTION_TYPES = {
    ============================================================ */
 let currentUser = null, currentQuiz = null, currentQuestionIndex = 0, currentAnswers = [];
 let selectedAnswerIndex = null, timerInterval = null, timeLeft = 0;
-let selectedRole = 'student'; // افتراضي: طالب
+let selectedRole = 'student';
 let selectedQuestionType = 'mcq', tfAnswer = true, uploadedImageData = null, tfSelected = null, newQuizData = null;
 
 /* ============================================================
@@ -597,6 +600,10 @@ function getSubjectName(id) { const s = SUBJECTS.find(x=>x.id===id); return s?s.
 function showAlert(msg, type='error') { const b = document.getElementById('authAlert'); b.innerHTML = `<div class="alert alert-${type}">${escapeHtml(msg)}</div>`; setTimeout(()=>{b.innerHTML='';},5000); }
 function showScreen(name) { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(name+'Screen').classList.add('active'); window.scrollTo(0,0); }
 function calculateAvg(attempts) { if(!attempts.length) return 0; return Math.round(attempts.reduce((a,x)=>a+(x.score/x.total)*100,0)/attempts.length); }
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+         (navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && /Macintosh/.test(navigator.userAgent));
+}
 
 /* ============================================================
    ============ Session helpers (تذكرني) ============
@@ -674,7 +681,6 @@ function switchAuthTab(tab) {
   document.getElementById('registerForm').style.display=tab==='register'?'block':'none';
   document.getElementById('authAlert').innerHTML='';
 
-  // ✅ عند فتح تبويب "حساب جديد"، اعرض حقول الطالب افتراضياً
   if (tab === 'register') {
     if (!selectedRole) {
       pickRole('student');
@@ -821,7 +827,7 @@ async function handleLogin(e) {
 }
 
 /* ============================================================
-   ============ تسجيل الدخول بـ Google ============
+   ============ تسجيل الدخول بـ Google (يدعم الهاتف) ============
    ============================================================ */
 async function handleGoogleSignIn() {
   if (!firebaseAuthEnabled) {
@@ -832,52 +838,108 @@ async function handleGoogleSignIn() {
   const btn = document.getElementById('googleBtn');
   const originalHTML = btn.innerHTML;
   btn.disabled = true;
-  btn.innerHTML = '<span>جارٍ الاتصال بـ Google...</span>';
 
   try {
     const provider = new fbAuth.GoogleAuthProvider();
     provider.addScope('email');
     provider.addScope('profile');
 
-    const result = await fbAuth.signInWithPopup(fbAuth.auth, provider);
-    const googleUser = result.user;
-
-    if (!googleUser || !googleUser.email) {
-      showAlert('تعذر الحصول على بيانات Google. حاول مرة أخرى.');
+    // ✅ على الهاتف: استخدم signInWithRedirect (أكثر توافقاً)
+    if (isMobileDevice()) {
+      btn.innerHTML = '<span>جارٍ التحويل إلى Google...</span>';
+      try {
+        // نحفظ علامة لمعرفة أن العملية قادمة من Redirect
+        sessionStorage.setItem('edu_google_redirect', '1');
+        await fbAuth.signInWithRedirect(fbAuth.auth, provider);
+      } catch (err) {
+        const msgs = {
+          'auth/operation-not-allowed': 'تسجيل الدخول بـ Google غير مفعّل في Firebase Console',
+          'auth/unauthorized-domain': 'هذا النطاق غير مصرح به في Firebase. أضفه إلى Authorized domains',
+          'auth/network-request-failed': 'تعذر الاتصال بالشبكة'
+        };
+        showAlert(msgs[err.code] || 'تعذر التحويل: ' + (err.message || 'خطأ'));
+        sessionStorage.removeItem('edu_google_redirect');
+      }
       return;
     }
 
-    const users = await DB.get('users');
-    const existing = users.find(u => u.id === googleUser.uid || u.email === googleUser.email);
-
-    if (existing) {
-      currentUser = existing;
-      saveSession(existing.id, true);
-      showAlert(`مرحباً ${existing.name}!`, 'success');
-      setTimeout(() => enterDashboard(), 400);
-    } else {
-      pendingGoogleUser = {
-        id: googleUser.uid,
-        email: googleUser.email,
-        name: googleUser.displayName || googleUser.email.split('@')[0],
-        photoURL: googleUser.photoURL || null,
-        provider: 'google'
+    // ✅ على الحاسوب: استخدم signInWithPopup
+    btn.innerHTML = '<span>جارٍ الاتصال بـ Google...</span>';
+    try {
+      const result = await fbAuth.signInWithPopup(fbAuth.auth, provider);
+      await processGoogleUser(result.user);
+    } catch (err) {
+      const msgs = {
+        'auth/popup-closed-by-user': 'تم إغلاق نافذة Google قبل الإكمال',
+        'auth/popup-blocked': 'المتصفح منع النافذة المنبثقة. اسمح بها وحاول مجدداً',
+        'auth/cancelled-popup-request': 'تم إلغاء الطلب',
+        'auth/operation-not-allowed': 'تسجيل الدخول بـ Google غير مفعّل في Firebase Console',
+        'auth/unauthorized-domain': 'هذا النطاق غير مصرح به في Firebase. أضفه إلى Authorized domains',
+        'auth/network-request-failed': 'تعذر الاتصال بالشبكة'
       };
-      openProfileCompletionModal();
+      showAlert(msgs[err.code] || 'تعذر تسجيل الدخول بـ Google: ' + (err.message || 'خطأ'));
     }
-  } catch (err) {
-    const msgs = {
-      'auth/popup-closed-by-user': 'تم إغلاق نافذة Google قبل الإكمال',
-      'auth/popup-blocked': 'المتصفح منع النافذة المنبثقة. اسمح بها وحاول مجدداً',
-      'auth/cancelled-popup-request': 'تم إلغاء الطلب',
-      'auth/operation-not-allowed': 'تسجيل الدخول بـ Google غير مفعّل في Firebase Console',
-      'auth/unauthorized-domain': 'هذا النطاق غير مصرح به في Firebase. أضفه إلى Authorized domains',
-      'auth/network-request-failed': 'تعذر الاتصال بالشبكة'
-    };
-    showAlert(msgs[err.code] || 'تعذر تسجيل الدخول بـ Google: ' + (err.message || 'خطأ'));
   } finally {
     btn.disabled = false;
     btn.innerHTML = originalHTML;
+  }
+}
+
+// معالجة نتيجة Google (سواء من popup أو redirect)
+async function processGoogleUser(googleUser) {
+  if (!googleUser || !googleUser.email) {
+    showAlert('تعذر الحصول على بيانات Google. حاول مرة أخرى.');
+    return;
+  }
+
+  const users = await DB.get('users');
+  const existing = users.find(u => u.id === googleUser.uid || u.email === googleUser.email);
+
+  if (existing) {
+    currentUser = existing;
+    saveSession(existing.id, true);
+    showAlert(`مرحباً ${existing.name}!`, 'success');
+    setTimeout(() => enterDashboard(), 400);
+  } else {
+    pendingGoogleUser = {
+      id: googleUser.uid,
+      email: googleUser.email,
+      name: googleUser.displayName || googleUser.email.split('@')[0],
+      photoURL: googleUser.photoURL || null,
+      provider: 'google'
+    };
+    openProfileCompletionModal();
+  }
+}
+
+// ✅ معالجة نتيجة الـ Redirect (تعمل عند تحميل الصفحة بعد عودة Google)
+async function handleGoogleRedirectResult() {
+  if (!firebaseAuthEnabled || !fbAuth.getRedirectResult) return;
+  // نتحقق فقط إذا كنا عائدين من redirect
+  if (sessionStorage.getItem('edu_google_redirect') !== '1') return;
+
+  isProcessingRedirect = true;
+  showLoading();
+  try {
+    const result = await fbAuth.getRedirectResult(fbAuth.auth);
+    sessionStorage.removeItem('edu_google_redirect');
+
+    if (result && result.user) {
+      await processGoogleUser(result.user);
+    }
+    // لا نعرض خطأ إذا لم توجد نتيجة (المستخدم قد يكون أغلق الصفحة)
+  } catch (err) {
+    sessionStorage.removeItem('edu_google_redirect');
+    const msgs = {
+      'auth/operation-not-allowed': 'تسجيل الدخول بـ Google غير مفعّل في Firebase Console',
+      'auth/unauthorized-domain': 'هذا النطاق غير مصرح به في Firebase. أضفه إلى Authorized domains',
+      'auth/network-request-failed': 'تعذر الاتصال بالشبكة',
+      'auth/account-exists-with-different-credential': 'يوجد حساب بهذا البريد بطريقة تسجيل مختلفة'
+    };
+    showAlert(msgs[err.code] || 'تعذر إكمال تسجيل الدخول: ' + (err.message || 'خطأ'));
+  } finally {
+    hideLoading();
+    isProcessingRedirect = false;
   }
 }
 
@@ -1047,6 +1109,12 @@ async function logout() {
 }
 
 async function checkSession() {
+  // ✅ أولاً: معالجة نتيجة Google Redirect (إن وجدت)
+  await handleGoogleRedirectResult();
+
+  // إذا كنا عائدين من redirect ولم يكتمل بعد، لا نكمل الفحص العادي
+  if (isProcessingRedirect) return false;
+
   if (firebaseAuthEnabled && fbAuth) {
     return new Promise((resolve) => {
       let resolved = false;
