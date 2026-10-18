@@ -287,10 +287,10 @@
           <label class="form-label">أنا...</label>
           <div class="role-picker">
             <button type="button" class="role-option" data-role="teacher" onclick="pickRole('teacher')"><div class="role-emoji">👨‍🏫</div><div class="role-label">مدرس</div></button>
-            <button type="button" class="role-option" data-role="student" onclick="pickRole('student')"><div class="role-emoji">👨‍🎓</div><div class="role-label">طالب</div></button>
+            <button type="button" class="role-option active" data-role="student" onclick="pickRole('student')"><div class="role-emoji">👨‍🎓</div><div class="role-label">طالب</div></button>
           </div>
         </div>
-        <div id="studentFields" style="display:none;">
+        <div id="studentFields">
           <div class="form-group"><label class="form-label">المدرسة التابع لها</label><input type="text" class="form-input" id="regSchool" placeholder="اسم المدرسة"></div>
           <div class="form-group"><label class="form-label">المرحلة الدراسية</label><select class="form-select" id="regStage"><option value="">اختر المرحلة</option><option value="ابتدائي">ابتدائي</option><option value="إعدادي">إعدادي</option><option value="ثانوي">ثانوي</option></select></div>
           <div class="form-group"><label class="form-label">السنة الدراسية</label><select class="form-select" id="regGrade"><option value="">اختر السنة</option></select></div>
@@ -374,7 +374,8 @@ const DEFAULT_FIREBASE_CONFIG = {
    ============================================================ */
 let fbApp = null, fbDB = null, fbAuth = null, firebaseEnabled = false, firebaseAuthEnabled = false;
 let FB = {};
-let pendingGoogleUser = null; // لانتظار إكمال الملف الشخصي
+let pendingGoogleUser = null;
+let notifUnsubscribe = null;
 
 function loadFirebaseConfig() {
   try {
@@ -394,7 +395,14 @@ async function initFirebase() {
     const dbMod = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
     FB = { ...appMod, ...dbMod };
     fbApp = appMod.initializeApp(config);
-    fbDB = { db: dbMod.getDatabase(fbApp), ref: dbMod.ref, set: dbMod.set, get: dbMod.get, onValue: dbMod.onValue };
+    fbDB = {
+      db: dbMod.getDatabase(fbApp),
+      ref: dbMod.ref,
+      set: dbMod.set,
+      get: dbMod.get,
+      onValue: dbMod.onValue,
+      off: dbMod.off
+    };
     firebaseEnabled = true;
 
     try {
@@ -436,31 +444,75 @@ function updateFirebaseStatus(error) {
 }
 
 /* ============================================================
-   ============ إدارة البيانات ============
+   ============ إدارة البيانات (محسّنة لـ Firebase) ============
    ============================================================ */
 const DB = {
+  _toArray(data) {
+    if (!data) return [];
+    if (Array.isArray(data)) return data.filter(x => x !== null && x !== undefined);
+    if (typeof data === 'object') {
+      return Object.keys(data)
+        .filter(k => data[k] !== null && data[k] !== undefined)
+        .map(k => {
+          const item = data[k];
+          if (item && typeof item === 'object' && !item.id) {
+            return { ...item, id: isNaN(k) ? k : item.id || k };
+          }
+          return item;
+        });
+    }
+    return [];
+  },
+
   async get(key, defaultValue = []) {
     let localData = defaultValue;
-    try { const d = localStorage.getItem('edu_' + key); localData = d ? JSON.parse(d) : defaultValue; } catch {}
+    try {
+      const d = localStorage.getItem('edu_' + key);
+      if (d) localData = JSON.parse(d);
+    } catch {}
+
     if (firebaseEnabled && fbDB) {
       try {
         const snapshot = await fbDB.get(fbDB.ref(fbDB.db, key));
         const remoteData = snapshot.val();
         if (remoteData) {
-          if (Array.isArray(remoteData)) return remoteData;
-          if (typeof remoteData === 'object') {
-            const keys = Object.keys(remoteData).filter(k => remoteData[k] !== null && remoteData[k] !== undefined);
-            return keys.map(k => remoteData[k]);
-          }
+          const arr = this._toArray(remoteData);
+          try { localStorage.setItem('edu_' + key, JSON.stringify(arr)); } catch {}
+          return arr;
         }
-      } catch (e) { console.warn('FB get:', e); }
+      } catch (e) { console.warn('FB get error:', e); }
     }
-    return localData;
+    return this._toArray(localData);
   },
+
   async set(key, value) {
-    localStorage.setItem('edu_' + key, JSON.stringify(value));
+    const arr = Array.isArray(value) ? value : this._toArray(value);
+    try { localStorage.setItem('edu_' + key, JSON.stringify(arr)); } catch {}
+
     if (firebaseEnabled && fbDB) {
-      try { await fbDB.set(fbDB.ref(fbDB.db, key), value); } catch (e) { console.warn('FB set:', e); }
+      try {
+        const asObject = {};
+        arr.forEach((item, idx) => {
+          if (!item) return;
+          const itemId = item.id || ('idx_' + idx + '_' + Date.now());
+          asObject[itemId] = item;
+        });
+        await fbDB.set(fbDB.ref(fbDB.db, key), asObject);
+      } catch (e) { console.warn('FB set error:', e); }
+    }
+  },
+
+  subscribe(key, callback) {
+    if (!firebaseEnabled || !fbDB) return () => {};
+    try {
+      const unsub = fbDB.onValue(fbDB.ref(fbDB.db, key), (snapshot) => {
+        const data = snapshot.val();
+        callback(DB._toArray(data));
+      });
+      return unsub;
+    } catch (e) {
+      console.warn('FB subscribe error:', e);
+      return () => {};
     }
   }
 };
@@ -532,7 +584,8 @@ const QUESTION_TYPES = {
    ============================================================ */
 let currentUser = null, currentQuiz = null, currentQuestionIndex = 0, currentAnswers = [];
 let selectedAnswerIndex = null, timerInterval = null, timeLeft = 0;
-let selectedRole = null, selectedQuestionType = 'mcq', tfAnswer = true, uploadedImageData = null, tfSelected = null, newQuizData = null;
+let selectedRole = 'student'; // افتراضي: طالب
+let selectedQuestionType = 'mcq', tfAnswer = true, uploadedImageData = null, tfSelected = null, newQuizData = null;
 
 /* ============================================================
    ============ أدوات ============
@@ -620,11 +673,21 @@ function switchAuthTab(tab) {
   document.getElementById('loginForm').style.display=tab==='login'?'block':'none';
   document.getElementById('registerForm').style.display=tab==='register'?'block':'none';
   document.getElementById('authAlert').innerHTML='';
+
+  // ✅ عند فتح تبويب "حساب جديد"، اعرض حقول الطالب افتراضياً
+  if (tab === 'register') {
+    if (!selectedRole) {
+      pickRole('student');
+    } else {
+      pickRole(selectedRole);
+    }
+  }
 }
 function pickRole(role) {
   selectedRole = role;
   document.querySelectorAll('.role-option').forEach(o => o.classList.remove('active'));
-  document.querySelector(`.role-option[data-role="${role}"]`).classList.add('active');
+  const activeEl = document.querySelector(`.role-option[data-role="${role}"]`);
+  if (activeEl) activeEl.classList.add('active');
 
   const studentFields = document.getElementById('studentFields');
   const teacherFields = document.getElementById('teacherFields');
@@ -773,7 +836,6 @@ async function handleGoogleSignIn() {
 
   try {
     const provider = new fbAuth.GoogleAuthProvider();
-    // إضافة scope للبريد والملف الشخصي
     provider.addScope('email');
     provider.addScope('profile');
 
@@ -789,13 +851,11 @@ async function handleGoogleSignIn() {
     const existing = users.find(u => u.id === googleUser.uid || u.email === googleUser.email);
 
     if (existing) {
-      // حساب موجود مسبقاً → دخول مباشر
       currentUser = existing;
       saveSession(existing.id, true);
       showAlert(`مرحباً ${existing.name}!`, 'success');
       setTimeout(() => enterDashboard(), 400);
     } else {
-      // حساب جديد → نطلب إكمال الملف الشخصي
       pendingGoogleUser = {
         id: googleUser.uid,
         email: googleUser.email,
@@ -850,7 +910,6 @@ function openProfileCompletionModal() {
       <button class="btn btn-success" onclick="completeGoogleProfile()" style="flex:2;">✅ إكمال الحساب</button>
     </div>`);
 
-  // ربط تغيير المرحلة
   setTimeout(() => {
     const stageEl = document.getElementById('gStage');
     if (stageEl) {
@@ -912,7 +971,6 @@ async function completeGoogleProfile() {
   showLoading();
   try {
     const users = await DB.get('users');
-    // تأكد مرة أخرى ألا يوجد تكرار
     if (users.find(u => u.id === profile.id || u.email === profile.email)) {
       alert('هذا الحساب موجود بالفعل'); return;
     }
@@ -978,6 +1036,7 @@ async function handleForgotPassword() {
 }
 
 async function logout() {
+  stopNotificationsListener();
   if (firebaseAuthEnabled && fbAuth) { try { await fbAuth.signOut(fbAuth.auth); } catch {} }
   currentUser = null;
   clearSession();
@@ -1000,7 +1059,6 @@ async function checkSession() {
             const users = await DB.get('users');
             const profile = users.find(u => u.id === user.uid || u.email === user.email);
             if (profile) { currentUser = profile; enterDashboard(); resolve(true); return; }
-            // حساب Google لكن لم يكمل الملف — نعرض له المودال
             if (user.providerData && user.providerData.some(p => p.providerId === 'google.com')) {
               pendingGoogleUser = {
                 id: user.uid,
@@ -1009,7 +1067,6 @@ async function checkSession() {
                 photoURL: user.photoURL || null,
                 provider: 'google'
               };
-              // انتظر حتى يُفتح المودال
               setTimeout(() => openProfileCompletionModal(), 300);
               resolve(false);
               return;
@@ -1036,6 +1093,7 @@ function enterDashboard() {
   showScreen('dashboard');
   updateHeader();
   updateNotifBadge();
+  startNotificationsListener();
   if (currentUser.role === 'teacher') renderTeacherDashboard();
   else renderStudentDashboard();
 }
@@ -1093,6 +1151,7 @@ async function renderTeacherDashboard() {
       <div class="section-header">
         <div><h2 class="section-title">اختباراتي</h2><p class="section-subtitle">إدارة الاختبارات</p></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-outline btn-sm" onclick="renderTeacherDashboard()">🔄 تحديث</button>
           <button class="btn btn-outline btn-sm" onclick="exportResults()">📥 تصدير النتائج</button>
           <button class="btn btn-primary" onclick="openNewQuizModal()">➕ اختبار جديد</button>
         </div>
@@ -1302,8 +1361,35 @@ async function updateNotifBadge() {
   const notifs = await DB.get('notifications');
   const my = notifs.filter(n => n.userId === currentUser.id && !n.read);
   const badge = document.getElementById('notifBadge');
-  if (badge) { badge.style.display = my.length > 0 ? 'flex' : 'none'; badge.textContent = my.length; }
+  if (badge) {
+    badge.style.display = my.length > 0 ? 'flex' : 'none';
+    badge.textContent = my.length;
+  }
 }
+
+function startNotificationsListener() {
+  stopNotificationsListener();
+  if (!firebaseEnabled) return;
+  try {
+    notifUnsubscribe = DB.subscribe('notifications', (notifs) => {
+      if (!currentUser) return;
+      const my = notifs.filter(n => n.userId === currentUser.id && !n.read);
+      const badge = document.getElementById('notifBadge');
+      if (badge) {
+        badge.style.display = my.length > 0 ? 'flex' : 'none';
+        badge.textContent = my.length;
+      }
+    });
+  } catch (e) { console.warn('notif listener:', e); }
+}
+
+function stopNotificationsListener() {
+  if (notifUnsubscribe) {
+    try { notifUnsubscribe(); } catch {}
+    notifUnsubscribe = null;
+  }
+}
+
 async function openNotifications() {
   const notifs = (await DB.get('notifications')).filter(n => n.userId === currentUser.id).sort((a,b) => b.createdAt - a.createdAt);
   const unread = notifs.filter(n => !n.read);
