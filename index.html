@@ -71,14 +71,20 @@
   .role-label { font-size: 15px; font-weight: 700; color: var(--text); }
   .role-option.active .role-label { color: var(--primary); }
   .btn { padding: 14px 24px; border-radius: 12px; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
   .btn-full { width: 100%; } .btn-lg { padding: 16px 28px; font-size: 16px; } .btn-sm { padding: 10px 16px; font-size: 13px; }
   .btn-primary { background: var(--primary); color: #fff; }
-  .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(79,70,229,0.3); }
-  .btn-success { background: var(--success); color: #fff; } .btn-success:hover { background: #059669; transform: translateY(-2px); }
-  .btn-danger { background: var(--danger); color: #fff; } .btn-danger:hover { background: #dc2626; transform: translateY(-2px); }
+  .btn-primary:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(79,70,229,0.3); }
+  .btn-success { background: var(--success); color: #fff; } .btn-success:hover:not(:disabled) { background: #059669; transform: translateY(-2px); }
+  .btn-danger { background: var(--danger); color: #fff; } .btn-danger:hover:not(:disabled) { background: #dc2626; transform: translateY(-2px); }
   .btn-outline { background: transparent; color: var(--text); border: 2px solid var(--border); }
-  .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
-  .btn-ghost { background: transparent; color: var(--text-light); } .btn-ghost:hover { background: var(--bg); color: var(--text); }
+  .btn-outline:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+  .btn-ghost { background: transparent; color: var(--text-light); } .btn-ghost:hover:not(:disabled) { background: var(--bg); color: var(--text); }
+  .btn-google { background: #fff; color: #3c4043; border: 2px solid #dadce0; }
+  .btn-google:hover:not(:disabled) { background: #f8f9fa; border-color: #c6c9cc; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .btn-google .google-icon { width: 20px; height: 20px; flex-shrink: 0; }
+  body.dark-mode .btn-google { background: #1e293b; color: #e2e8f0; border-color: #334155; }
+  body.dark-mode .btn-google:hover:not(:disabled) { background: #334155; }
   .alert { padding: 12px 16px; border-radius: 12px; font-size: 14px; font-weight: 600; margin-bottom: 16px; }
   .alert-error { background: var(--danger-light); color: #991b1b; }
   .alert-success { background: var(--success-light); color: #065f46; }
@@ -87,7 +93,8 @@
   .dashboard-header { background: linear-gradient(135deg, var(--primary), #7c3aed); color: #fff; padding: 24px 0; margin-bottom: 24px; box-shadow: var(--shadow); }
   .header-content { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
   .header-user { display: flex; align-items: center; gap: 14px; }
-  .user-avatar { width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 26px; border: 2px solid rgba(255,255,255,0.3); }
+  .user-avatar { width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 26px; border: 2px solid rgba(255,255,255,0.3); overflow: hidden; }
+  .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
   .user-info h3 { font-size: 18px; font-weight: 800; margin-bottom: 2px; } .user-info p { font-size: 13px; opacity: 0.9; }
   .header-actions { display: flex; gap: 8px; }
   .header-actions .btn { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25); position: relative; }
@@ -108,6 +115,8 @@
   .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px; }
   .subject-card { background: var(--card); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
   .subject-card:hover { transform: translateY(-4px); border-color: var(--primary); box-shadow: var(--shadow-lg); }
+  .subject-card.completed { cursor: not-allowed; opacity: 0.85; border-color: var(--success); background: linear-gradient(135deg, var(--card), var(--success-light)); }
+  .subject-card.completed:hover { transform: none; box-shadow: var(--shadow); }
   .subject-emoji { font-size: 36px; margin-bottom: 10px; } .subject-name { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
   .subject-meta { font-size: 13px; color: var(--text-light); font-weight: 600; margin-bottom: 12px; }
   .subject-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 6px; }
@@ -190,6 +199,32 @@
   .pending-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--warning); animation: blink 1.5s infinite; }
   @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
+  /* ===== Loading Overlay ===== */
+  .loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(2px); }
+  .loading-overlay.active { display: flex; }
+  .spinner { width: 48px; height: 48px; border: 4px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ===== Remember me / Forgot password ===== */
+  .auth-options { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 8px; }
+  .checkbox-label { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer; user-select: none; }
+  .checkbox-label input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
+  .link-btn { background: none; border: none; color: var(--primary); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; padding: 4px 0; transition: opacity 0.2s; }
+  .link-btn:hover { opacity: 0.7; text-decoration: underline; }
+  .link-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ===== Divider ===== */
+  .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: var(--text-light); font-size: 13px; font-weight: 700; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ===== Developer Footer ===== */
+  .dev-footer { text-align: center; padding: 24px 20px 32px; font-size: 13px; color: var(--text-light); font-weight: 600; }
+  .dev-footer .dev-brand { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; background: var(--card); border: 1px solid var(--border); border-radius: 999px; box-shadow: var(--shadow-sm); transition: all 0.2s; text-decoration: none; color: var(--text); }
+  .dev-footer .dev-brand:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow); }
+  .dev-footer .dev-brand strong { color: var(--primary); font-weight: 900; letter-spacing: 0.3px; }
+  body.dark-mode .dev-footer .dev-brand strong { color: var(--primary); }
+  .dev-footer .dev-copy { margin-top: 12px; font-size: 11px; opacity: 0.7; }
+
   @media (max-width: 600px) {
     .card { padding: 20px; } .auth-wrapper { margin: 20px auto; }
     .stats-grid { grid-template-columns: repeat(2, 1fr); } .stat-card { flex-direction: column; text-align: center; }
@@ -199,6 +234,9 @@
 </style>
 </head>
 <body>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
 
 <!-- ============= شاشة تسجيل الدخول ============= -->
 <section id="authScreen" class="screen active">
@@ -214,11 +252,33 @@
         <button class="tab" onclick="switchAuthTab('register')">حساب جديد</button>
       </div>
       <div id="authAlert"></div>
+
+      <!-- زر Google (يظهر في كلا التبويبين) -->
+      <button type="button" class="btn btn-google btn-full btn-lg" onclick="handleGoogleSignIn()" id="googleBtn">
+        <svg class="google-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        <span>تسجيل الدخول باستخدام Google</span>
+      </button>
+
+      <div class="divider">أو بالبريد الإلكتروني</div>
+
       <form id="loginForm" onsubmit="handleLogin(event)">
         <div class="form-group"><label class="form-label">البريد الإلكتروني</label><input type="email" class="form-input" id="loginEmail" required placeholder="you@example.com"></div>
         <div class="form-group"><label class="form-label">كلمة المرور</label><input type="password" class="form-input" id="loginPassword" required placeholder="••••••••"></div>
+        <div class="auth-options">
+          <label class="checkbox-label">
+            <input type="checkbox" id="rememberMe">
+            <span>تذكرني</span>
+          </label>
+          <button type="button" class="link-btn" onclick="handleForgotPassword()" id="forgotBtn">نسيت كلمة المرور؟</button>
+        </div>
         <button type="submit" class="btn btn-primary btn-full btn-lg">دخول</button>
       </form>
+
       <form id="registerForm" style="display:none;" onsubmit="handleRegister(event)">
         <div class="form-group"><label class="form-label">الاسم الكامل</label><input type="text" class="form-input" id="regName" required placeholder="أدخل اسمك الكامل"></div>
         <div class="form-group"><label class="form-label">البريد الإلكتروني</label><input type="email" class="form-input" id="regEmail" required placeholder="you@example.com"></div>
@@ -231,6 +291,7 @@
           </div>
         </div>
         <div id="studentFields" style="display:none;">
+          <div class="form-group"><label class="form-label">المدرسة التابع لها</label><input type="text" class="form-input" id="regSchool" placeholder="اسم المدرسة"></div>
           <div class="form-group"><label class="form-label">المرحلة الدراسية</label><select class="form-select" id="regStage"><option value="">اختر المرحلة</option><option value="ابتدائي">ابتدائي</option><option value="إعدادي">إعدادي</option><option value="ثانوي">ثانوي</option></select></div>
           <div class="form-group"><label class="form-label">السنة الدراسية</label><select class="form-select" id="regGrade"><option value="">اختر السنة</option></select></div>
         </div>
@@ -239,6 +300,15 @@
         </div>
         <button type="submit" class="btn btn-primary btn-full btn-lg">إنشاء الحساب</button>
       </form>
+    </div>
+
+    <!-- بيانات المطور -->
+    <div class="dev-footer">
+      <a class="dev-brand" href="#" onclick="event.preventDefault();" title="مطوّر المنصة">
+        <span>💻</span>
+        <span>تطوير <strong>EMAA.Tech</strong></span>
+      </a>
+      <div class="dev-copy">© <span id="devYear"></span> EMAA.Tech — جميع الحقوق محفوظة</div>
     </div>
   </div>
 </section>
@@ -254,13 +324,18 @@
       <div class="header-actions">
         <button class="btn btn-sm" onclick="toggleDarkMode()" id="darkModeBtn">🌙</button>
         <button class="btn btn-sm" onclick="openNotifications()" id="notifBtn">🔔<span class="notification-badge" id="notifBadge" style="display:none;">0</span></button>
-        <button class="btn btn-sm" onclick="openFirebaseConfig()" title="إعداد Firebase">⚙️</button>
         <button class="btn btn-sm" onclick="logout()">🚪 خروج</button>
       </div>
     </div>
   </div>
   <div id="firebaseStatus"></div>
   <div class="container" id="dashboardContent"></div>
+  <div class="dev-footer">
+    <a class="dev-brand" href="#" onclick="event.preventDefault();" title="مطوّر المنصة">
+      <span>💻</span>
+      <span>تطوير <strong>EMAA.Tech</strong></span>
+    </a>
+  </div>
 </section>
 
 <!-- ============= شاشة الاختبار ============= -->
@@ -283,7 +358,6 @@
 <script>
 /* ============================================================
    ============ إعدادات Firebase الافتراضية ============
-   ============ يمكن للمستخدم تعديلها من ⚙️ ============
    ============================================================ */
 const DEFAULT_FIREBASE_CONFIG = {
   apiKey: "AIzaSyBPuzIkp-Qc4CIBAYsY6hLwAVHwqY3oODg",
@@ -299,7 +373,8 @@ const DEFAULT_FIREBASE_CONFIG = {
    ============ Firebase SDK (Dynamic Load) ============
    ============================================================ */
 let fbApp = null, fbDB = null, fbAuth = null, firebaseEnabled = false, firebaseAuthEnabled = false;
-let FB = {}; // للاحتفاظ بوحدات Firebase
+let FB = {};
+let pendingGoogleUser = null; // لانتظار إكمال الملف الشخصي
 
 function loadFirebaseConfig() {
   try {
@@ -325,7 +400,19 @@ async function initFirebase() {
     try {
       const authMod = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
       FB = { ...FB, ...authMod };
-      fbAuth = { auth: authMod.getAuth(fbApp), createUserWithEmailAndPassword: authMod.createUserWithEmailAndPassword, signInWithEmailAndPassword: authMod.signInWithEmailAndPassword, signOut: authMod.signOut, onAuthStateChanged: authMod.onAuthStateChanged };
+      fbAuth = {
+        auth: authMod.getAuth(fbApp),
+        createUserWithEmailAndPassword: authMod.createUserWithEmailAndPassword,
+        signInWithEmailAndPassword: authMod.signInWithEmailAndPassword,
+        signOut: authMod.signOut,
+        onAuthStateChanged: authMod.onAuthStateChanged,
+        sendPasswordResetEmail: authMod.sendPasswordResetEmail,
+        setPersistence: authMod.setPersistence,
+        browserLocalPersistence: authMod.browserLocalPersistence,
+        browserSessionPersistence: authMod.browserSessionPersistence,
+        GoogleAuthProvider: authMod.GoogleAuthProvider,
+        signInWithPopup: authMod.signInWithPopup
+      };
       firebaseAuthEnabled = true;
       console.log('✅ Firebase + Auth متصل');
     } catch (e) {
@@ -361,7 +448,10 @@ const DB = {
         const remoteData = snapshot.val();
         if (remoteData) {
           if (Array.isArray(remoteData)) return remoteData;
-          if (typeof remoteData === 'object') return Object.values(remoteData);
+          if (typeof remoteData === 'object') {
+            const keys = Object.keys(remoteData).filter(k => remoteData[k] !== null && remoteData[k] !== undefined);
+            return keys.map(k => remoteData[k]);
+          }
         }
       } catch (e) { console.warn('FB get:', e); }
     }
@@ -376,6 +466,12 @@ const DB = {
 };
 
 /* ============================================================
+   ============ Loading Spinner Helpers ============
+   ============================================================ */
+function showLoading() { document.getElementById('loadingOverlay').classList.add('active'); }
+function hideLoading() { document.getElementById('loadingOverlay').classList.remove('active'); }
+
+/* ============================================================
    ============ Web Crypto PBKDF2 (fallback) ============
    ============================================================ */
 async function hashPassword(password) {
@@ -383,19 +479,31 @@ async function hashPassword(password) {
   const keyMaterial = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), { name: 'PBKDF2' }, false, ['deriveBits']);
   const derivedBits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' }, keyMaterial, 256);
   const hashArray = new Uint8Array(derivedBits);
-  return `pbkdf2_sha256$100000$${btoa(String.fromCharCode(...salt))}$${btoa(String.fromCharCode(...hashArray))}`;
+  return `pbkdf2_sha256$100000$${safeBtoa(salt)}$${safeBtoa(hashArray)}`;
 }
 async function verifyPassword(storedHash, password) {
   try {
     const parts = storedHash.split('$');
     if (parts.length !== 4 || parts[0] !== 'pbkdf2_sha256') return false;
     const iterations = parseInt(parts[1]);
-    const salt = Uint8Array.from(atob(parts[2]), c => c.charCodeAt(0));
+    const salt = safeAtob(parts[2]);
     const keyMaterial = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), { name: 'PBKDF2' }, false, ['deriveBits']);
     const derivedBits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations, hash: 'SHA-256' }, keyMaterial, 256);
-    const computedHash = btoa(String.fromCharCode(...new Uint8Array(derivedBits)));
+    const computedHash = safeBtoa(new Uint8Array(derivedBits));
     return computedHash === parts[3];
   } catch { return false; }
+}
+function safeBtoa(bytes) {
+  let binary = '';
+  const arr = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  for (let i = 0; i < arr.length; i++) binary += String.fromCharCode(arr[i]);
+  return btoa(binary);
+}
+function safeAtob(str) {
+  const binary = atob(str);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
 }
 
 /* ============================================================
@@ -433,9 +541,35 @@ function uid() { return Date.now().toString(36) + Math.random().toString(36).sub
 function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 function getSubjectEmoji(id) { const s = SUBJECTS.find(x=>x.id===id); return s?s.emoji:'📚'; }
 function getSubjectName(id) { const s = SUBJECTS.find(x=>x.id===id); return s?s.name:id; }
-function showAlert(msg, type='error') { const b = document.getElementById('authAlert'); b.innerHTML = `<div class="alert alert-${type}">${escapeHtml(msg)}</div>`; setTimeout(()=>{b.innerHTML='';},4000); }
+function showAlert(msg, type='error') { const b = document.getElementById('authAlert'); b.innerHTML = `<div class="alert alert-${type}">${escapeHtml(msg)}</div>`; setTimeout(()=>{b.innerHTML='';},5000); }
 function showScreen(name) { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(name+'Screen').classList.add('active'); window.scrollTo(0,0); }
 function calculateAvg(attempts) { if(!attempts.length) return 0; return Math.round(attempts.reduce((a,x)=>a+(x.score/x.total)*100,0)/attempts.length); }
+
+/* ============================================================
+   ============ Session helpers (تذكرني) ============
+   ============================================================ */
+const SESSION_KEY = 'edu_session';
+const REMEMBER_KEY = 'edu_remember';
+
+function saveSession(userId, remember) {
+  if (remember) {
+    localStorage.setItem(SESSION_KEY, userId);
+    localStorage.setItem(REMEMBER_KEY, '1');
+    sessionStorage.removeItem(SESSION_KEY);
+  } else {
+    sessionStorage.setItem(SESSION_KEY, userId);
+    localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(REMEMBER_KEY);
+  }
+}
+function getSessionUserId() {
+  return sessionStorage.getItem(SESSION_KEY) || localStorage.getItem(SESSION_KEY);
+}
+function clearSession() {
+  localStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(REMEMBER_KEY);
+  sessionStorage.removeItem(SESSION_KEY);
+}
 
 /* ============================================================
    ============ Dark Mode ============
@@ -444,12 +578,13 @@ function toggleDarkMode() { document.body.classList.toggle('dark-mode'); const d
 function loadDarkMode() { if(localStorage.getItem('edu_dark_mode')==='1'){ document.body.classList.add('dark-mode'); document.getElementById('darkModeBtn').textContent='☀️'; } }
 
 /* ============================================================
-   ============ Firebase Config Modal ============
+   ============ Firebase Config Modal (اختياري - غير ظاهر) ============
    ============================================================ */
 function openFirebaseConfig() {
   const cfg = loadFirebaseConfig() || {};
   openModal(`<div class="modal-header"><h3 class="modal-title">⚙️ إعداد Firebase</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
     <div class="alert alert-info">💡 المفاتيح مضمنة افتراضياً. يمكنك تعديلها إذا أنشأت مشروعاً جديداً.</div>
+    <div class="alert alert-warning">🔒 تذكير أمني: يجب ضبط Firebase Security Rules على الخادم لحماية البيانات.</div>
     <div class="form-group"><label class="form-label">API Key</label><input type="text" class="form-input" id="fbApiKey" value="${escapeHtml(cfg.apiKey||'')}"></div>
     <div class="form-group"><label class="form-label">Database URL</label><input type="text" class="form-input" id="fbDatabaseURL" value="${escapeHtml(cfg.databaseURL||'')}"></div>
     <div class="form-group"><label class="form-label">Project ID</label><input type="text" class="form-input" id="fbProjectId" value="${escapeHtml(cfg.projectId||'')}"></div>
@@ -487,14 +622,23 @@ function switchAuthTab(tab) {
   document.getElementById('authAlert').innerHTML='';
 }
 function pickRole(role) {
-  selectedRole=role;
-  document.querySelectorAll('.role-option').forEach(o=>o.classList.remove('active'));
+  selectedRole = role;
+  document.querySelectorAll('.role-option').forEach(o => o.classList.remove('active'));
   document.querySelector(`.role-option[data-role="${role}"]`).classList.add('active');
-  document.getElementById('studentFields').style.display=role==='student'?'block':'none';
-  document.getElementById('teacherFields').style.display=role==='teacher'?'block':'none';
-  if(role==='teacher'){
-    document.getElementById('regSubject').innerHTML='<option value="">اختر المادة</option>'+
-      SUBJECTS.map(s=>`<option value="${s.id}">${s.emoji} ${s.name}</option>`).join('');
+
+  const studentFields = document.getElementById('studentFields');
+  const teacherFields = document.getElementById('teacherFields');
+  const schoolInput = document.getElementById('regSchool');
+
+  studentFields.style.display = role === 'student' ? 'block' : 'none';
+  teacherFields.style.display = role === 'teacher' ? 'block' : 'none';
+
+  if (schoolInput) schoolInput.required = (role === 'student');
+  if (role === 'teacher' && schoolInput) schoolInput.value = '';
+
+  if (role === 'teacher') {
+    document.getElementById('regSubject').innerHTML = '<option value="">اختر المادة</option>' +
+      SUBJECTS.map(s => `<option value="${s.id}">${s.emoji} ${s.name}</option>`).join('');
   }
 }
 document.getElementById('regStage').addEventListener('change', function() {
@@ -509,11 +653,14 @@ async function handleRegister(e) {
   const password = document.getElementById('regPassword').value;
   if (!selectedRole) { showAlert('اختر دورك'); return; }
 
-  const profile = { name, email, role: selectedRole, createdAt: Date.now() };
+  const profile = { name, email, role: selectedRole, createdAt: Date.now(), provider: 'email' };
   if (selectedRole === 'student') {
+    const school = document.getElementById('regSchool').value.trim();
     const stage = document.getElementById('regStage').value;
     const grade = document.getElementById('regGrade').value;
+    if (!school) { showAlert('أدخل اسم المدرسة'); return; }
     if (!stage || !grade) { showAlert('اختر المرحلة والسنة'); return; }
+    profile.school = school;
     profile.stage = stage; profile.grade = grade;
   } else {
     const subject = document.getElementById('regSubject').value;
@@ -521,102 +668,360 @@ async function handleRegister(e) {
     profile.subject = subject;
   }
 
-  const users = await DB.get('users');
-  if (users.find(u => u.email === email)) { showAlert('هذا البريد مسجل بالفعل'); return; }
+  showLoading();
+  try {
+    const users = await DB.get('users');
+    if (users.find(u => u.email === email)) { showAlert('هذا البريد مسجل بالفعل'); return; }
 
-  if (firebaseAuthEnabled) {
-    try {
-      const cred = await fbAuth.createUserWithEmailAndPassword(fbAuth.auth, email, password);
-      profile.id = cred.user.uid;
-      users.push(profile);
-      await DB.set('users', users);
-      currentUser = profile;
-      localStorage.setItem('edu_session', profile.id);
-      showAlert('تم إنشاء الحساب!', 'success');
-      setTimeout(() => enterDashboard(), 500);
-    } catch (err) {
-      const msgs = {
-        'auth/email-already-in-use': 'البريد مسجل بالفعل',
-        'auth/weak-password': 'كلمة المرور ضعيفة',
-        'auth/invalid-email': 'البريد غير صالح',
-        'auth/operation-not-allowed': 'تسجيل البريد غير مفعّل في Firebase Console'
-      };
-      showAlert(msgs[err.code] || err.message);
+    if (firebaseAuthEnabled) {
+      try {
+        const cred = await fbAuth.createUserWithEmailAndPassword(fbAuth.auth, email, password);
+        profile.id = cred.user.uid;
+        users.push(profile);
+        await DB.set('users', users);
+        currentUser = profile;
+        saveSession(profile.id, true);
+        showAlert('تم إنشاء الحساب!', 'success');
+        setTimeout(() => enterDashboard(), 500);
+      } catch (err) {
+        const msgs = {
+          'auth/email-already-in-use': 'البريد مسجل بالفعل',
+          'auth/weak-password': 'كلمة المرور ضعيفة',
+          'auth/invalid-email': 'البريد غير صالح',
+          'auth/operation-not-allowed': 'تسجيل البريد غير مفعّل في Firebase Console'
+        };
+        showAlert(msgs[err.code] || err.message);
+      }
+      return;
     }
-    return;
-  }
 
-  profile.id = uid();
-  profile.passwordHash = await hashPassword(password);
-  users.push(profile);
-  await DB.set('users', users);
-  currentUser = profile;
-  localStorage.setItem('edu_session', profile.id);
-  showAlert('تم إنشاء الحساب (محلي)!', 'success');
-  setTimeout(() => enterDashboard(), 500);
+    profile.id = uid();
+    profile.passwordHash = await hashPassword(password);
+    users.push(profile);
+    await DB.set('users', users);
+    currentUser = profile;
+    saveSession(profile.id, true);
+    showAlert('تم إنشاء الحساب (محلي)!', 'success');
+    setTimeout(() => enterDashboard(), 500);
+  } finally {
+    hideLoading();
+  }
 }
 
 async function handleLogin(e) {
   e.preventDefault();
   const email = document.getElementById('loginEmail').value.trim().toLowerCase();
   const password = document.getElementById('loginPassword').value;
+  const remember = document.getElementById('rememberMe').checked;
 
-  if (firebaseAuthEnabled) {
-    try {
-      const cred = await fbAuth.signInWithEmailAndPassword(fbAuth.auth, email, password);
-      const users = await DB.get('users');
-      const user = users.find(u => u.id === cred.user.uid || u.email === email);
-      if (!user) { showAlert('الملف الشخصي غير موجود'); await fbAuth.signOut(fbAuth.auth); return; }
-      currentUser = user;
-      localStorage.setItem('edu_session', user.id);
-      enterDashboard();
-    } catch (err) {
-      const msgs = {
-        'auth/user-not-found': 'لا يوجد حساب بهذا البريد',
-        'auth/wrong-password': 'كلمة المرور غير صحيحة',
-        'auth/invalid-credential': 'بيانات الدخول غير صحيحة',
-        'auth/too-many-requests': 'محاولات كثيرة، حاول لاحقاً'
-      };
-      showAlert(msgs[err.code] || 'البريد أو كلمة المرور غير صحيحة');
+  showLoading();
+  try {
+    if (firebaseAuthEnabled) {
+      try {
+        if (fbAuth.setPersistence) {
+          try {
+            await fbAuth.setPersistence(fbAuth.auth, remember ? fbAuth.browserLocalPersistence : fbAuth.browserSessionPersistence);
+          } catch (e) { console.warn('setPersistence:', e); }
+        }
+        const cred = await fbAuth.signInWithEmailAndPassword(fbAuth.auth, email, password);
+        const users = await DB.get('users');
+        const user = users.find(u => u.id === cred.user.uid || u.email === email);
+        if (!user) { showAlert('الملف الشخصي غير موجود'); await fbAuth.signOut(fbAuth.auth); return; }
+        currentUser = user;
+        saveSession(user.id, remember);
+        enterDashboard();
+      } catch (err) {
+        const msgs = {
+          'auth/user-not-found': 'لا يوجد حساب بهذا البريد',
+          'auth/wrong-password': 'كلمة المرور غير صحيحة',
+          'auth/invalid-credential': 'بيانات الدخول غير صحيحة',
+          'auth/too-many-requests': 'محاولات كثيرة، حاول لاحقاً'
+        };
+        showAlert(msgs[err.code] || 'البريد أو كلمة المرور غير صحيحة');
+      }
+      return;
     }
+
+    const users = await DB.get('users');
+    const user = users.find(u => u.email === email);
+    if (!user) { showAlert('البريد أو كلمة المرور غير صحيحة'); return; }
+    let valid = false;
+    if (user.passwordHash) { valid = await verifyPassword(user.passwordHash, password); }
+    else if (user.password) { valid = (user.password === password); }
+    if (!valid) { showAlert('البريد أو كلمة المرور غير صحيحة'); return; }
+    currentUser = user;
+    saveSession(user.id, remember);
+    enterDashboard();
+  } finally {
+    hideLoading();
+  }
+}
+
+/* ============================================================
+   ============ تسجيل الدخول بـ Google ============
+   ============================================================ */
+async function handleGoogleSignIn() {
+  if (!firebaseAuthEnabled) {
+    showAlert('تسجيل الدخول بـ Google غير متاح في الوضع المحلي. تأكد من اتصال Firebase.', 'warning');
     return;
   }
 
-  const users = await DB.get('users');
-  const user = users.find(u => u.email === email);
-  if (!user) { showAlert('البريد أو كلمة المرور غير صحيحة'); return; }
-  let valid = false;
-  if (user.passwordHash) { valid = await verifyPassword(user.passwordHash, password); }
-  else if (user.password) { valid = (user.password === password); }
-  if (!valid) { showAlert('البريد أو كلمة المرور غير صحيحة'); return; }
-  currentUser = user;
-  localStorage.setItem('edu_session', user.id);
-  enterDashboard();
+  const btn = document.getElementById('googleBtn');
+  const originalHTML = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span>جارٍ الاتصال بـ Google...</span>';
+
+  try {
+    const provider = new fbAuth.GoogleAuthProvider();
+    // إضافة scope للبريد والملف الشخصي
+    provider.addScope('email');
+    provider.addScope('profile');
+
+    const result = await fbAuth.signInWithPopup(fbAuth.auth, provider);
+    const googleUser = result.user;
+
+    if (!googleUser || !googleUser.email) {
+      showAlert('تعذر الحصول على بيانات Google. حاول مرة أخرى.');
+      return;
+    }
+
+    const users = await DB.get('users');
+    const existing = users.find(u => u.id === googleUser.uid || u.email === googleUser.email);
+
+    if (existing) {
+      // حساب موجود مسبقاً → دخول مباشر
+      currentUser = existing;
+      saveSession(existing.id, true);
+      showAlert(`مرحباً ${existing.name}!`, 'success');
+      setTimeout(() => enterDashboard(), 400);
+    } else {
+      // حساب جديد → نطلب إكمال الملف الشخصي
+      pendingGoogleUser = {
+        id: googleUser.uid,
+        email: googleUser.email,
+        name: googleUser.displayName || googleUser.email.split('@')[0],
+        photoURL: googleUser.photoURL || null,
+        provider: 'google'
+      };
+      openProfileCompletionModal();
+    }
+  } catch (err) {
+    const msgs = {
+      'auth/popup-closed-by-user': 'تم إغلاق نافذة Google قبل الإكمال',
+      'auth/popup-blocked': 'المتصفح منع النافذة المنبثقة. اسمح بها وحاول مجدداً',
+      'auth/cancelled-popup-request': 'تم إلغاء الطلب',
+      'auth/operation-not-allowed': 'تسجيل الدخول بـ Google غير مفعّل في Firebase Console',
+      'auth/unauthorized-domain': 'هذا النطاق غير مصرح به في Firebase. أضفه إلى Authorized domains',
+      'auth/network-request-failed': 'تعذر الاتصال بالشبكة'
+    };
+    showAlert(msgs[err.code] || 'تعذر تسجيل الدخول بـ Google: ' + (err.message || 'خطأ'));
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalHTML;
+  }
+}
+
+/* ============================================================
+   ============ إكمال الملف الشخصي لحساب Google ============
+   ============================================================ */
+let googleSelectedRole = null;
+
+function openProfileCompletionModal() {
+  googleSelectedRole = null;
+  openModal(`<div class="modal-header"><h3 class="modal-title">👋 مرحباً ${escapeHtml(pendingGoogleUser?.name || '')}</h3></div>
+    <div class="alert alert-info">تم تسجيل الدخول بـ Google. لإكمال إنشاء حسابك، اختر دورك وأدخل بياناتك.</div>
+    <div class="form-group">
+      <label class="form-label">أنا...</label>
+      <div class="role-picker">
+        <button type="button" class="role-option" id="gRoleTeacher" onclick="pickGoogleRole('teacher')"><div class="role-emoji">👨‍🏫</div><div class="role-label">مدرس</div></button>
+        <button type="button" class="role-option" id="gRoleStudent" onclick="pickGoogleRole('student')"><div class="role-emoji">👨‍🎓</div><div class="role-label">طالب</div></button>
+      </div>
+    </div>
+    <div id="gStudentFields" style="display:none;">
+      <div class="form-group"><label class="form-label">المدرسة التابع لها</label><input type="text" class="form-input" id="gSchool" placeholder="اسم المدرسة"></div>
+      <div class="form-group"><label class="form-label">المرحلة الدراسية</label><select class="form-select" id="gStage"><option value="">اختر المرحلة</option><option value="ابتدائي">ابتدائي</option><option value="إعدادي">إعدادي</option><option value="ثانوي">ثانوي</option></select></div>
+      <div class="form-group"><label class="form-label">السنة الدراسية</label><select class="form-select" id="gGrade"><option value="">اختر السنة</option></select></div>
+    </div>
+    <div id="gTeacherFields" style="display:none;">
+      <div class="form-group"><label class="form-label">المادة التي تدرّسها</label><select class="form-select" id="gSubject"><option value="">اختر المادة</option></select></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn btn-ghost" onclick="cancelGoogleProfile()" style="flex:1;">إلغاء</button>
+      <button class="btn btn-success" onclick="completeGoogleProfile()" style="flex:2;">✅ إكمال الحساب</button>
+    </div>`);
+
+  // ربط تغيير المرحلة
+  setTimeout(() => {
+    const stageEl = document.getElementById('gStage');
+    if (stageEl) {
+      stageEl.addEventListener('change', function() {
+        document.getElementById('gGrade').innerHTML = '<option value="">اختر السنة</option>' +
+          (STAGES[this.value] || []).map(g => `<option value="${g}">${g}</option>`).join('');
+      });
+    }
+  }, 50);
+}
+
+function pickGoogleRole(role) {
+  googleSelectedRole = role;
+  document.getElementById('gRoleTeacher').classList.toggle('active', role === 'teacher');
+  document.getElementById('gRoleStudent').classList.toggle('active', role === 'student');
+  document.getElementById('gStudentFields').style.display = role === 'student' ? 'block' : 'none';
+  document.getElementById('gTeacherFields').style.display = role === 'teacher' ? 'block' : 'none';
+  if (role === 'teacher') {
+    document.getElementById('gSubject').innerHTML = '<option value="">اختر المادة</option>' +
+      SUBJECTS.map(s => `<option value="${s.id}">${s.emoji} ${s.name}</option>`).join('');
+  }
+}
+
+async function cancelGoogleProfile() {
+  try { if (fbAuth) await fbAuth.signOut(fbAuth.auth); } catch {}
+  pendingGoogleUser = null;
+  googleSelectedRole = null;
+  closeModal();
+}
+
+async function completeGoogleProfile() {
+  if (!pendingGoogleUser) return;
+  if (!googleSelectedRole) { alert('اختر دورك'); return; }
+
+  const profile = {
+    id: pendingGoogleUser.id,
+    email: pendingGoogleUser.email,
+    name: pendingGoogleUser.name,
+    role: googleSelectedRole,
+    provider: 'google',
+    photoURL: pendingGoogleUser.photoURL,
+    createdAt: Date.now()
+  };
+
+  if (googleSelectedRole === 'student') {
+    const school = document.getElementById('gSchool').value.trim();
+    const stage = document.getElementById('gStage').value;
+    const grade = document.getElementById('gGrade').value;
+    if (!school) { alert('أدخل اسم المدرسة'); return; }
+    if (!stage || !grade) { alert('اختر المرحلة والسنة'); return; }
+    profile.school = school;
+    profile.stage = stage; profile.grade = grade;
+  } else {
+    const subject = document.getElementById('gSubject').value;
+    if (!subject) { alert('اختر المادة'); return; }
+    profile.subject = subject;
+  }
+
+  showLoading();
+  try {
+    const users = await DB.get('users');
+    // تأكد مرة أخرى ألا يوجد تكرار
+    if (users.find(u => u.id === profile.id || u.email === profile.email)) {
+      alert('هذا الحساب موجود بالفعل'); return;
+    }
+    users.push(profile);
+    await DB.set('users', users);
+    currentUser = profile;
+    saveSession(profile.id, true);
+    pendingGoogleUser = null;
+    googleSelectedRole = null;
+    closeModal();
+    showAlert('تم إنشاء الحساب بنجاح!', 'success');
+    setTimeout(() => enterDashboard(), 400);
+  } finally {
+    hideLoading();
+  }
+}
+
+/* ============================================================
+   ============ نسيت كلمة المرور ============
+   ============================================================ */
+async function handleForgotPassword() {
+  const emailInput = document.getElementById('loginEmail');
+  let email = emailInput.value.trim().toLowerCase();
+
+  if (!email) {
+    showAlert('أدخل بريدك الإلكتروني أولاً في حقل "البريد الإلكتروني"', 'warning');
+    emailInput.focus();
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    showAlert('البريد الإلكتروني غير صالح', 'error');
+    emailInput.focus();
+    return;
+  }
+
+  if (!firebaseAuthEnabled) {
+    showAlert('استعادة كلمة المرور غير متاحة في الوضع المحلي (بدون Firebase Auth). تواصل مع إدارة المنصة.', 'warning');
+    return;
+  }
+
+  const btn = document.getElementById('forgotBtn');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'جارٍ الإرسال...';
+
+  try {
+    await fbAuth.sendPasswordResetEmail(fbAuth.auth, email);
+    showAlert(`✅ تم إرسال رابط إعادة تعيين كلمة المرور إلى ${email}. تحقق من صندوق الوارد (وقد يكون في مجلد Spam).`, 'success');
+  } catch (err) {
+    const msgs = {
+      'auth/user-not-found': 'لا يوجد حساب بهذا البريد',
+      'auth/invalid-email': 'البريد الإلكتروني غير صالح',
+      'auth/too-many-requests': 'محاولات كثيرة، حاول لاحقاً',
+      'auth/network-request-failed': 'تعذر الاتصال بالشبكة. تحقق من الإنترنت'
+    };
+    showAlert(msgs[err.code] || 'تعذر إرسال البريد: ' + (err.message || 'خطأ غير معروف'));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalText;
+  }
 }
 
 async function logout() {
   if (firebaseAuthEnabled && fbAuth) { try { await fbAuth.signOut(fbAuth.auth); } catch {} }
-  currentUser = null; localStorage.removeItem('edu_session');
+  currentUser = null;
+  clearSession();
   showScreen('auth');
   document.getElementById('loginForm').reset();
   document.getElementById('registerForm').reset();
+  document.getElementById('rememberMe').checked = false;
 }
 
 async function checkSession() {
   if (firebaseAuthEnabled && fbAuth) {
     return new Promise((resolve) => {
+      let resolved = false;
       const unsub = fbAuth.onAuthStateChanged(fbAuth.auth, async (user) => {
+        if (resolved) return;
+        resolved = true;
         unsub();
         if (user) {
-          const users = await DB.get('users');
-          const profile = users.find(u => u.id === user.uid || u.email === user.email);
-          if (profile) { currentUser = profile; enterDashboard(); resolve(true); return; }
+          try {
+            const users = await DB.get('users');
+            const profile = users.find(u => u.id === user.uid || u.email === user.email);
+            if (profile) { currentUser = profile; enterDashboard(); resolve(true); return; }
+            // حساب Google لكن لم يكمل الملف — نعرض له المودال
+            if (user.providerData && user.providerData.some(p => p.providerId === 'google.com')) {
+              pendingGoogleUser = {
+                id: user.uid,
+                email: user.email,
+                name: user.displayName || user.email.split('@')[0],
+                photoURL: user.photoURL || null,
+                provider: 'google'
+              };
+              // انتظر حتى يُفتح المودال
+              setTimeout(() => openProfileCompletionModal(), 300);
+              resolve(false);
+              return;
+            }
+          } catch (e) { console.warn(e); }
         }
         resolve(false);
       });
+      setTimeout(() => { if (!resolved) { resolved = true; resolve(false); } }, 5000);
     });
   }
-  const id = localStorage.getItem('edu_session');
+  const id = getSessionUserId();
   if (!id) return false;
   const users = await DB.get('users');
   const u = users.find(x => x.id === id);
@@ -635,82 +1040,91 @@ function enterDashboard() {
   else renderStudentDashboard();
 }
 function updateHeader() {
-  document.getElementById('userAvatar').textContent = currentUser.role==='teacher'?'👨‍🏫':'👨‍🎓';
+  const avatarEl = document.getElementById('userAvatar');
+  if (currentUser.photoURL) {
+    avatarEl.innerHTML = `<img src="${currentUser.photoURL}" alt="avatar" referrerpolicy="no-referrer">`;
+  } else {
+    avatarEl.textContent = currentUser.role==='teacher'?'👨‍🏫':'👨‍🎓';
+  }
   document.getElementById('userName').textContent = currentUser.name;
   document.getElementById('userMeta').textContent = currentUser.role==='teacher'
     ? `مدرس • ${getSubjectName(currentUser.subject)}`
-    : `طالب • ${currentUser.grade}`;
+    : `طالب • ${currentUser.grade}${currentUser.school ? ' • ' + currentUser.school : ''}`;
 }
 
 /* ============================================================
    ============ Teacher Dashboard ============
    ============================================================ */
 async function renderTeacherDashboard() {
-  const allQuizzes = await DB.get('quizzes');
-  const quizzes = allQuizzes.filter(q => q.teacherId === currentUser.id);
-  const allAttempts = await DB.get('attempts');
-  const attempts = allAttempts.filter(a => quizzes.some(q => q.id === a.quizId));
-  const allUsers = await DB.get('users');
-  const students = allUsers.filter(u => u.role === 'student');
+  showLoading();
+  try {
+    const allQuizzes = await DB.get('quizzes');
+    const quizzes = allQuizzes.filter(q => q.teacherId === currentUser.id);
+    const allAttempts = await DB.get('attempts');
+    const attempts = allAttempts.filter(a => quizzes.some(q => q.id === a.quizId));
+    const allUsers = await DB.get('users');
+    const students = allUsers.filter(u => u.role === 'student');
 
-  // حساب المحاولات التي تحتاج تصحيحاً
-  const pendingGrading = attempts.filter(a => a.needsGrading && !a.graded);
+    const pendingGrading = attempts.filter(a => a.needsGrading && !a.graded);
 
-  const container = document.getElementById('dashboardContent');
-  container.innerHTML = `
-    <div class="stats-grid">
-      <div class="stat-card"><div class="stat-icon primary">📝</div><div class="stat-info"><h4>${quizzes.length}</h4><p>اختباراتي</p></div></div>
-      <div class="stat-card"><div class="stat-icon success">✅</div><div class="stat-info"><h4>${attempts.length}</h4><p>محاولات</p></div></div>
-      <div class="stat-card"><div class="stat-icon warning">📊</div><div class="stat-info"><h4>${calculateAvg(attempts)}%</h4><p>متوسط</p></div></div>
-      <div class="stat-card"><div class="stat-icon info">👥</div><div class="stat-info"><h4>${students.length}</h4><p>طلاب</p></div></div>
-    </div>
+    const container = document.getElementById('dashboardContent');
+    container.innerHTML = `
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon primary">📝</div><div class="stat-info"><h4>${quizzes.length}</h4><p>اختباراتي</p></div></div>
+        <div class="stat-card"><div class="stat-icon success">✅</div><div class="stat-info"><h4>${attempts.length}</h4><p>محاولات</p></div></div>
+        <div class="stat-card"><div class="stat-icon warning">📊</div><div class="stat-info"><h4>${calculateAvg(attempts)}%</h4><p>متوسط</p></div></div>
+        <div class="stat-card"><div class="stat-icon info">👥</div><div class="stat-info"><h4>${students.length}</h4><p>طلاب</p></div></div>
+      </div>
 
-    ${pendingGrading.length > 0 ? `
-      <div class="card" style="border-right:4px solid var(--warning); background: var(--warning-light);">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-          <div>
-            <h3 style="font-size:18px; font-weight:900; color:var(--warning); margin-bottom:4px;">⏳ لديك ${pendingGrading.length} محاولة بحاجة للتصحيح</h3>
-            <p style="font-size:13px; color:var(--text-light); font-weight:600;">تحتوي على أسئلة مقالية تحتاج مراجعة يدوية</p>
+      ${pendingGrading.length > 0 ? `
+        <div class="card" style="border-right:4px solid var(--warning); background: var(--warning-light);">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h3 style="font-size:18px; font-weight:900; color:var(--warning); margin-bottom:4px;">⏳ لديك ${pendingGrading.length} محاولة بحاجة للتصحيح</h3>
+              <p style="font-size:13px; color:var(--text-light); font-weight:600;">تحتوي على أسئلة مقالية تحتاج مراجعة يدوية</p>
+            </div>
+            <button class="btn btn-primary" onclick="openGradingCenter()">✏️ ابدأ التصحيح</button>
           </div>
-          <button class="btn btn-primary" onclick="openGradingCenter()">✏️ ابدأ التصحيح</button>
+        </div>
+      ` : ''}
+
+      <div class="chart-container"><canvas id="teacherChart"></canvas></div>
+
+      <div class="section-header">
+        <div><h2 class="section-title">اختباراتي</h2><p class="section-subtitle">إدارة الاختبارات</p></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-outline btn-sm" onclick="exportResults()">📥 تصدير النتائج</button>
+          <button class="btn btn-primary" onclick="openNewQuizModal()">➕ اختبار جديد</button>
         </div>
       </div>
-    ` : ''}
 
-    <div class="chart-container"><canvas id="teacherChart"></canvas></div>
+      ${quizzes.length === 0 ? `<div class="card"><div class="empty-state"><div class="empty-state-icon">📚</div><h3>لا توجد اختبارات</h3></div></div>` : `<div class="cards-grid">${quizzes.map(renderQuizCard).join('')}</div>`}
 
-    <div class="section-header">
-      <div><h2 class="section-title">اختباراتي</h2><p class="section-subtitle">إدارة الاختبارات</p></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-outline btn-sm" onclick="exportResults()">📥 تصدير النتائج</button>
-        <button class="btn btn-primary" onclick="openNewQuizModal()">➕ اختبار جديد</button>
+      <div class="section-header" style="margin-top:32px;">
+        <div><h2 class="section-title">إدارة الطلاب</h2><p class="section-subtitle">${students.length} طالب مسجل</p></div>
+        <button class="btn btn-outline btn-sm" onclick="exportStudents()">📥 تصدير الطلاب</button>
       </div>
-    </div>
+      ${students.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا يوجد طلاب</h3></div></div>` : renderStudentsList(students, allAttempts)}
 
-    ${quizzes.length === 0 ? `<div class="card"><div class="empty-state"><div class="empty-state-icon">📚</div><h3>لا توجد اختبارات</h3></div></div>` : `<div class="cards-grid">${quizzes.map(renderQuizCard).join('')}</div>`}
+      <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">آخر النتائج</h2></div></div>
+      ${attempts.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا نتائج</h3></div></div>` : await renderAttemptsList(attempts.sort((a,b) => b.createdAt - a.createdAt).slice(0, 20))}
+    `;
 
-    <div class="section-header" style="margin-top:32px;">
-      <div><h2 class="section-title">إدارة الطلاب</h2><p class="section-subtitle">${students.length} طالب مسجل</p></div>
-      <button class="btn btn-outline btn-sm" onclick="exportStudents()">📥 تصدير الطلاب</button>
-    </div>
-    ${students.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا يوجد طلاب</h3></div></div>` : renderStudentsList(students, allAttempts)}
-
-    <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">آخر النتائج</h2></div></div>
-    ${attempts.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا نتائج</h3></div></div>` : await renderAttemptsList(attempts.sort((a,b) => b.createdAt - a.createdAt).slice(0, 20))}
-  `;
-
-  const ctx = document.getElementById('teacherChart')?.getContext('2d');
-  if (ctx && quizzes.length > 0) {
-    const quizNames = quizzes.map(q => q.title.length > 15 ? q.title.slice(0, 15) + '...' : q.title);
-    const avgScores = quizzes.map(q => {
-      const at = attempts.filter(a => a.quizId === q.id);
-      return at.length ? Math.round(at.reduce((s, a) => s + (a.score / a.total) * 100, 0) / at.length) : 0;
-    });
-    new Chart(ctx, {
-      type: 'bar',
-      data: { labels: quizNames, datasets: [{ label: 'متوسط النتائج %', data: avgScores, backgroundColor: 'rgba(79,70,229,0.7)', borderRadius: 8 }] },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100 } } }
-    });
+    const ctx = document.getElementById('teacherChart')?.getContext('2d');
+    if (ctx && quizzes.length > 0) {
+      const quizNames = quizzes.map(q => q.title.length > 15 ? q.title.slice(0, 15) + '...' : q.title);
+      const avgScores = quizzes.map(q => {
+        const at = attempts.filter(a => a.quizId === q.id);
+        return at.length ? Math.round(at.reduce((s, a) => s + (a.score / a.total) * 100, 0) / at.length) : 0;
+      });
+      new Chart(ctx, {
+        type: 'bar',
+        data: { labels: quizNames, datasets: [{ label: 'متوسط النتائج %', data: avgScores, backgroundColor: 'rgba(79,70,229,0.7)', borderRadius: 8 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100 } } }
+      });
+    }
+  } finally {
+    hideLoading();
   }
 }
 
@@ -734,17 +1148,32 @@ function renderQuizCard(quiz) {
 }
 
 function renderStudentsList(students, allAttempts) {
-  return `<div class="card">${students.map(s => {
-    const sAttempts = allAttempts.filter(a => a.studentId === s.id);
-    const avg = sAttempts.length ? calculateAvg(sAttempts) : 0;
-    return `<div class="student-row">
-      <div class="student-info">
-        <h4>${escapeHtml(s.name)}</h4>
-        <p>${escapeHtml(s.grade || '')} • ${escapeHtml(s.stage || '')} • ${sAttempts.length} محاولة</p>
+  const bySchool = {};
+  students.forEach(s => {
+    const key = s.school || 'غير محدد';
+    if (!bySchool[key]) bySchool[key] = [];
+    bySchool[key].push(s);
+  });
+  return `<div class="card">${Object.entries(bySchool).map(([school, list]) => `
+    <div style="margin-bottom:16px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <span class="badge badge-info">🏫 ${escapeHtml(school)}</span>
+        <span class="badge badge-primary">${list.length} طالب</span>
       </div>
-      <span class="badge badge-${avg>=80?'success':avg>=50?'warning':'danger'}">${avg}%</span>
-    </div>`;
-  }).join('')}</div>`;
+      ${list.map(s => {
+        const sAttempts = allAttempts.filter(a => a.studentId === s.id);
+        const avg = sAttempts.length ? calculateAvg(sAttempts) : 0;
+        const providerIcon = s.provider === 'google' ? ' <span title="حساب Google">🔵</span>' : '';
+        return `<div class="student-row">
+          <div class="student-info">
+            <h4>${escapeHtml(s.name)}${providerIcon}</h4>
+            <p>${escapeHtml(s.grade || '')} • ${escapeHtml(s.stage || '')} • ${sAttempts.length} محاولة</p>
+          </div>
+          <span class="badge badge-${avg>=80?'success':avg>=50?'warning':'danger'}">${avg}%</span>
+        </div>`;
+      }).join('')}
+    </div>
+  `).join('')}</div>`;
 }
 
 async function renderAttemptsList(attempts) {
@@ -772,52 +1201,75 @@ async function renderAttemptsList(attempts) {
    ============ Student Dashboard ============
    ============================================================ */
 async function renderStudentDashboard() {
-  const allQuizzes = await DB.get('quizzes');
-  const myQuizzes = allQuizzes.filter(q => q.grade === currentUser.grade);
-  const allAttempts = await DB.get('attempts');
-  const myAttempts = allAttempts.filter(a => a.studentId === currentUser.id);
+  showLoading();
+  try {
+    const allQuizzes = await DB.get('quizzes');
+    const myQuizzes = allQuizzes.filter(q => q.grade === currentUser.grade);
+    const allAttempts = await DB.get('attempts');
+    const myAttempts = allAttempts.filter(a => a.studentId === currentUser.id);
 
-  const container = document.getElementById('dashboardContent');
-  container.innerHTML = `
-    <div class="stats-grid">
-      <div class="stat-card"><div class="stat-icon primary">📝</div><div class="stat-info"><h4>${myQuizzes.length}</h4><p>اختبارات متاحة</p></div></div>
-      <div class="stat-card"><div class="stat-icon success">✅</div><div class="stat-info"><h4>${myAttempts.length}</h4><p>حليتها</p></div></div>
-      <div class="stat-card"><div class="stat-icon warning">📊</div><div class="stat-info"><h4>${calculateAvg(myAttempts)}%</h4><p>متوسطك</p></div></div>
-    </div>
-    <div class="chart-container"><canvas id="studentChart"></canvas></div>
-    <div class="section-header"><div><h2 class="section-title">الاختبارات المتاحة</h2><p class="section-subtitle">${escapeHtml(currentUser.grade)} • ${escapeHtml(currentUser.stage)}</p></div></div>
-    ${myQuizzes.length === 0 ? `<div class="card"><div class="empty-state"><div class="empty-state-icon">📚</div><h3>لا اختبارات</h3></div></div>` : `<div class="cards-grid">${myQuizzes.map(q => renderStudentQuizCard(q, myAttempts)).join('')}</div>`}
-    <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">سجل نتائجي</h2></div></div>
-    ${myAttempts.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا نتائج</h3></div></div>` : await renderMyAttempts(myAttempts.sort((a, b) => b.createdAt - a.createdAt))}
-  `;
+    const solvedQuizIds = new Set(myAttempts.map(a => a.quizId));
+    const availableQuizzes = myQuizzes.filter(q => !solvedQuizIds.has(q.id));
+    const completedQuizzes = myQuizzes.filter(q => solvedQuizIds.has(q.id));
 
-  const ctx = document.getElementById('studentChart')?.getContext('2d');
-  if (ctx && myAttempts.length > 0) {
-    const labels = myAttempts.slice(0, 10).reverse().map(a => {
-      const q = allQuizzes.find(x => x.id === a.quizId);
-      return q ? q.title.slice(0, 10) : 'اختبار';
-    });
-    const data = myAttempts.slice(0, 10).reverse().map(a => Math.round((a.score / a.total) * 100));
-    new Chart(ctx, {
-      type: 'line',
-      data: { labels, datasets: [{ label: 'درجاتك %', data, borderColor: '#4f46e5', backgroundColor: 'rgba(79,70,229,0.1)', fill: true, tension: 0.4 }] },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100 } } }
-    });
+    const container = document.getElementById('dashboardContent');
+    container.innerHTML = `
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon primary">📝</div><div class="stat-info"><h4>${availableQuizzes.length}</h4><p>اختبارات متاحة</p></div></div>
+        <div class="stat-card"><div class="stat-icon success">✅</div><div class="stat-info"><h4>${completedQuizzes.length}</h4><p>حلّيتها</p></div></div>
+        <div class="stat-card"><div class="stat-icon warning">📊</div><div class="stat-info"><h4>${calculateAvg(myAttempts)}%</h4><p>متوسطك</p></div></div>
+      </div>
+      <div class="chart-container"><canvas id="studentChart"></canvas></div>
+      <div class="section-header"><div><h2 class="section-title">الاختبارات المتاحة</h2><p class="section-subtitle">${escapeHtml(currentUser.grade)} • ${escapeHtml(currentUser.stage)}${currentUser.school ? ' • ' + escapeHtml(currentUser.school) : ''}</p></div></div>
+      ${myQuizzes.length === 0 ? `<div class="card"><div class="empty-state"><div class="empty-state-icon">📚</div><h3>لا اختبارات</h3></div></div>` : `<div class="cards-grid">${myQuizzes.map(q => renderStudentQuizCard(q, myAttempts)).join('')}</div>`}
+      <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">سجل نتائجي</h2></div></div>
+      ${myAttempts.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا نتائج</h3></div></div>` : await renderMyAttempts(myAttempts.sort((a,b) => b.createdAt - a.createdAt))}
+    `;
+
+    const ctx = document.getElementById('studentChart')?.getContext('2d');
+    if (ctx && myAttempts.length > 0) {
+      const labels = myAttempts.slice(0, 10).reverse().map(a => {
+        const q = allQuizzes.find(x => x.id === a.quizId);
+        return q ? q.title.slice(0, 10) : 'اختبار';
+      });
+      const data = myAttempts.slice(0, 10).reverse().map(a => Math.round((a.score / a.total) * 100));
+      new Chart(ctx, {
+        type: 'line',
+        data: { labels, datasets: [{ label: 'درجاتك %', data, borderColor: '#4f46e5', backgroundColor: 'rgba(79,70,229,0.1)', fill: true, tension: 0.4 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100 } } }
+      });
+    }
+  } finally {
+    hideLoading();
   }
 }
 
 function renderStudentQuizCard(quiz, myAttempts) {
   const attempts = myAttempts.filter(a => a.quizId === quiz.id);
-  const best = attempts.length ? Math.max(...attempts.map(a => Math.round((a.score / a.total) * 100))) : null;
+  const isSolved = attempts.length > 0;
+  const best = isSolved ? Math.max(...attempts.map(a => Math.round((a.score / a.total) * 100))) : null;
   const pending = attempts.some(a => a.needsGrading && !a.graded);
+
+  if (isSolved) {
+    return `<div class="subject-card completed" title="لقد حللت هذا الاختبار بالفعل">
+      <div class="subject-emoji">${getSubjectEmoji(quiz.subject)}</div>
+      <div class="subject-name">${escapeHtml(quiz.title)}</div>
+      <div class="subject-meta">${getSubjectName(quiz.subject)} • ${quiz.questions.length} سؤال</div>
+      <div class="subject-footer">
+        <span class="badge badge-success">✅ تم الحل</span>
+        ${pending
+          ? `<span class="pending-badge"><span class="pending-dot"></span> بانتظار التصحيح</span>`
+          : `<span class="badge badge-${best>=80?'success':best>=50?'warning':'info'}">الدرجة: ${best}%</span>`}
+      </div>
+    </div>`;
+  }
+
   return `<div class="subject-card" onclick="startQuiz('${quiz.id}')">
     <div class="subject-emoji">${getSubjectEmoji(quiz.subject)}</div>
     <div class="subject-name">${escapeHtml(quiz.title)}</div>
     <div class="subject-meta">${getSubjectName(quiz.subject)} • ${quiz.questions.length} سؤال</div>
     <div class="subject-footer">
       <span class="badge badge-primary">ابدأ</span>
-      ${pending ? `<span class="pending-badge"><span class="pending-dot"></span> بانتظار التصحيح</span>` : ''}
-      ${best !== null ? `<span class="badge badge-${best>=80?'success':best>=50?'warning':'info'}">أفضل: ${best}%</span>` : ''}
     </div>
   </div>`;
 }
@@ -853,7 +1305,7 @@ async function updateNotifBadge() {
   if (badge) { badge.style.display = my.length > 0 ? 'flex' : 'none'; badge.textContent = my.length; }
 }
 async function openNotifications() {
-  const notifs = (await DB.get('notifications')).filter(n => n.userId === currentUser.id).sort((a, b) => b.createdAt - a.createdAt);
+  const notifs = (await DB.get('notifications')).filter(n => n.userId === currentUser.id).sort((a,b) => b.createdAt - a.createdAt);
   const unread = notifs.filter(n => !n.read);
   if (unread.length > 0) {
     const all = await DB.get('notifications');
@@ -881,76 +1333,94 @@ async function notifyStudents(quiz) {
 }
 
 /* ============================================================
-   ============ التصحيح المقالي (جديد) ============
+   ============ التصحيح المقالي ============
    ============================================================ */
 async function openGradingCenter() {
-  const allQuizzes = await DB.get('quizzes');
-  const quizzes = allQuizzes.filter(q => q.teacherId === currentUser.id);
-  const allAttempts = await DB.get('attempts');
-  const pending = allAttempts.filter(a => a.needsGrading && !a.graded && quizzes.some(q => q.id === a.quizId));
-  const allUsers = await DB.get('users');
+  showLoading();
+  try {
+    const allQuizzes = await DB.get('quizzes');
+    const quizzes = allQuizzes.filter(q => q.teacherId === currentUser.id);
+    const allAttempts = await DB.get('attempts');
+    const pending = allAttempts.filter(a => a.needsGrading && !a.graded && quizzes.some(q => q.id === a.quizId));
+    const allUsers = await DB.get('users');
 
-  if (pending.length === 0) {
-    openModal(`<div class="modal-header"><h3 class="modal-title">✏️ التصحيح</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-      <div class="empty-state"><div class="empty-state-icon">🎉</div><h3>لا توجد محاولات بحاجة للتصحيح</h3><p style="margin-top:8px;">كل شيء تحت السيطرة!</p></div>`);
-    return;
+    if (pending.length === 0) {
+      openModal(`<div class="modal-header"><h3 class="modal-title">✏️ التصحيح</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+        <div class="empty-state"><div class="empty-state-icon">🎉</div><h3>لا توجد محاولات بحاجة للتصحيح</h3><p style="margin-top:8px;">كل شيء تحت السيطرة!</p></div>`);
+      return;
+    }
+
+    openModal(`<div class="modal-header"><h3 class="modal-title">✏️ مركز التصحيح (${pending.length})</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+      <p style="color:var(--text-light); margin-bottom:16px; font-size:14px; font-weight:600;">اختر محاولة لتصحيح الأسئلة المقالية:</p>
+      ${pending.sort((a,b) => a.createdAt - b.createdAt).map(a => {
+        const quiz = quizzes.find(q => q.id === a.quizId);
+        const student = allUsers.find(u => u.id === a.studentId);
+        const essayCount = (a.results || []).filter(r => r.correct === null).length;
+        return `<div class="history-item" onclick="openGradingAttempt('${a.id}')" style="cursor:pointer;">
+          <div class="history-info">
+            <h4>${escapeHtml(student?.name || 'طالب')}</h4>
+            <p>${escapeHtml(quiz?.title || '')} • ${new Date(a.createdAt).toLocaleString('ar-EG')}</p>
+          </div>
+          <span class="badge badge-warning">${essayCount} سؤال مقالي</span>
+        </div>`;
+      }).join('')}`);
+  } finally {
+    hideLoading();
   }
-
-  openModal(`<div class="modal-header"><h3 class="modal-title">✏️ مركز التصحيح (${pending.length})</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-    <p style="color:var(--text-light); margin-bottom:16px; font-size:14px; font-weight:600;">اختر محاولة لتصحيح الأسئلة المقالية:</p>
-    ${pending.sort((a,b) => a.createdAt - b.createdAt).map(a => {
-      const quiz = quizzes.find(q => q.id === a.quizId);
-      const student = allUsers.find(u => u.id === a.studentId);
-      const essayCount = (a.results || []).filter(r => r.correct === null).length;
-      return `<div class="history-item" onclick="openGradingAttempt('${a.id}')" style="cursor:pointer;">
-        <div class="history-info">
-          <h4>${escapeHtml(student?.name || 'طالب')}</h4>
-          <p>${escapeHtml(quiz?.title || '')} • ${new Date(a.createdAt).toLocaleString('ar-EG')}</p>
-        </div>
-        <span class="badge badge-warning">${essayCount} سؤال مقالي</span>
-      </div>`;
-    }).join('')}`);
 }
 
 async function openGradingAttempt(attemptId) {
-  const allAttempts = await DB.get('attempts');
-  const attempt = allAttempts.find(a => a.id === attemptId);
-  if (!attempt) return;
-  const allQuizzes = await DB.get('quizzes');
-  const quiz = allQuizzes.find(q => q.id === attempt.quizId);
-  const allUsers = await DB.get('users');
-  const student = allUsers.find(u => u.id === attempt.studentId);
+  showLoading();
+  try {
+    const allAttempts = await DB.get('attempts');
+    const attempt = allAttempts.find(a => a.id === attemptId);
+    if (!attempt) return;
+    const allQuizzes = await DB.get('quizzes');
+    const quiz = allQuizzes.find(q => q.id === attempt.quizId);
+    if (!quiz || quiz.teacherId !== currentUser.id) {
+      openModal(`<div class="modal-header"><h3 class="modal-title">⛔ غير مصرح</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+        <div class="alert alert-error">لا تملك صلاحية الوصول لهذه المحاولة.</div>`);
+      return;
+    }
+    const allUsers = await DB.get('users');
+    const student = allUsers.find(u => u.id === attempt.studentId);
 
-  // البحث عن الأسئلة المقالية في هذه المحاولة
-  const essayQuestions = quiz.questions.map((q, i) => ({ ...q, index: i })).filter(q => q.type === 'essay');
+    const essayQuestions = quiz.questions.map((q, i) => ({ ...q, index: i })).filter(q => q.type === 'essay');
+    const prevEssayBonus = attempt.essayBonusPrev || 0;
+    const autoScore = attempt.score - prevEssayBonus;
 
-  openModal(`<div class="modal-header"><h3 class="modal-title">✏️ تصحيح: ${escapeHtml(student?.name || '')}</h3><button class="modal-close" onclick="openGradingCenter()">✕</button></div>
-    <div class="alert alert-info">
-      📝 الاختبار: <strong>${escapeHtml(quiz.title)}</strong><br>
-      📅 التاريخ: ${new Date(attempt.createdAt).toLocaleString('ar-EG')}<br>
-      📊 الدرجة الحالية: <strong>${attempt.score}/${attempt.total}</strong> (قبل تصحيح المقالي)
-    </div>
+    openModal(`<div class="modal-header"><h3 class="modal-title">✏️ تصحيح: ${escapeHtml(student?.name || '')}</h3><button class="modal-close" onclick="openGradingCenter()">✕</button></div>
+      <div class="alert alert-info">
+        📝 الاختبار: <strong>${escapeHtml(quiz.title)}</strong><br>
+        🏫 المدرسة: <strong>${escapeHtml(student?.school || 'غير محدد')}</strong><br>
+        📅 التاريخ: ${new Date(attempt.createdAt).toLocaleString('ar-EG')}<br>
+        📊 الدرجة الحالية: <strong>${attempt.score}/${attempt.total}</strong><br>
+        🤖 الدرجة التلقائية (بدون مقالي): <strong>${autoScore}</strong>
+      </div>
 
-    ${essayQuestions.map(q => {
-      const answer = attempt.answers[q.index] || '(لم يجب)';
-      const currentGrade = (attempt.essayGrades && attempt.essayGrades[q.index]) ?? 0;
-      return `<div class="grading-card">
-        <div class="grading-question">س${q.index + 1}: ${escapeHtml(q.text)}</div>
-        ${q.image ? `<img src="${q.image}" style="max-width:100%; max-height:120px; border-radius:8px; margin-bottom:12px;">` : ''}
-        <div class="grading-answer-label">📝 إجابة الطالب:</div>
-        <div class="grading-answer">${escapeHtml(answer)}</div>
-        <div class="grading-answer-label">✏️ التقييم:</div>
-        <div class="grading-btn-row">
-          ${[0, 0.25, 0.5, 0.75, 1].map(grade => `
-            <button class="grade-chip ${currentGrade === grade ? 'active' : ''}" onclick="setEssayGrade('${attempt.id}', ${q.index}, ${grade}, this)">
-              ${grade === 0 ? '❌ صفر' : grade === 1 ? '✅ كامل' : `${grade * 100}%`}
-            </button>
-          `).join('')}
-        </div>
-      </div>`;
-    }).join('')}
+      ${essayQuestions.map(q => {
+        const answer = attempt.answers[q.index] || '(لم يجب)';
+        const currentGrade = (attempt.essayGrades && attempt.essayGrades[q.index]) ?? 0;
+        return `<div class="grading-card">
+          <div class="grading-question">س${q.index + 1}: ${escapeHtml(q.text)}</div>
+          ${q.image ? `<img src="${q.image}" style="max-width:100%; max-height:120px; border-radius:8px; margin-bottom:12px;">` : ''}
+          <div class="grading-answer-label">📝 إجابة الطالب:</div>
+          <div class="grading-answer">${escapeHtml(answer)}</div>
+          <div class="grading-answer-label">✏️ التقييم:</div>
+          <div class="grading-btn-row">
+            ${[0, 0.25, 0.5, 0.75, 1].map(grade => `
+              <button class="grade-chip ${currentGrade === grade ? 'active' : ''}" onclick="setEssayGrade('${attempt.id}', ${q.index}, ${grade}, this)">
+                ${grade === 0 ? '❌ صفر' : grade === 1 ? '✅ كامل' : `${grade * 100}%`}
+              </button>
+            `).join('')}
+          </div>
+        </div>`;
+      }).join('')}
 
-    <button class="btn btn-success btn-full" onclick="finalizeGrading('${attempt.id}')" style="margin-top:16px;">💾 حفظ التصحيح وإرسال النتيجة للطالب</button>`);
+      <button class="btn btn-success btn-full" onclick="finalizeGrading('${attempt.id}')" style="margin-top:16px;">💾 حفظ التصحيح وإرسال النتيجة للطالب</button>`);
+  } finally {
+    hideLoading();
+  }
 }
 
 async function setEssayGrade(attemptId, questionIndex, grade, btn) {
@@ -960,56 +1430,54 @@ async function setEssayGrade(attemptId, questionIndex, grade, btn) {
   if (!attempt.essayGrades) attempt.essayGrades = {};
   attempt.essayGrades[questionIndex] = grade;
   await DB.set('attempts', allAttempts);
-
-  // تحديث الأزرار النشطة
   const parent = btn.parentElement;
   parent.querySelectorAll('.grade-chip').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 }
 
 async function finalizeGrading(attemptId) {
-  const allAttempts = await DB.get('attempts');
-  const attempt = allAttempts.find(a => a.id === attemptId);
-  if (!attempt) return;
+  showLoading();
+  try {
+    const allAttempts = await DB.get('attempts');
+    const attempt = allAttempts.find(a => a.id === attemptId);
+    if (!attempt) return;
 
-  // حساب الدرجة الجديدة
-  const essayGrades = attempt.essayGrades || {};
-  let essayBonus = 0;
-  Object.keys(essayGrades).forEach(idx => { essayBonus += essayGrades[idx]; });
-  attempt.score = attempt.essayBonusBase !== undefined 
-    ? attempt.essayBonusBase + essayBonus 
-    : attempt.score + essayBonus;
-  // احفظ الدرجة الجديدة
-  const allQuizzes = await DB.get('quizzes');
-  const quiz = allQuizzes.find(q => q.id === attempt.quizId);
-  const autoGradedCount = quiz.questions.filter(q => q.type !== 'essay').length;
-  const essayCount = quiz.questions.filter(q => q.type === 'essay').length;
-  if (attempt.essayBonusBase === undefined) {
-    // أول مرة: احسب أساس الدرجة التلقائية
-    attempt.essayBonusBase = attempt.score - essayBonus;
+    const allQuizzes = await DB.get('quizzes');
+    const quiz = allQuizzes.find(q => q.id === attempt.quizId);
+    if (!quiz || quiz.teacherId !== currentUser.id) {
+      alert('غير مصرح'); return;
+    }
+
+    if (attempt.autoScore === undefined) {
+      const prevBonus = attempt.essayBonusPrev || 0;
+      attempt.autoScore = attempt.score - prevBonus;
+    }
+    const essayBonus = Object.values(attempt.essayGrades || {}).reduce((a, b) => a + Number(b || 0), 0);
+    attempt.score = attempt.autoScore + essayBonus;
+    attempt.essayBonusPrev = essayBonus;
+    attempt.needsGrading = false;
+    attempt.graded = true;
+    attempt.gradedAt = Date.now();
+    attempt.gradedBy = currentUser.id;
+
+    await DB.set('attempts', allAttempts);
+
+    const notifs = await DB.get('notifications');
+    notifs.push({
+      id: uid(),
+      userId: attempt.studentId,
+      title: '✅ تم تصحيح اختبارك',
+      body: `تم تصحيح "${quiz.title}". درجتك النهائية: ${attempt.score}/${attempt.total}`,
+      createdAt: Date.now(),
+      read: false
+    });
+    await DB.set('notifications', notifs);
+
+    closeModal();
+    renderTeacherDashboard();
+  } finally {
+    hideLoading();
   }
-  attempt.score = attempt.essayBonusBase + essayBonus;
-  attempt.needsGrading = false;
-  attempt.graded = true;
-  attempt.gradedAt = Date.now();
-  attempt.gradedBy = currentUser.id;
-
-  await DB.set('attempts', allAttempts);
-
-  // إشعار للطالب
-  const notifs = await DB.get('notifications');
-  notifs.push({
-    id: uid(),
-    userId: attempt.studentId,
-    title: '✅ تم تصحيح اختبارك',
-    body: `تم تصحيح "${quiz.title}". درجتك النهائية: ${attempt.score}/${attempt.total}`,
-    createdAt: Date.now(),
-    read: false
-  });
-  await DB.set('notifications', notifs);
-
-  closeModal();
-  renderTeacherDashboard();
 }
 
 /* ============================================================
@@ -1028,6 +1496,7 @@ async function exportResults() {
     const pct = Math.round((a.score / a.total) * 100);
     return {
       'الطالب': student?.name || '',
+      'المدرسة': student?.school || '',
       'الاختبار': quiz?.title || '',
       'المادة': getSubjectName(quiz?.subject),
       'السنة': quiz?.grade || '',
@@ -1048,10 +1517,10 @@ async function exportResults() {
   doc.setFontSize(16);
   doc.text('نتائج الطلاب', 14, 15);
   doc.autoTable({
-    head: [['الطالب', 'الاختبار', 'المادة', 'الدرجة', 'النسبة', 'الحالة', 'التاريخ']],
-    body: rows.map(r => [r['الطالب'], r['الاختبار'], r['المادة'], `${r['الدرجة']}/${r['الإجمالي']}`, `${r['النسبة %']}%`, r['الحالة'], r['التاريخ']]),
+    head: [['الطالب', 'المدرسة', 'الاختبار', 'المادة', 'الدرجة', 'النسبة', 'الحالة', 'التاريخ']],
+    body: rows.map(r => [r['الطالب'], r['المدرسة'], r['الاختبار'], r['المادة'], `${r['الدرجة']}/${r['الإجمالي']}`, `${r['النسبة %']}%`, r['الحالة'], r['التاريخ']]),
     startY: 25,
-    styles: { fontSize: 9 },
+    styles: { fontSize: 8 },
     headStyles: { fillColor: [79, 70, 229] }
   });
   doc.save('نتائج_الطلاب.pdf');
@@ -1061,7 +1530,8 @@ async function exportStudents() {
   const users = (await DB.get('users')).filter(u => u.role === 'student');
   if (!users.length) { alert('لا يوجد طلاب'); return; }
   const rows = users.map(u => ({
-    'الاسم': u.name, 'البريد': u.email, 'المرحلة': u.stage, 'السنة': u.grade,
+    'الاسم': u.name, 'البريد': u.email, 'المدرسة': u.school || '', 'المرحلة': u.stage, 'السنة': u.grade,
+    'طريقة التسجيل': u.provider === 'google' ? 'Google' : 'بريد إلكتروني',
     'تاريخ التسجيل': new Date(u.createdAt).toLocaleDateString('ar-EG')
   }));
   const ws = XLSX.utils.json_to_sheet(rows);
@@ -1177,81 +1647,110 @@ function addQuestion() {
 function removeQuestion(i) { newQuizData.questions.splice(i, 1); showQuestionsEditor(); }
 async function saveQuiz() {
   if (!newQuizData.questions.length) return;
-  const quiz = {
-    id: uid(), teacherId: currentUser.id, title: newQuizData.title, subject: newQuizData.subject,
-    grade: newQuizData.grade, timePerQuestion: newQuizData.timePerQuestion,
-    questions: newQuizData.questions, createdAt: Date.now()
-  };
-  const quizzes = await DB.get('quizzes');
-  quizzes.push(quiz);
-  await DB.set('quizzes', quizzes);
-  await notifyStudents(quiz);
-  newQuizData = null; closeModal(); renderTeacherDashboard();
+  showLoading();
+  try {
+    const quiz = {
+      id: uid(), teacherId: currentUser.id, title: newQuizData.title, subject: newQuizData.subject,
+      grade: newQuizData.grade, timePerQuestion: newQuizData.timePerQuestion,
+      questions: newQuizData.questions, createdAt: Date.now()
+    };
+    const quizzes = await DB.get('quizzes');
+    quizzes.push(quiz);
+    await DB.set('quizzes', quizzes);
+    await notifyStudents(quiz);
+    newQuizData = null; closeModal(); renderTeacherDashboard();
+  } finally {
+    hideLoading();
+  }
 }
 
 /* ============================================================
    ============ Teacher: Manage Quiz ============
    ============================================================ */
 async function openQuizManage(quizId) {
-  const quizzes = await DB.get('quizzes');
-  const quiz = quizzes.find(q => q.id === quizId);
-  if (!quiz) return;
-  const attempts = (await DB.get('attempts')).filter(a => a.quizId === quizId);
-  const users = await DB.get('users');
-  const attemptsHtml = attempts.length > 0 ? `<h4 style="font-size:16px;font-weight:800;margin-top:20px;margin-bottom:12px;">النتائج (${attempts.length})</h4>${attempts.sort((a, b) => b.createdAt - a.createdAt).map(a => {
-    const st = users.find(u => u.id === a.studentId);
-    const pct = Math.round((a.score / a.total) * 100);
-    const pending = a.needsGrading && !a.graded;
-    return `<div class="history-item">
-      <div class="history-info"><h4>${escapeHtml(st?.name || 'طالب')}</h4><p>${new Date(a.createdAt).toLocaleString('ar-EG')}</p></div>
-      ${pending ? `<span class="pending-badge"><span class="pending-dot"></span> بانتظار التصحيح</span>` : ''}
-      <div class="history-score">${a.score}/${a.total}</div>
-      <span class="badge badge-${pct>=80?'success':pct>=50?'warning':'danger'}">${pct}%</span>
-    </div>`;
-  }).join('')}` : '';
-
-  openModal(`<div class="modal-header"><h3 class="modal-title">${escapeHtml(quiz.title)}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-    <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
-      <span class="badge badge-primary">${getSubjectEmoji(quiz.subject)} ${getSubjectName(quiz.subject)}</span>
-      <span class="badge badge-info">${escapeHtml(quiz.grade)}</span>
-      <span class="badge badge-success">${quiz.questions.length} سؤال</span>
-      <span class="badge badge-warning">⏱️ ${quiz.timePerQuestion || 30}ث</span>
-    </div>
-    <h4 style="font-size:16px;font-weight:800;margin-bottom:12px;">الأسئلة</h4>
-    ${quiz.questions.map((q, i) => {
-      const ti = QUESTION_TYPES[q.type] || QUESTION_TYPES.mcq;
-      return `<div class="question-item">
-        <div class="question-item-header">
-          <span style="font-weight:900;color:var(--primary);">س${i + 1}</span>
-          <span class="question-type-badge qtype-${q.type}">${ti.emoji} ${ti.name}</span>
-          <div class="question-item-text">${escapeHtml(q.text)}</div>
-        </div>
-        ${q.image ? `<img src="${q.image}" style="max-width:100%;max-height:100px;border-radius:8px;margin-bottom:8px;">` : ''}
+  showLoading();
+  try {
+    const quizzes = await DB.get('quizzes');
+    const quiz = quizzes.find(q => q.id === quizId);
+    if (!quiz || quiz.teacherId !== currentUser.id) return;
+    const attempts = (await DB.get('attempts')).filter(a => a.quizId === quizId);
+    const users = await DB.get('users');
+    const attemptsHtml = attempts.length > 0 ? `<h4 style="font-size:16px;font-weight:800;margin-top:20px;margin-bottom:12px;">النتائج (${attempts.length})</h4>${attempts.sort((a, b) => b.createdAt - a.createdAt).map(a => {
+      const st = users.find(u => u.id === a.studentId);
+      const pct = Math.round((a.score / a.total) * 100);
+      const pending = a.needsGrading && !a.graded;
+      return `<div class="history-item">
+        <div class="history-info"><h4>${escapeHtml(st?.name || 'طالب')}</h4><p>${escapeHtml(st?.school || '')} • ${new Date(a.createdAt).toLocaleString('ar-EG')}</p></div>
+        ${pending ? `<span class="pending-badge"><span class="pending-dot"></span> بانتظار التصحيح</span>` : ''}
+        <div class="history-score">${a.score}/${a.total}</div>
+        <span class="badge badge-${pct>=80?'success':pct>=50?'warning':'danger'}">${pct}%</span>
       </div>`;
-    }).join('')}
-    ${attemptsHtml}
-    <div style="display:flex;gap:8px;margin-top:20px;">
-      <button class="btn btn-danger" onclick="deleteQuiz('${quiz.id}')" style="flex:1;">🗑 حذف</button>
-      <button class="btn btn-outline" onclick="closeModal()" style="flex:2;">إغلاق</button>
-    </div>`);
+    }).join('')}` : '';
+
+    openModal(`<div class="modal-header"><h3 class="modal-title">${escapeHtml(quiz.title)}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+      <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+        <span class="badge badge-primary">${getSubjectEmoji(quiz.subject)} ${getSubjectName(quiz.subject)}</span>
+        <span class="badge badge-info">${escapeHtml(quiz.grade)}</span>
+        <span class="badge badge-success">${quiz.questions.length} سؤال</span>
+        <span class="badge badge-warning">⏱️ ${quiz.timePerQuestion || 30}ث</span>
+      </div>
+      <h4 style="font-size:16px;font-weight:800;margin-bottom:12px;">الأسئلة</h4>
+      ${quiz.questions.map((q, i) => {
+        const ti = QUESTION_TYPES[q.type] || QUESTION_TYPES.mcq;
+        return `<div class="question-item">
+          <div class="question-item-header">
+            <span style="font-weight:900;color:var(--primary);">س${i + 1}</span>
+            <span class="question-type-badge qtype-${q.type}">${ti.emoji} ${ti.name}</span>
+            <div class="question-item-text">${escapeHtml(q.text)}</div>
+          </div>
+          ${q.image ? `<img src="${q.image}" style="max-width:100%;max-height:100px;border-radius:8px;margin-bottom:8px;">` : ''}
+        </div>`;
+      }).join('')}
+      ${attemptsHtml}
+      <div style="display:flex;gap:8px;margin-top:20px;">
+        <button class="btn btn-danger" onclick="deleteQuiz('${quiz.id}')" style="flex:1;">🗑 حذف</button>
+        <button class="btn btn-outline" onclick="closeModal()" style="flex:2;">إغلاق</button>
+      </div>`);
+  } finally {
+    hideLoading();
+  }
 }
 async function deleteQuiz(quizId) {
-  if (!confirm('حذف الاختبار؟')) return;
-  await DB.set('quizzes', (await DB.get('quizzes')).filter(q => q.id !== quizId));
-  await DB.set('attempts', (await DB.get('attempts')).filter(a => a.quizId !== quizId));
-  closeModal(); renderTeacherDashboard();
+  if (!confirm('حذف الاختبار؟ سيتم حذف جميع محاولات الطلاب أيضاً. هل أنت متأكد؟')) return;
+  showLoading();
+  try {
+    await DB.set('quizzes', (await DB.get('quizzes')).filter(q => q.id !== quizId));
+    await DB.set('attempts', (await DB.get('attempts')).filter(a => a.quizId !== quizId));
+    closeModal(); renderTeacherDashboard();
+  } finally {
+    hideLoading();
+  }
 }
 
 /* ============================================================
    ============ Student: Take Quiz ============
    ============================================================ */
 async function startQuiz(quizId) {
-  const quizzes = await DB.get('quizzes');
-  const quiz = quizzes.find(q => q.id === quizId);
-  if (!quiz) return;
-  currentQuiz = quiz; currentQuestionIndex = 0; currentAnswers = [];
-  selectedAnswerIndex = null; tfSelected = null;
-  showScreen('quiz'); renderCurrentQuestion();
+  showLoading();
+  try {
+    const quizzes = await DB.get('quizzes');
+    const quiz = quizzes.find(q => q.id === quizId);
+    if (!quiz) return;
+
+    const allAttempts = await DB.get('attempts');
+    const alreadySolved = allAttempts.some(a => a.quizId === quizId && a.studentId === currentUser.id);
+    if (alreadySolved) {
+      hideLoading();
+      alert('لقد قمت بحل هذا الاختبار بالفعل. لا يمكن إعادة حله.');
+      return;
+    }
+
+    currentQuiz = quiz; currentQuestionIndex = 0; currentAnswers = [];
+    selectedAnswerIndex = null; tfSelected = null;
+    showScreen('quiz'); renderCurrentQuestion();
+  } finally {
+    hideLoading();
+  }
 }
 function renderCurrentQuestion() {
   const q = currentQuiz.questions[currentQuestionIndex];
@@ -1331,44 +1830,58 @@ function checkAnswer(q, a) {
 }
 async function finishQuiz() {
   clearInterval(timerInterval);
-  let score = 0, autoGraded = 0, hasEssay = false;
-  const results = currentQuiz.questions.map((q, i) => {
-    const a = currentAnswers[i];
-    const c = checkAnswer(q, a);
-    if (c === true) { score++; autoGraded++; }
-    else if (c === false) autoGraded++;
-    else if (c === null) hasEssay = true;
-    return { questionIndex: i, answer: a, correct: c };
-  });
-  const attempt = {
-    id: uid(), quizId: currentQuiz.id, studentId: currentUser.id,
-    score, total: currentQuiz.questions.length, autoGraded,
-    answers: currentAnswers, results, createdAt: Date.now(),
-    needsGrading: hasEssay, graded: !hasEssay,
-    essayGrades: {}
-  };
-  const attempts = await DB.get('attempts');
-  attempts.push(attempt);
-  await DB.set('attempts', attempts);
+  showLoading();
+  try {
+    const existing = await DB.get('attempts');
+    if (existing.some(a => a.quizId === currentQuiz.id && a.studentId === currentUser.id)) {
+      hideLoading();
+      alert('لقد قمت بحل هذا الاختبار بالفعل.');
+      exitQuiz();
+      return;
+    }
 
-  const pct = autoGraded > 0 ? Math.round((score / autoGraded) * 100) : 0;
-  const emoji = pct >= 80 ? '🏆' : pct >= 50 ? '👍' : '💪';
-  const title = pct >= 80 ? 'ممتاز! 🎉' : pct >= 50 ? 'جيد جداً' : 'حاول مرة أخرى';
-  const msg = pct >= 80 ? 'أداء رائع!' : pct >= 50 ? 'يمكنك الأفضل' : 'راجع وحاول مجدداً!';
-  const essayCount = currentQuiz.questions.filter(q => q.type === 'essay').length;
+    let score = 0, autoGraded = 0, hasEssay = false;
+    const results = currentQuiz.questions.map((q, i) => {
+      const a = currentAnswers[i];
+      const c = checkAnswer(q, a);
+      if (c === true) { score++; autoGraded++; }
+      else if (c === false) autoGraded++;
+      else if (c === null) hasEssay = true;
+      return { questionIndex: i, answer: a, correct: c };
+    });
+    const attempt = {
+      id: uid(), quizId: currentQuiz.id, studentId: currentUser.id,
+      score, total: currentQuiz.questions.length, autoGraded,
+      autoScore: score,
+      answers: currentAnswers, results, createdAt: Date.now(),
+      needsGrading: hasEssay, graded: !hasEssay,
+      essayGrades: {}, essayBonusPrev: 0
+    };
+    existing.push(attempt);
+    await DB.set('attempts', existing);
 
-  document.getElementById('quizContent').innerHTML = `
-    <div style="text-align:center;padding:20px 0;">
-      <div style="font-size:80px;margin-bottom:16px;">${emoji}</div>
-      <h2 style="font-size:26px;font-weight:900;margin-bottom:12px;color:${pct>=80?'var(--success)':pct>=50?'var(--primary)':'var(--danger)'};">${title}</h2>
-      <div style="font-size:56px;font-weight:900;color:var(--primary);margin-bottom:4px;">${score}<span style="font-size:28px;color:var(--text-light);"> / ${autoGraded}</span></div>
-      <p style="font-size:20px;font-weight:700;color:var(--text-light);margin-bottom:12px;">${pct}% (التلقائي)</p>
-      ${essayCount > 0 ? `<div class="alert alert-warning" style="text-align:right;">📄 لديك <strong>${essayCount}</strong> سؤال مقالي — سيتم تصحيحه من قبل المعلم. سيصلك إشعار عند اكتمال التصحيح.</div>` : ''}
-      <p style="font-size:15px;color:var(--text-light);margin-bottom:28px;line-height:1.7;">${msg}</p>
-      <button class="btn btn-primary btn-lg" onclick="exitQuiz()">🏠 العودة</button>
-    </div>`;
-  document.getElementById('quizProgressFill').style.width = '100%';
-  document.getElementById('quizProgressText').textContent = 'تم';
+    const pct = autoGraded > 0 ? Math.round((score / autoGraded) * 100) : 0;
+    const emoji = pct >= 80 ? '🏆' : pct >= 50 ? '👍' : '💪';
+    const title = pct >= 80 ? 'ممتاز! 🎉' : pct >= 50 ? 'جيد جداً' : 'حاول مرة أخرى';
+    const msg = pct >= 80 ? 'أداء رائع!' : pct >= 50 ? 'يمكنك الأفضل' : 'راجع وحاول مجدداً!';
+    const essayCount = currentQuiz.questions.filter(q => q.type === 'essay').length;
+
+    document.getElementById('quizContent').innerHTML = `
+      <div style="text-align:center;padding:20px 0;">
+        <div style="font-size:80px;margin-bottom:16px;">${emoji}</div>
+        <h2 style="font-size:26px;font-weight:900;margin-bottom:12px;color:${pct>=80?'var(--success)':pct>=50?'var(--primary)':'var(--danger)'};">${title}</h2>
+        <div style="font-size:56px;font-weight:900;color:var(--primary);margin-bottom:4px;">${score}<span style="font-size:28px;color:var(--text-light);"> / ${autoGraded}</span></div>
+        <p style="font-size:20px;font-weight:700;color:var(--text-light);margin-bottom:12px;">${pct}% (التلقائي)</p>
+        ${essayCount > 0 ? `<div class="alert alert-warning" style="text-align:right;">📄 لديك <strong>${essayCount}</strong> سؤال مقالي — سيتم تصحيحه من قبل المعلم. سيصلك إشعار عند اكتمال التصحيح.</div>` : ''}
+        <div class="alert alert-info" style="text-align:right;">🔒 لا يمكن إعادة حل هذا الاختبار. تم تسجيل محاولتك الوحيدة.</div>
+        <p style="font-size:15px;color:var(--text-light);margin-bottom:28px;line-height:1.7;">${msg}</p>
+        <button class="btn btn-primary btn-lg" onclick="exitQuiz()">🏠 العودة</button>
+      </div>`;
+    document.getElementById('quizProgressFill').style.width = '100%';
+    document.getElementById('quizProgressText').textContent = 'تم';
+  } finally {
+    hideLoading();
+  }
 }
 function exitQuiz() {
   clearInterval(timerInterval);
@@ -1382,6 +1895,7 @@ function exitQuiz() {
    ============================================================ */
 window.addEventListener('DOMContentLoaded', async () => {
   loadDarkMode();
+  document.getElementById('devYear').textContent = new Date().getFullYear();
   await initFirebase();
   const ok = await checkSession();
   if (!ok) showScreen('auth');
@@ -1392,13 +1906,13 @@ document.getElementById('modalOverlay').addEventListener('click', (e) => { if (e
    ============ Global Exports ============
    ============================================================ */
 const globalFns = [
-  switchAuthTab, pickRole, handleRegister, handleLogin, logout, toggleDarkMode,
+  switchAuthTab, pickRole, handleRegister, handleLogin, handleGoogleSignIn, handleForgotPassword, logout, toggleDarkMode,
   openFirebaseConfig, applyFirebaseConfig, clearFirebaseConfig, openNotifications, closeModal,
   openNewQuizModal, continueToQuestions, showQuestionsEditor, openAddQuestionForm, changeQType,
   pickTFAnswer, handleImageUpload, clearImage, addQuestion, removeQuestion, saveQuiz,
   openQuizManage, deleteQuiz, startQuiz, selectMcqAnswer, selectTfAnswer, onFillInput, onEssayInput,
   nextQuizQuestion, exitQuiz, exportResults, exportStudents, openGradingCenter, openGradingAttempt,
-  setEssayGrade, finalizeGrading
+  setEssayGrade, finalizeGrading, pickGoogleRole, completeGoogleProfile, cancelGoogleProfile
 ];
 globalFns.forEach(fn => { try { window[fn.name] = fn; } catch(e) {} });
 </script>
