@@ -255,12 +255,31 @@
   .broadcast-option:hover { border-color: var(--primary); }
   .broadcast-option input[type="radio"] { width: 20px; height: 20px; accent-color: var(--primary); }
 
+  /* ===== User Tabs (في لوحة الأدمن) ===== */
+  .user-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .user-tab { padding: 12px 24px; border: 2px solid var(--border); background: var(--card); border-radius: 12px; font-family: inherit; font-size: 15px; font-weight: 700; color: var(--text-light); cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+  .user-tab:hover { border-color: var(--primary); color: var(--primary); }
+  .user-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(79,70,229,0.3); }
+  .user-tab .count { background: rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 999px; font-size: 12px; }
+  .user-tab:not(.active) .count { background: var(--bg); color: var(--text-light); }
+
+  /* ===== Subject Group Header ===== */
+  .subject-group { margin-bottom: 32px; }
+  .subject-group-header { display: flex; align-items: center; gap: 12px; padding: 14px 20px; background: linear-gradient(135deg, var(--primary-light), transparent); border-radius: 14px; margin-bottom: 16px; border-right: 4px solid var(--primary); flex-wrap: wrap; }
+  .subject-group-emoji { font-size: 32px; flex-shrink: 0; }
+  .subject-group-title { font-size: 20px; font-weight: 900; color: var(--text); flex: 1; min-width: 120px; }
+  .subject-group-count { padding: 4px 12px; background: var(--primary); color: #fff; border-radius: 999px; font-size: 13px; font-weight: 800; }
+  body.dark-mode .subject-group-header { background: linear-gradient(135deg, var(--primary-light), transparent); }
+
   @media (max-width: 600px) {
     .card { padding: 20px; } .auth-wrapper { margin: 20px auto; }
     .stats-grid { grid-template-columns: repeat(2, 1fr); } .stat-card { flex-direction: column; text-align: center; }
     .section-title { font-size: 18px; } .modal { padding: 20px; } .user-info h3 { font-size: 16px; }
     .qtype-picker { grid-template-columns: 1fr 1fr; } .chart-container { height: 220px; }
     .leaderboard-rank { width: 40px; height: 40px; font-size: 16px; }
+    .user-tab { padding: 10px 16px; font-size: 13px; }
+    .subject-group-title { font-size: 16px; }
+    .subject-group-emoji { font-size: 26px; }
   }
 </style>
 </head>
@@ -466,7 +485,7 @@ async function initFirebase() {
 }
 
 /* ============================================================
-   ============ إدارة البيانات (محسّنة) ============
+   ============ إدارة البيانات ============
    ============================================================ */
 const DB = {
   _toArray(data) {
@@ -671,6 +690,7 @@ let selectedAnswerIndex = null, timerInterval = null, timeLeft = 0;
 let selectedRole = 'student';
 let selectedQuestionType = 'mcq', tfAnswer = true, uploadedImageData = null, tfSelected = null, newQuizData = null;
 let editingQuizId = null;
+let currentUserTab = 'students';
 
 /* ============================================================
    ============ أدوات ============
@@ -1249,7 +1269,7 @@ async function logout() {
 }
 
 /* ============================================================
-   ============ checkSession (محسّن) ============
+   ============ checkSession ============
    ============================================================ */
 async function checkSession() {
   await handleGoogleRedirectResult();
@@ -1384,6 +1404,16 @@ async function renderAdminDashboard() {
         <div class="stat-card"><div class="stat-icon warning">📊</div><div class="stat-info"><h4>${calculateAvg(allAttempts)}%</h4><p>المتوسط العام</p></div></div>
       </div>
 
+      <div class="card" style="border-right:4px solid var(--danger); background: var(--danger-light);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h3 style="font-size:16px; font-weight:900; color:var(--danger); margin-bottom:4px;">🗑 منطقة الخطر</h3>
+            <p style="font-size:13px; color:var(--text-light); font-weight:600;">مسح جميع الاختبارات والمحاولات (لا يؤثر على حسابات المستخدمين)</p>
+          </div>
+          <button class="btn btn-danger" onclick="wipeQuizData()">🗑 مسح جميع الاختبارات والمحاولات</button>
+        </div>
+      </div>
+
       ${pendingTeachers.length > 0 ? `
         <div class="card" style="border-right:4px solid var(--warning); background: var(--warning-light);">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
@@ -1396,27 +1426,77 @@ async function renderAdminDashboard() {
       ` : ''}
 
       <div class="section-header" style="margin-top:32px;">
-        <div><h2 class="section-title">إدارة المستخدمين</h2><p class="section-subtitle">جميع المستخدمين المسجلين</p></div>
+        <div><h2 class="section-title">إدارة المستخدمين</h2><p class="section-subtitle">جميع المستخدمين المسجلين (${allUsers.length})</p></div>
       </div>
 
-      <div class="card" style="max-height:500px; overflow-y:auto;">
-        ${allUsers.sort((a,b) => (b.createdAt||0) - (a.createdAt||0)).map(u => `
-          <div class="student-row">
-            <div class="student-info">
-              <h4>${escapeHtml(u.name)} ${isAdmin(u) ? '<span class="admin-badge">👑 أدمن</span>' : ''} ${u.approved === false ? '<span class="badge badge-warning">⏳ معلق</span>' : ''}</h4>
-              <p>${escapeHtml(u.email)} • ${u.role === 'student' ? escapeHtml(u.grade || '') + ' • ' + escapeHtml(u.school || '') : u.role === 'teacher' ? getSubjectName(u.subject) : 'مدير'}</p>
-            </div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              ${u.approved === false && u.role === 'teacher' ? `<button class="btn btn-sm btn-success" onclick="approveTeacher('${u.id}')">✅ اعتماد</button>` : ''}
-              ${!isAdmin(u) ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')">🗑 حذف</button>` : ''}
-            </div>
-          </div>
-        `).join('')}
+      <div class="user-tabs">
+        <button class="user-tab ${currentUserTab === 'students' ? 'active' : ''}" onclick="switchUserTab('students')">
+          👨‍🎓 الطلاب <span class="count">${students.length}</span>
+        </button>
+        <button class="user-tab ${currentUserTab === 'teachers' ? 'active' : ''}" onclick="switchUserTab('teachers')">
+          👨‍🏫 المدرسون <span class="count">${teachers.length}</span>
+        </button>
+      </div>
+
+      <div class="card" id="usersListContainer">
+        ${renderUsersListForTab(allUsers, allAttempts, currentUserTab)}
       </div>
     `;
   } finally {
     hideLoading();
   }
+}
+
+function switchUserTab(tab) {
+  currentUserTab = tab;
+  renderAdminDashboard();
+}
+
+function renderUsersListForTab(allUsers, allAttempts, tab) {
+  let filtered = [];
+  let emptyMsg = '';
+
+  if (tab === 'students') {
+    filtered = allUsers.filter(u => u.role === 'student');
+    emptyMsg = 'لا يوجد طلاب مسجلون';
+  } else {
+    filtered = allUsers.filter(u => u.role === 'teacher');
+    emptyMsg = 'لا يوجد مدرسون مسجلون';
+  }
+
+  if (filtered.length === 0) {
+    return `<div class="empty-state"><div class="empty-state-icon">${tab === 'students' ? '👨‍🎓' : '👨‍🏫'}</div><h3>${emptyMsg}</h3></div>`;
+  }
+
+  filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+  return filtered.map(u => {
+    if (tab === 'students') {
+      const sAttempts = allAttempts.filter(a => a.studentId === u.id);
+      const avg = sAttempts.length ? calculateAvg(sAttempts) : 0;
+      return `<div class="student-row">
+        <div class="student-info">
+          <h4>${escapeHtml(u.name)} ${u.provider === 'google' ? '🔵' : ''}</h4>
+          <p>${escapeHtml(u.email)} • ${escapeHtml(u.grade || '')} • ${escapeHtml(u.school || '')} • ${sAttempts.length} محاولة • متوسط ${avg}%</p>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="badge badge-${avg>=80?'success':avg>=50?'warning':'danger'}">${avg}%</span>
+          <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')">🗑 حذف</button>
+        </div>
+      </div>`;
+    } else {
+      return `<div class="student-row">
+        <div class="student-info">
+          <h4>${escapeHtml(u.name)} ${isAdmin(u) ? '<span class="admin-badge">👑 أدمن</span>' : ''} ${u.approved === false ? '<span class="badge badge-warning">⏳ معلق</span>' : ''}</h4>
+          <p>${escapeHtml(u.email)} • ${getSubjectName(u.subject)} • ${new Date(u.createdAt).toLocaleDateString('ar-EG')}</p>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          ${u.approved === false ? `<button class="btn btn-sm btn-success" onclick="approveTeacher('${u.id}')">✅ اعتماد</button>` : ''}
+          ${!isAdmin(u) ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')">🗑 حذف</button>` : ''}
+        </div>
+      </div>`;
+    }
+  }).join('');
 }
 
 async function openPendingTeachers() {
@@ -1491,6 +1571,54 @@ async function deleteUser(userId) {
   }
 }
 
+/* ============================================================
+   ============ Wipe Data ============
+   ============================================================ */
+async function wipeQuizData() {
+  if (!isAdmin(currentUser)) { alert('غير مصرح'); return; }
+
+  const confirmed = confirm(
+    '⚠️ تحذير خطير!\n\n' +
+    'سيتم حذف:\n' +
+    '• جميع الاختبارات\n' +
+    '• جميع محاولات الطلاب\n' +
+    '• جميع الإشعارات\n\n' +
+    'لن تُحذف حسابات المستخدمين.\n\n' +
+    'هل أنت متأكد؟'
+  );
+  if (!confirmed) return;
+
+  const doubleConfirm = prompt('اكتب كلمة "حذف" (بالعربية) للتأكيد النهائي:');
+  if (doubleConfirm !== 'حذف') {
+    alert('تم الإلغاء');
+    return;
+  }
+
+  showLoading();
+  try {
+    await DB.set('quizzes', []);
+    await DB.set('attempts', []);
+    await DB.set('notifications', []);
+
+    if (firebaseEnabled && fbDB) {
+      try {
+        await fbDB.set(fbDB.ref(fbDB.db, 'quizzes'), null);
+        await fbDB.set(fbDB.ref(fbDB.db, 'attempts'), null);
+        await fbDB.set(fbDB.ref(fbDB.db, 'notifications'), null);
+      } catch (e) {
+        console.warn('مسح مباشر فشل:', e);
+      }
+    }
+
+    alert('✅ تم مسح جميع الاختبارات والمحاولات والإشعارات بنجاح');
+    renderAdminDashboard();
+  } catch (e) {
+    alert('حدث خطأ: ' + e.message);
+  } finally {
+    hideLoading();
+  }
+}
+
 function renderPendingTeacherDashboard() {
   const container = document.getElementById('dashboardContent');
   container.innerHTML = `
@@ -1524,6 +1652,17 @@ async function renderTeacherDashboard() {
 
     const pendingGrading = attempts.filter(a => a.needsGrading && !a.graded);
 
+    // ✅ تجميع اختبارات المدرس حسب المادة
+    const bySubject = {};
+    quizzes.forEach(q => {
+      const key = q.subject || 'other';
+      if (!bySubject[key]) bySubject[key] = [];
+      bySubject[key].push(q);
+    });
+    const orderedSubjects = SUBJECTS
+      .filter(s => bySubject[s.id] && bySubject[s.id].length > 0)
+      .map(s => ({ ...s, quizzes: bySubject[s.id] }));
+
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
       <div class="stats-grid">
@@ -1547,7 +1686,7 @@ async function renderTeacherDashboard() {
       <div class="chart-container"><canvas id="teacherChart"></canvas></div>
 
       <div class="section-header">
-        <div><h2 class="section-title">اختباراتي</h2><p class="section-subtitle">إدارة الاختبارات</p></div>
+        <div><h2 class="section-title">اختباراتي</h2><p class="section-subtitle">إدارة الاختبارات (مجمّعة حسب المادة)</p></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn btn-outline btn-sm" onclick="renderTeacherDashboard()">🔄 تحديث</button>
           <button class="btn btn-outline btn-sm" onclick="openBroadcastModal()">📢 إشعار جماعي</button>
@@ -1556,7 +1695,20 @@ async function renderTeacherDashboard() {
         </div>
       </div>
 
-      ${quizzes.length === 0 ? `<div class="card"><div class="empty-state"><div class="empty-state-icon">📚</div><h3>لا توجد اختبارات</h3></div></div>` : `<div class="cards-grid">${quizzes.map(renderQuizCard).join('')}</div>`}
+      ${quizzes.length === 0 ? `
+        <div class="card"><div class="empty-state"><div class="empty-state-icon">📚</div><h3>لا توجد اختبارات</h3></div></div>
+      ` : orderedSubjects.map(subj => `
+        <div class="subject-group">
+          <div class="subject-group-header">
+            <span class="subject-group-emoji">${subj.emoji}</span>
+            <span class="subject-group-title">${escapeHtml(subj.name)}</span>
+            <span class="subject-group-count">${subj.quizzes.length} اختبار</span>
+          </div>
+          <div class="cards-grid">
+            ${subj.quizzes.map(renderQuizCard).join('')}
+          </div>
+        </div>
+      `).join('')}
 
       <div class="section-header" style="margin-top:32px;">
         <div><h2 class="section-title">إدارة الطلاب</h2><p class="section-subtitle">${students.length} طالب مسجل</p></div>
@@ -1786,7 +1938,7 @@ async function renderAttemptsList(attempts) {
 }
 
 /* ============================================================
-   ============ Student Dashboard ============
+   ============ Student Dashboard (مجمّعة حسب المادة) ============
    ============================================================ */
 async function renderStudentDashboard() {
   showLoading();
@@ -1800,6 +1952,26 @@ async function renderStudentDashboard() {
     const availableQuizzes = myQuizzes.filter(q => !solvedQuizIds.has(q.id));
     const completedQuizzes = myQuizzes.filter(q => solvedQuizIds.has(q.id));
 
+    // ✅ تجميع الاختبارات حسب المادة
+    const bySubject = {};
+    myQuizzes.forEach(q => {
+      const key = q.subject || 'other';
+      if (!bySubject[key]) bySubject[key] = [];
+      bySubject[key].push(q);
+    });
+
+    // ترتيب المواد حسب ترتيب SUBJECTS
+    const orderedSubjects = SUBJECTS
+      .filter(s => bySubject[s.id] && bySubject[s.id].length > 0)
+      .map(s => ({ ...s, quizzes: bySubject[s.id] }));
+
+    // أي مواد غير معروفة (احتياطي)
+    Object.keys(bySubject).forEach(key => {
+      if (!SUBJECTS.find(s => s.id === key) && bySubject[key].length > 0) {
+        orderedSubjects.push({ id: key, name: key, emoji: '📚', quizzes: bySubject[key] });
+      }
+    });
+
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
       <div class="stats-grid">
@@ -1808,12 +1980,40 @@ async function renderStudentDashboard() {
         <div class="stat-card"><div class="stat-icon warning">📊</div><div class="stat-info"><h4>${calculateAvg(myAttempts)}%</h4><p>متوسطك</p></div></div>
       </div>
       <div class="chart-container"><canvas id="studentChart"></canvas></div>
-      <div class="section-header"><div><h2 class="section-title">الاختبارات المتاحة</h2><p class="section-subtitle">${escapeHtml(currentUser.grade || '')} • ${escapeHtml(currentUser.stage || '')}${currentUser.school ? ' • ' + escapeHtml(currentUser.school) : ''}</p></div></div>
-      ${myQuizzes.length === 0 ? `<div class="card"><div class="empty-state"><div class="empty-state-icon">📚</div><h3>لا اختبارات</h3></div></div>` : `<div class="cards-grid">${myQuizzes.map(q => renderStudentQuizCard(q, myAttempts)).join('')}</div>`}
+
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">الاختبارات المتاحة</h2>
+          <p class="section-subtitle">${escapeHtml(currentUser.grade || '')} • ${escapeHtml(currentUser.stage || '')}${currentUser.school ? ' • ' + escapeHtml(currentUser.school) : ''}</p>
+        </div>
+      </div>
+
+      ${myQuizzes.length === 0 ? `
+        <div class="card"><div class="empty-state"><div class="empty-state-icon">📚</div><h3>لا اختبارات</h3><p style="margin-top:8px;">لم يُضف أي اختبار لسنتك بعد</p></div></div>
+      ` : orderedSubjects.map(subj => {
+        const availableInSubject = subj.quizzes.filter(q => !solvedQuizIds.has(q.id)).length;
+        const completedInSubject = subj.quizzes.filter(q => solvedQuizIds.has(q.id)).length;
+        return `
+          <div class="subject-group">
+            <div class="subject-group-header">
+              <span class="subject-group-emoji">${subj.emoji}</span>
+              <span class="subject-group-title">${escapeHtml(subj.name)}</span>
+              <span class="subject-group-count">${subj.quizzes.length} اختبار</span>
+              ${availableInSubject > 0 ? `<span class="badge badge-primary">${availableInSubject} متاح</span>` : ''}
+              ${completedInSubject > 0 ? `<span class="badge badge-success">${completedInSubject} محلول</span>` : ''}
+            </div>
+            <div class="cards-grid">
+              ${subj.quizzes.map(q => renderStudentQuizCard(q, myAttempts)).join('')}
+            </div>
+          </div>
+        `;
+      }).join('')}
+
       <div class="section-header" style="margin-top:32px;">
         <div><h2 class="section-title">🏆 لوحة الشرف</h2><p class="section-subtitle">ترتيبك بين زملائك</p></div>
       </div>
       ${renderLeaderboard(await DB.get('users'), allAttempts, 'all')}
+
       <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">سجل نتائجي</h2></div></div>
       ${myAttempts.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا نتائج</h3></div></div>` : await renderMyAttempts(myAttempts.sort((a,b) => b.createdAt - a.createdAt))}
     `;
@@ -2602,7 +2802,7 @@ const globalFns = [
   nextQuizQuestion, exitQuiz, exportResults, exportStudents, openGradingCenter, openGradingAttempt,
   setEssayGrade, finalizeGrading, pickGoogleRole, completeGoogleProfile, cancelGoogleProfile,
   openPendingTeachers, approveTeacher, deleteUser, openBroadcastModal, sendBroadcast,
-  saveExistingProfile
+  saveExistingProfile, wipeQuizData, switchUserTab
 ];
 globalFns.forEach(fn => { try { window[fn.name] = fn; } catch(e) {} });
 </script>
