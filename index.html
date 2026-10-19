@@ -520,7 +520,7 @@
 <div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox"></div></div>
 
 <script>
-  /* ⬇️ الجزء الثاني من JavaScript - Firebase + DB */
+/* ⬇️ الجزء الثاني من JavaScript */
 
 const DEFAULT_FIREBASE_CONFIG = {
   apiKey: "AIzaSyBPuzIkp-Qc4CIBAYsY6hLwAVHwqY3oODg",
@@ -829,10 +829,95 @@ async function initFirebase() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ✅ DB - مُصلح بالكامل للعمل مع Realtime Database
+   ✅ دوال الكتابة المباشرة — تحل مشكلة PERMISSION_DENIED
+   ═══════════════════════════════════════════════════════════ */
+
+/* ✅ كتابة عقدة واحدة (users/{uid}, quizzes/{id}, etc.) */
+async function dbSetNode(key, nodeId, data) {
+  if (!key || !nodeId) { console.error('dbSetNode: key and nodeId required'); return false; }
+  // اكتب إلى localStorage
+  try {
+    const d = localStorage.getItem('edu_' + key);
+    const arr = d ? JSON.parse(d) : [];
+    const idx = arr.findIndex(x => x && x.id === nodeId);
+    const newItem = { ...data, id: nodeId };
+    if (idx >= 0) arr[idx] = newItem;
+    else arr.push(newItem);
+    localStorage.setItem('edu_' + key, JSON.stringify(arr));
+  } catch (e) { console.warn('localStorage write failed:', e); }
+  
+  // اكتب إلى Firebase مباشرة
+  if (firebaseEnabled && fbDB) {
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        await fbDB.set(fbDB.ref(fbDB.db, `${key}/${nodeId}`), data);
+        return true;
+      } catch (e) {
+        console.warn(`Firebase set(${key}/${nodeId}) attempt ${attempt} failed:`, e.message);
+        await new Promise(r => setTimeout(r, 500 * attempt));
+      }
+    }
+    return false;
+  }
+  return true;
+}
+
+/* ✅ تحديث عقدة واحدة */
+async function dbUpdateNode(key, nodeId, updates) {
+  if (!key || !nodeId) return false;
+  try {
+    const d = localStorage.getItem('edu_' + key);
+    if (d) {
+      const arr = JSON.parse(d);
+      const idx = arr.findIndex(x => x && x.id === nodeId);
+      if (idx >= 0) { arr[idx] = { ...arr[idx], ...updates }; localStorage.setItem('edu_' + key, JSON.stringify(arr)); }
+    }
+  } catch (e) {}
+  if (firebaseEnabled && fbDB) {
+    try {
+      await fbDB.update(fbDB.ref(fbDB.db, `${key}/${nodeId}`), updates);
+      return true;
+    } catch (e) { 
+      console.warn(`Firebase update(${key}/${nodeId}) failed:`, e.message); 
+    }
+  }
+  return false;
+}
+
+/* ✅ حذف عقدة واحدة */
+async function dbRemoveNode(key, nodeId) {
+  if (!key || !nodeId) return false;
+  try {
+    const d = localStorage.getItem('edu_' + key);
+    if (d) {
+      const arr = JSON.parse(d).filter(x => x && x.id !== nodeId);
+      localStorage.setItem('edu_' + key, JSON.stringify(arr));
+    }
+  } catch (e) {}
+  if (firebaseEnabled && fbDB) {
+    try {
+      await fbDB.set(fbDB.ref(fbDB.db, `${key}/${nodeId}`), null);
+      return true;
+    } catch (e) { 
+      console.warn(`Firebase remove(${key}/${nodeId}) failed:`, e.message); 
+    }
+  }
+  return false;
+}
+
+/* ✅ دالة البحث عن مستخدم */
+function findUserByIdOrEmail(users, idOrEmail) {
+  if (!idOrEmail) return null;
+  const lower = String(idOrEmail).toLowerCase();
+  return users.find(u => u.id === idOrEmail) 
+    || users.find(u => u.email && u.email.toLowerCase() === lower)
+    || null;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ✅ DB - للقراءة والمزامنة (لا للكتابة الجماعية)
    ═══════════════════════════════════════════════════════════ */
 const DB = {
-  /* ✅ _toArray محسّن: يحافظ على id دائماً */
   _toArray(data) {
     if (!data) return [];
     if (Array.isArray(data)) {
@@ -847,7 +932,6 @@ const DB = {
         .map(k => {
           const item = data[k];
           if (item && typeof item === 'object') {
-            // ✅ إذا كان item.id موجوداً استخدمه، وإلا استخدم المفتاح k
             return { ...item, id: item.id || k };
           }
           return { id: k, value: item };
@@ -855,8 +939,6 @@ const DB = {
     }
     return [];
   },
-
-  /* ✅ get: يقرأ من Firebase أولاً (المصدر الموثوق) ثم من localStorage */
   async get(key, defaultValue = []) {
     if (firebaseEnabled && fbDB) {
       try {
@@ -867,26 +949,21 @@ const DB = {
           try { localStorage.setItem('edu_' + key, JSON.stringify(arr)); } catch {}
           return arr;
         }
-        // إذا كانت العقدة فارغة في Firebase، أرجع القيمة الافتراضية
         return Array.isArray(defaultValue) ? defaultValue : this._toArray(defaultValue);
       } catch (e) {
-        console.warn(`Firebase get(${key}) failed, using localStorage:`, e.message);
+        console.warn(`Firebase get(${key}) failed:`, e.message);
       }
     }
-    // Fallback: localStorage
     try { 
       const d = localStorage.getItem('edu_' + key); 
       if (d) return this._toArray(JSON.parse(d)); 
     } catch {}
     return Array.isArray(defaultValue) ? defaultValue : this._toArray(defaultValue);
   },
-
-  /* ✅ set: يكتب إلى Firebase و localStorage معاً */
+  /* ⚠️ DB.set للاستخدام فقط مع البيانات الصغيرة التي ليست في /users */
   async set(key, value) {
     const arr = Array.isArray(value) ? value : this._toArray(value);
-    // اكتب إلى localStorage أولاً (fallback)
     try { localStorage.setItem('edu_' + key, JSON.stringify(arr)); } catch {}
-    // ثم اكتب إلى Firebase
     if (firebaseEnabled && fbDB) {
       for (let attempt = 1; attempt <= 3; attempt++) {
         try {
@@ -898,7 +975,7 @@ const DB = {
           });
           await fbDB.set(fbDB.ref(fbDB.db, key), asObject);
           return true;
-        } catch (e) {
+        } catch (e) { 
           console.warn(`Firebase set(${key}) attempt ${attempt} failed:`, e.message);
           await new Promise(r => setTimeout(r, 500 * attempt));
         }
@@ -907,50 +984,6 @@ const DB = {
     }
     return true;
   },
-
-  /* ✅ update: تحديث جزئي لعنصر واحد */
-  async update(key, itemId, updates) {
-    if (!itemId) return false;
-    // تحديث localStorage
-    try {
-      const d = localStorage.getItem('edu_' + key);
-      if (d) {
-        const arr = JSON.parse(d);
-        const idx = arr.findIndex(x => x && x.id === itemId);
-        if (idx >= 0) { arr[idx] = { ...arr[idx], ...updates }; localStorage.setItem('edu_' + key, JSON.stringify(arr)); }
-      }
-    } catch {}
-    // تحديث Firebase
-    if (firebaseEnabled && fbDB) {
-      try {
-        await fbDB.update(fbDB.ref(fbDB.db, `${key}/${itemId}`), updates);
-        return true;
-      } catch (e) { console.warn(`Firebase update(${key}/${itemId}) failed:`, e.message); }
-    }
-    return false;
-  },
-
-  /* ✅ remove: حذف عنصر واحد */
-  async remove(key, itemId) {
-    if (!itemId) return false;
-    try {
-      const d = localStorage.getItem('edu_' + key);
-      if (d) {
-        const arr = JSON.parse(d);
-        const filtered = arr.filter(x => x && x.id !== itemId);
-        localStorage.setItem('edu_' + key, JSON.stringify(filtered));
-      }
-    } catch {}
-    if (firebaseEnabled && fbDB) {
-      try {
-        await fbDB.set(fbDB.ref(fbDB.db, `${key}/${itemId}`), null);
-        return true;
-      } catch (e) { console.warn(`Firebase remove(${key}/${itemId}) failed:`, e.message); }
-    }
-    return false;
-  },
-
-  /* ✅ subscribe: استماع فوري للتغييرات */
   subscribe(key, callback) {
     if (!firebaseEnabled || !fbDB) return () => {};
     try {
@@ -1118,72 +1151,87 @@ function renderAnnouncementEverywhere() {
 }
 function dismissAnnouncement(id) { localStorage.setItem('edu_announcement_dismissed', id); renderAnnouncementEverywhere(); }
 
-/* ✅ logActivity */
+/* ═══════════════════════════════════════════════════════════
+   ✅ logActivity - كتابة عقدة واحدة
+   ═══════════════════════════════════════════════════════════ */
 async function logActivity(action, details = '') {
   try {
-    const logs = await DB.get('auditLog');
-    logs.push({ 
-      id: uid(), 
+    const logId = uid();
+    const logEntry = { 
       userId: currentUser?.id || 'unknown', 
       userName: currentUser?.name || 'غير معروف', 
       userRole: currentUser?.role || 'unknown', 
       action, details, timestamp: Date.now() 
-    });
-    if (logs.length > 500) logs.splice(0, logs.length - 500);
-    await DB.set('auditLog', logs);
-  } catch (e) {}
+    };
+    await dbSetNode('auditLog', logId, logEntry);
+  } catch (e) { console.error('logActivity failed:', e); }
 }
 
-/* ✅ awardXP */
+/* ═══════════════════════════════════════════════════════════
+   ✅ XP & Badges & Streak - كتابة مباشرة
+   ═══════════════════════════════════════════════════════════ */
 async function awardXP(studentId, amount, reason) {
   if (amount <= 0) return;
   try {
     const users = await DB.get('users');
     const idx = users.findIndex(u => u.id === studentId);
     if (idx < 0) return;
-    users[idx].xp = (users[idx].xp || 0) + amount;
-    users[idx].lastXpReason = reason;
-    users[idx].lastXpAt = Date.now();
-    await DB.set('users', users);
-    const notifs = await DB.get('notifications');
-    notifs.push({ id: uid(), userId: studentId, title: `+${amount} نقطة XP`, body: reason, createdAt: Date.now(), read: false });
-    await DB.set('notifications', notifs);
-  } catch (e) {}
+    const newXP = (users[idx].xp || 0) + amount;
+    await dbUpdateNode('users', studentId, { 
+      xp: newXP, 
+      lastXpReason: reason, 
+      lastXpAt: Date.now() 
+    });
+    // إشعار
+    const notifId = uid();
+    await dbSetNode('notifications', notifId, { 
+      userId: studentId, 
+      title: `+${amount} نقطة XP`, 
+      body: reason, 
+      createdAt: Date.now(), 
+      read: false 
+    });
+  } catch (e) { console.error('awardXP failed:', e); }
 }
 
-/* ✅ checkAndAwardBadges */
 async function checkAndAwardBadges(studentId) {
   try {
     const users = await DB.get('users');
     const idx = users.findIndex(u => u.id === studentId);
     if (idx < 0) return [];
     const user = users[idx];
-    if (!user.badges) user.badges = [];
+    const currentBadges = user.badges || [];
     const attempts = await DB.get('attempts');
     const myAttempts = attempts.filter(a => a.studentId === studentId);
     const avg = myAttempts.length ? calculateAvg(myAttempts) : 0;
     const perfect = myAttempts.some(a => a.score === a.total && a.total > 0);
     const toAward = [];
-    if (myAttempts.length >= 1 && !user.badges.includes('first_quiz')) toAward.push('first_quiz');
-    if (myAttempts.length >= 5 && !user.badges.includes('five_quizzes')) toAward.push('five_quizzes');
-    if (myAttempts.length >= 10 && !user.badges.includes('ten_quizzes')) toAward.push('ten_quizzes');
-    if (perfect && !user.badges.includes('perfect_score')) toAward.push('perfect_score');
-    if (avg >= 90 && myAttempts.length >= 3 && !user.badges.includes('excellent_avg')) toAward.push('excellent_avg');
-    if ((user.streak || 0) >= 3 && !user.badges.includes('streak_3')) toAward.push('streak_3');
-    if ((user.streak || 0) >= 7 && !user.badges.includes('streak_7')) toAward.push('streak_7');
-    if ((user.xp || 0) >= 800 && !user.badges.includes('high_scorer')) toAward.push('high_scorer');
+    if (myAttempts.length >= 1 && !currentBadges.includes('first_quiz')) toAward.push('first_quiz');
+    if (myAttempts.length >= 5 && !currentBadges.includes('five_quizzes')) toAward.push('five_quizzes');
+    if (myAttempts.length >= 10 && !currentBadges.includes('ten_quizzes')) toAward.push('ten_quizzes');
+    if (perfect && !currentBadges.includes('perfect_score')) toAward.push('perfect_score');
+    if (avg >= 90 && myAttempts.length >= 3 && !currentBadges.includes('excellent_avg')) toAward.push('excellent_avg');
+    if ((user.streak || 0) >= 3 && !currentBadges.includes('streak_3')) toAward.push('streak_3');
+    if ((user.streak || 0) >= 7 && !currentBadges.includes('streak_7')) toAward.push('streak_7');
+    if ((user.xp || 0) >= 800 && !currentBadges.includes('high_scorer')) toAward.push('high_scorer');
     if (toAward.length > 0) {
-      user.badges.push(...toAward);
-      await DB.set('users', users);
-      const notifs = await DB.get('notifications');
-      toAward.forEach(b => notifs.push({ id: uid(), userId: studentId, title: `🏆 شارة جديدة: ${BADGES[b].name}`, body: `${BADGES[b].emoji} ${BADGES[b].desc}`, createdAt: Date.now(), read: false }));
-      await DB.set('notifications', notifs);
+      const newBadges = [...currentBadges, ...toAward];
+      await dbUpdateNode('users', studentId, { badges: newBadges });
+      for (const b of toAward) {
+        const notifId = uid();
+        await dbSetNode('notifications', notifId, { 
+          userId: studentId, 
+          title: `🏆 شارة جديدة: ${BADGES[b].name}`, 
+          body: `${BADGES[b].emoji} ${BADGES[b].desc}`, 
+          createdAt: Date.now(), 
+          read: false 
+        });
+      }
     }
     return toAward;
-  } catch (e) { return []; }
+  } catch (e) { console.error('checkAndAwardBadges failed:', e); return []; }
 }
 
-/* ✅ updateStreak */
 async function updateStreak(studentId) {
   try {
     const users = await DB.get('users');
@@ -1194,12 +1242,15 @@ async function updateStreak(studentId) {
     const lastDate = user.lastQuizDate ? new Date(user.lastQuizDate).toDateString() : null;
     if (lastDate === today) return;
     const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-    if (lastDate === yesterday.toDateString()) user.streak = (user.streak || 0) + 1;
-    else user.streak = 1;
-    user.lastQuizDate = Date.now();
-    await DB.set('users', users);
-  } catch (e) {}
+    let newStreak = 1;
+    if (lastDate === yesterday.toDateString()) newStreak = (user.streak || 0) + 1;
+    await dbUpdateNode('users', studentId, { 
+      streak: newStreak, 
+      lastQuizDate: Date.now() 
+    });
+  } catch (e) { console.error('updateStreak failed:', e); }
 }
+
 function calculateXPForAttempt(attempt) {
   const pct = attempt.total > 0 ? (attempt.score / attempt.total) * 100 : 0;
   let xp = Math.round(attempt.score * 10);
@@ -1210,29 +1261,19 @@ function calculateXPForAttempt(attempt) {
   return xp;
 }
 /* ═══════════════════════════════════════════════════════════
-   ✅ AUTH - مُصلح بالكامل
+   ✅ AUTH - حفظ مباشر (يحل PERMISSION_DENIED)
    ═══════════════════════════════════════════════════════════ */
 
-/* ✅ البحث عن مستخدم بـ uid أو email - دالة مساعدة */
-function findUserByIdOrEmail(users, idOrEmail) {
-  if (!idOrEmail) return null;
-  const lower = String(idOrEmail).toLowerCase();
-  return users.find(u => u.id === idOrEmail) 
-    || users.find(u => u.email && u.email.toLowerCase() === lower)
-    || null;
-}
-
-/* ✅ ensureUserProfile - إصلاح: الاسم الثلاثي لا يحتاج إكمال */
+/* ✅ ensureUserProfile - حفظ مباشر */
 async function ensureUserProfile(fbUser, existingProfile) {
   if (existingProfile) return existingProfile;
   const nameParts = (fbUser.displayName || '').split(/\s+/).filter(p => p.length > 0);
   const isName3 = nameParts.length >= 3;
   const fallback = {
-    id: fbUser.uid, 
     email: fbUser.email,
     name: fbUser.displayName || (fbUser.email || '').split('@')[0] || 'مستخدم',
     role: 'student', 
-    provider: 'email', 
+    provider: 'google', 
     photoURL: fbUser.photoURL || null,
     createdAt: Date.now(), 
     needsProfileCompletion: !isName3,
@@ -1243,24 +1284,27 @@ async function ensureUserProfile(fbUser, existingProfile) {
     fallback.approved = true; 
     fallback.needsProfileCompletion = false;
   }
+  
   try {
+    // التحقق أولاً من وجود المستخدم
     const users = await DB.get('users');
-    const exists = findUserByIdOrEmail(users, fbUser.uid) || users.find(u => u.email === fbUser.email);
-    if (exists) {
-      // ✅ تحديث id إذا كان مختلفاً
-      if (exists.id !== fbUser.uid) {
-        const idx = users.findIndex(u => u.email && fbUser.email && u.email.toLowerCase() === fbUser.email.toLowerCase());
-        if (idx >= 0) { users[idx].id = fbUser.uid; await DB.set('users', users); }
-      }
-      return exists;
+    const exists = users.find(u => u.id === fbUser.uid) || users.find(u => u.email === fbUser.email);
+    if (exists) return exists;
+    
+    // ✅ حفظ مباشر
+    const saved = await dbSetNode('users', fbUser.uid, fallback);
+    if (!saved) {
+      console.error('ensureUserProfile: Failed to save');
+      return { ...fallback, id: fbUser.uid };
     }
-    users.push(fallback);
-    await DB.set('users', users);
-    return fallback;
-  } catch (e) { return fallback; }
+    return { ...fallback, id: fbUser.uid };
+  } catch (e) {
+    console.error('ensureUserProfile failed:', e);
+    return { ...fallback, id: fbUser.uid };
+  }
 }
 
-/* ✅ handleRegister - إصلاح: needsProfileCompletion = false دائماً */
+/* ✅ handleRegister - حفظ مباشر + فحص نجاح */
 async function handleRegister(e) {
   e.preventDefault();
   if (!platformSettings.registrationEnabled) { showAlert('التسجيل متوقف مؤقتاً', 'warning'); return; }
@@ -1276,7 +1320,7 @@ async function handleRegister(e) {
     createdAt: Date.now(), 
     provider: 'email', 
     xp: 0, badges: [], streak: 0, friends: [], following: [],
-    needsProfileCompletion: false // ✅ دائماً false
+    needsProfileCompletion: false
   };
   
   if (selectedRole === 'student') {
@@ -1309,37 +1353,72 @@ async function handleRegister(e) {
   try {
     if (firebaseAuthEnabled) {
       try {
+        // 1️⃣ إنشاء حساب Firebase Auth
         const cred = await fbAuth.createUserWithEmailAndPassword(fbAuth.auth, email, password);
-        profile.id = cred.user.uid;
+        const uid = cred.user.uid;
+        profile.id = uid;
+        
+        // 2️⃣ التحقق من عدم وجود البريد في DB
         const users = await DB.get('users');
-        if (users.find(u => u.email === email || u.id === profile.id)) { 
-          showAlert('هذا البريد مسجل بالفعل'); 
-          return; 
+        if (users.find(u => u.email === email)) {
+          try { await cred.user.delete(); } catch {}
+          showAlert('هذا البريد مسجل بالفعل');
+          return;
         }
-        users.push(profile);
-        await DB.set('users', users);
+        
+        // 3️⃣ ✅ حفظ مباشر إلى users/{uid} (وليس /users)
+        const saved = await dbSetNode('users', uid, profile);
+        
+        // 4️⃣ فحص النجاح
+        if (!saved) {
+          try { await cred.user.delete(); } catch {}
+          showAlert('⚠️ فشل حفظ البيانات في Firebase. تحقق من الصلاحيات.', 'error');
+          return;
+        }
+        
+        // 5️⃣ التحقق النهائي
+        try {
+          const verifySnapshot = await fbDB.get(fbDB.ref(fbDB.db, `users/${uid}`));
+          if (!verifySnapshot.val()) {
+            try { await cred.user.delete(); } catch {}
+            showAlert('⚠️ البيانات لم تُحفظ. حاول مرة أخرى.', 'error');
+            return;
+          }
+        } catch (vErr) {
+          console.warn('Verification failed:', vErr);
+        }
+        
+        // 6️⃣ تعيين currentUser
         currentUser = profile;
-        saveSession(profile.id, true);
-        showAlert('✅ تم إنشاء الحساب!', 'success');
+        saveSession(uid, true);
+        
+        // 7️⃣ تسجيل النشاط
+        await logActivity('تسجيل حساب جديد', `${name} (${selectedRole})`);
+        
+        showAlert('✅ تم إنشاء الحساب بنجاح!', 'success');
         launchConfetti(50);
         setTimeout(() => enterDashboard(), 500);
+        
       } catch (err) {
+        console.error('Registration error:', err);
         const msgs = { 
           'auth/email-already-in-use': 'البريد مسجل بالفعل', 
-          'auth/weak-password': 'كلمة المرور ضعيفة', 
-          'auth/invalid-email': 'البريد غير صالح' 
+          'auth/weak-password': 'كلمة المرور ضعيفة (6 أحرف على الأقل)', 
+          'auth/invalid-email': 'البريد غير صالح',
+          'PERMISSION_DENIED': '⚠️ قواعد Firebase تمنع الحفظ'
         };
-        showAlert(msgs[err.code] || err.message);
+        showAlert(msgs[err.code] || msgs[err.message] || err.message, 'error');
       }
       return;
     }
+    
     // Fallback: بدون Firebase Auth
     const users = await DB.get('users');
     if (users.find(u => u.email === email)) { showAlert('هذا البريد مسجل'); return; }
     profile.id = uid();
     profile.passwordHash = await hashPassword(password);
-    users.push(profile);
-    await DB.set('users', users);
+    const saved = await dbSetNode('users', profile.id, profile);
+    if (!saved) { showAlert('فشل الحفظ'); return; }
     currentUser = profile;
     saveSession(profile.id, true);
     showAlert('✅ تم إنشاء الحساب!', 'success');
@@ -1348,7 +1427,7 @@ async function handleRegister(e) {
   } finally { hideLoading(); }
 }
 
-/* ✅ handleLogin - إصلاح: البحث بـ uid ثم email + تحديث id */
+/* ✅ handleLogin - يبحث بـ uid ثم email */
 async function handleLogin(e) {
   e.preventDefault();
   const email = document.getElementById('loginEmail').value.trim().toLowerCase();
@@ -1363,38 +1442,37 @@ async function handleLogin(e) {
         }
         const cred = await fbAuth.signInWithEmailAndPassword(fbAuth.auth, email, password);
         const users = await DB.get('users');
-        // ✅ البحث بـ uid أولاً
         let user = users.find(u => u.id === cred.user.uid);
         if (!user) user = users.find(u => u.email && cred.user.email && u.email.toLowerCase() === cred.user.email.toLowerCase());
         if (!user) user = await ensureUserProfile(cred.user, null);
-        // ✅ تحديث id إذا كان مختلفاً
+        
+        // تحديث id إذا كان مختلفاً
         if (user.id !== cred.user.uid) {
-          const idx = users.findIndex(u => u.email && u.email.toLowerCase() === email);
-          if (idx >= 0) { 
-            users[idx].id = cred.user.uid; 
-            await DB.set('users', users); 
-            user.id = cred.user.uid;
+          const oldId = user.id;
+          user.id = cred.user.uid;
+          // نقل العقدة في Firebase
+          if (oldId && oldId !== cred.user.uid) {
+            const oldData = { ...user };
+            delete oldData.id;
+            await dbSetNode('users', cred.user.uid, oldData);
+            await dbRemoveNode('users', oldId);
           }
         }
-        // ✅ تحديث صلاحية الأدمن
+        
+        // تحديث صلاحية الأدمن
         if (email === ADMIN_EMAIL.toLowerCase() && user.role !== 'admin') {
           user.role = 'admin'; 
           user.approved = true;
-          const idx = users.findIndex(u => u.id === user.id);
-          if (idx >= 0) users[idx] = user; 
-          else users.push(user);
-          await DB.set('users', users);
+          await dbUpdateNode('users', user.id, { role: 'admin', approved: true });
         }
-        // ✅ إصلاح needsProfileCompletion بناءً على الاسم
+        
+        // إصلاح needsProfileCompletion
         const np = (user.name || '').split(/\s+/).filter(x => x.length > 0);
         if (np.length >= 3 && user.needsProfileCompletion) {
           user.needsProfileCompletion = false;
-          const idx = users.findIndex(u => u.id === user.id);
-          if (idx >= 0) { 
-            users[idx].needsProfileCompletion = false; 
-            await DB.set('users', users); 
-          }
+          await dbUpdateNode('users', user.id, { needsProfileCompletion: false });
         }
+        
         currentUser = user;
         saveSession(user.id, remember);
         enterDashboard();
@@ -1408,6 +1486,7 @@ async function handleLogin(e) {
       }
       return;
     }
+    
     // Fallback
     const users = await DB.get('users');
     let user = users.find(u => u.email === email);
@@ -1419,11 +1498,7 @@ async function handleLogin(e) {
     if (email === ADMIN_EMAIL.toLowerCase() && user.role !== 'admin') {
       user.role = 'admin'; 
       user.approved = true;
-      const idx = users.findIndex(u => u.id === user.id);
-      if (idx >= 0) { 
-        users[idx] = user; 
-        await DB.set('users', users); 
-      }
+      await dbUpdateNode('users', user.id, { role: 'admin', approved: true });
     }
     currentUser = user;
     saveSession(user.id, remember);
@@ -1464,36 +1539,34 @@ async function processGoogleUser(g) {
     || users.find(u => u.email && g.email && u.email.toLowerCase() === g.email.toLowerCase());
   if (!existing && !platformSettings.registrationEnabled) { showAlert('التسجيل متوقف مؤقتاً', 'warning'); return; }
   
-  // ✅ تحديث id إذا كان مختلفاً
+  // تحديث id إذا كان مختلفاً
   if (existing && existing.id !== g.uid) {
-    const idx = users.findIndex(u => u.email && g.email && u.email.toLowerCase() === g.email.toLowerCase());
-    if (idx >= 0) { 
-      users[idx].id = g.uid; 
-      await DB.set('users', users); 
-      existing.id = g.uid;
+    const oldId = existing.id;
+    existing.id = g.uid;
+    if (oldId && oldId !== g.uid) {
+      const data = { ...existing };
+      delete data.id;
+      await dbSetNode('users', g.uid, data);
+      await dbRemoveNode('users', oldId);
     }
   }
   
   if (g.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() && existing) {
     existing.role = 'admin'; 
     existing.approved = true;
-    const idx = users.findIndex(u => u.id === existing.id);
-    if (idx >= 0) { users[idx] = existing; await DB.set('users', users); }
+    await dbUpdateNode('users', existing.id, { role: 'admin', approved: true });
   }
   
   if (existing) {
     const np = (existing.name || '').split(/\s+/).filter(p => p.length > 0);
-    // ✅ إصلاح: لا نطلب إكمال إذا الاسم ثلاثي أو needsProfileCompletion = false
     if (np.length < 3 && !isAdmin(existing) && existing.needsProfileCompletion !== false) {
       pendingGoogleUser = { id: existing.id, email: existing.email, name: existing.name, photoURL: existing.photoURL, isExisting: true };
       openProfileCompletionModal(true);
       return;
     }
-    // ✅ إصلاح: حذف needsProfileCompletion إذا الاسم ثلاثي
     if (np.length >= 3 && existing.needsProfileCompletion) {
       existing.needsProfileCompletion = false;
-      const idx = users.findIndex(u => u.id === existing.id);
-      if (idx >= 0) { users[idx].needsProfileCompletion = false; await DB.set('users', users); }
+      await dbUpdateNode('users', existing.id, { needsProfileCompletion: false });
     }
     currentUser = existing;
     saveSession(existing.id, true);
@@ -1582,7 +1655,7 @@ async function completeGoogleProfile() {
   const np = fullName.split(/\s+/).filter(p => p.length > 0);
   if (np.length < 3) { alert('يجب إدخال الاسم الثلاثي'); return; }
   const profile = { 
-    id: pendingGoogleUser.id, email: pendingGoogleUser.email, 
+    email: pendingGoogleUser.email, 
     name: fullName, role: googleSelectedRole, 
     provider: 'google', photoURL: pendingGoogleUser.photoURL, 
     createdAt: Date.now(), xp: 0, badges: [], streak: 0, 
@@ -1613,25 +1686,24 @@ async function completeGoogleProfile() {
   }
   showLoading();
   try {
-    const users = await DB.get('users');
-    const idx = users.findIndex(u => u.id === profile.id || (u.email && profile.email && u.email.toLowerCase() === profile.email.toLowerCase()));
-    if (idx >= 0) { 
-      users[idx] = { ...users[idx], ...profile }; 
-      await DB.set('users', users); 
-      currentUser = users[idx]; 
+    const uid = pendingGoogleUser.id;
+    const saved = await dbSetNode('users', uid, profile);
+    if (!saved) {
+      alert('⚠️ فشل الحفظ. تحقق من الصلاحيات.');
+      return;
     }
-    else { 
-      users.push(profile); 
-      await DB.set('users', users); 
-      currentUser = profile; 
-    }
-    saveSession(currentUser.id, true);
+    profile.id = uid;
+    currentUser = profile;
+    saveSession(uid, true);
     pendingGoogleUser = null; 
     googleSelectedRole = null;
     closeModal();
     showAlert('✅ تم حفظ البيانات!', 'success');
     launchConfetti(50);
     setTimeout(() => enterDashboard(), 400);
+  } catch (err) {
+    console.error('completeGoogleProfile failed:', err);
+    alert('فشل الحفظ: ' + (err.message || 'خطأ'));
   } finally { hideLoading(); }
 }
 
@@ -1685,16 +1757,16 @@ async function saveExistingProfile() {
   } else { updates.children = currentUser.children || []; }
   showLoading();
   try {
-    const users = await DB.get('users');
-    const idx = users.findIndex(u => u.id === currentUser.id);
-    if (idx >= 0) {
-      users[idx] = { ...users[idx], ...updates };
-      await DB.set('users', users);
-      currentUser = users[idx];
-      closeModal();
-      launchConfetti(30);
-      enterDashboard();
-    }
+    const saved = await dbUpdateNode('users', currentUser.id, updates);
+    if (!saved) { alert('فشل الحفظ'); return; }
+    currentUser = { ...currentUser, ...updates };
+    saveSession(currentUser.id, true);
+    closeModal();
+    launchConfetti(30);
+    enterDashboard();
+  } catch (err) {
+    console.error('saveExistingProfile failed:', err);
+    alert('فشل: ' + err.message);
   } finally { hideLoading(); }
 }
 
@@ -1726,7 +1798,7 @@ async function logout() {
   document.getElementById('registerForm').reset();
 }
 
-/* ✅ checkSession - إصلاح: البحث بـ uid + إصلاح needsProfileCompletion */
+/* ✅ checkSession - بحث دقيق */
 async function checkSession() {
   await handleGoogleRedirectResult();
   if (isProcessingRedirect) return false;
@@ -1741,42 +1813,36 @@ async function checkSession() {
         if (user) {
           try {
             const users = await DB.get('users');
-            // ✅ البحث بـ uid أولاً
             let p = users.find(u => u.id === user.uid);
             if (!p) p = users.find(u => u.email && user.email && u.email.toLowerCase() === user.email.toLowerCase());
             if (!p) p = await ensureUserProfile(user, null);
             
-            // ✅ تحديث id إذا كان مختلفاً
+            // تحديث id إذا مختلف
             if (p.id !== user.uid) {
+              const oldId = p.id;
               p.id = user.uid;
-              const idx = users.findIndex(u => u.email && user.email && u.email.toLowerCase() === user.email.toLowerCase());
-              if (idx >= 0) { 
-                users[idx].id = user.uid; 
-                await DB.set('users', users); 
+              if (oldId && oldId !== user.uid) {
+                const data = { ...p };
+                delete data.id;
+                await dbSetNode('users', user.uid, data);
+                await dbRemoveNode('users', oldId);
               }
             }
             
             if (!p) { resolve(false); return; }
             
-            // ✅ تحديث صلاحية الأدمن
+            // تحديث صلاحية الأدمن
             if (user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() && p.role !== 'admin') {
               p.role = 'admin'; 
               p.approved = true;
-              const i = users.findIndex(u => u.id === p.id);
-              if (i >= 0) users[i] = p; 
-              else users.push(p);
-              await DB.set('users', users);
+              await dbUpdateNode('users', p.id, { role: 'admin', approved: true });
             }
             
-            // ✅ إصلاح needsProfileCompletion بناءً على الاسم
+            // إصلاح needsProfileCompletion
             const np = (p.name || '').split(/\s+/).filter(x => x.length > 0);
             if (np.length >= 3 && p.needsProfileCompletion) {
               p.needsProfileCompletion = false;
-              const i = users.findIndex(u => u.id === p.id);
-              if (i >= 0) { 
-                users[i].needsProfileCompletion = false; 
-                await DB.set('users', users); 
-              }
+              await dbUpdateNode('users', p.id, { needsProfileCompletion: false });
             }
             
             currentUser = p;
@@ -1794,7 +1860,6 @@ async function checkSession() {
     });
   }
   
-  // Fallback: من الجلسة
   const id = getSessionUserId();
   if (!id) return false;
   const users = await DB.get('users');
@@ -1814,7 +1879,6 @@ function enterDashboard() {
   startNotificationsListener();
   startRealtimeAnalytics();
   
-  // ✅ إصلاح: تحقق من needsProfileCompletion بشكل أدق
   const nameParts = (currentUser.name || '').split(/\s+/).filter(x => x.length > 0);
   if (currentUser.needsProfileCompletion === true && nameParts.length < 3 && !isAdmin(currentUser)) {
     setTimeout(() => openProfileCompletionForExisting(), 500); 
@@ -1870,9 +1934,9 @@ async function openNotifications() {
   const notifs = (await DB.get('notifications')).filter(n => n.userId === currentUser.id).sort((a,b) => b.createdAt - a.createdAt);
   const unread = notifs.filter(n => !n.read);
   if (unread.length > 0) {
-    const all = await DB.get('notifications');
-    all.forEach(n => { if (n.userId === currentUser.id) n.read = true; });
-    await DB.set('notifications', all);
+    for (const n of unread) {
+      await dbUpdateNode('notifications', n.id, { read: true });
+    }
     updateNotifBadge();
   }
   openModal(`<div class="modal-header"><h3 class="modal-title">🔔 الإشعارات (${notifs.length})</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
@@ -1882,12 +1946,20 @@ async function openNotifications() {
       </div>
     `).join('')}`);
 }
+
 async function notifyStudents(quiz) {
   const users = await DB.get('users');
   const students = users.filter(u => u.role === 'student' && u.grade === quiz.grade);
-  const notifs = await DB.get('notifications');
-  students.forEach(s => notifs.push({ id: uid(), userId: s.id, title: 'اختبار جديد', body: `تم إضافة "${quiz.title}"`, createdAt: Date.now(), read: false }));
-  await DB.set('notifications', notifs);
+  for (const s of students) {
+    const notifId = uid();
+    await dbSetNode('notifications', notifId, { 
+      userId: s.id, 
+      title: 'اختبار جديد', 
+      body: `تم إضافة "${quiz.title}"`, 
+      createdAt: Date.now(), 
+      read: false 
+    });
+  }
 }
 
 function openModal(html) { 
@@ -1929,7 +2001,7 @@ function stopRealtimeAnalytics() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ✅ Friends & Challenges - مُصلح بالكامل
+   ✅ Friends & Challenges - كامل مع حفظ مباشر
    ═══════════════════════════════════════════════════════════ */
 let _challengesUnsubscribe = null;
 let _challengesCache = [];
@@ -1940,10 +2012,9 @@ function startChallengesListener() {
   try {
     _challengesUnsubscribe = DB.subscribe('challenges', (challenges) => {
       _challengesCache = challenges;
-      // ✅ إذا كان المستخدم في صفحة الأصدقاء، حدّث المحتوى فوراً
       const tabContent = document.getElementById('friendsTabContent');
       if (tabContent && currentUser && currentUser.role === 'student') {
-        const activeTabBtn = document.querySelector('.content-tab.active');
+        const activeTabBtn = document.querySelector('#friendsTabs .content-tab.active');
         if (activeTabBtn) {
           const tabName = activeTabBtn.textContent.includes('تحديات') ? 'challenges' 
                         : activeTabBtn.textContent.includes('إضافة') ? 'add' : 'friends';
@@ -1960,7 +2031,6 @@ function stopChallengesListener() {
   }
 }
 
-/* ✅ فتح نافذة الأصدقاء والتحديات */
 async function openFriendsModal() {
   if (!currentUser || currentUser.role !== 'student') { alert('للطلاب فقط'); return; }
   showLoading();
@@ -1968,6 +2038,9 @@ async function openFriendsModal() {
     const users = await DB.get('users');
     const challenges = await DB.get('challenges');
     _challengesCache = challenges;
+    
+    const freshMe = users.find(u => u.id === currentUser.id);
+    if (freshMe) currentUser = freshMe;
     
     const myFriends = users.filter(u => (currentUser.friends || []).includes(u.id));
     const myChallenges = challenges.filter(c => c.fromId === currentUser.id || c.toId === currentUser.id)
@@ -2007,7 +2080,6 @@ async function refreshFriendsTabContent(tab) {
   const challenges = await DB.get('challenges');
   _challengesCache = challenges;
   
-  // ✅ تحديث currentUser من DB للحصول على أحدث قائمة أصدقاء
   const freshMe = users.find(u => u.id === currentUser.id);
   if (freshMe) currentUser = freshMe;
   
@@ -2020,7 +2092,6 @@ async function refreshFriendsTabContent(tab) {
     !(currentUser.friends || []).includes(u.id)
   ).slice(0, 20);
   
-  // تحديث التبويبات (العدد)
   const tabBtns = document.querySelectorAll('#friendsTabs .content-tab');
   if (tabBtns[0]) tabBtns[0].textContent = `👥 أصدقائي (${myFriends.length})`;
   if (tabBtns[1]) {
@@ -2032,7 +2103,6 @@ async function refreshFriendsTabContent(tab) {
   if (content) content.innerHTML = renderFriendsTabContent(tab, myFriends, myChallenges, otherStudents);
 }
 
-/* ✅ رسم محتوى التبويبات */
 function renderFriendsTabContent(tab, myFriends, myChallenges, otherStudents) {
   if (tab === 'friends') {
     if (myFriends.length === 0) return '<div class="empty-state"><div class="empty-state-icon">👥</div><h3>لا أصدقاء بعد</h3><p>أضف أصدقاء من تبويب "إضافة"</p></div>';
@@ -2056,7 +2126,6 @@ function renderFriendsTabContent(tab, myFriends, myChallenges, otherStudents) {
     return myChallenges.map(c => renderChallengeCard(c)).join('');
   }
   
-  // tab === 'add'
   if (otherStudents.length === 0) return '<div class="empty-state"><h3>لا طلاب آخرون</h3></div>';
   return otherStudents.map(s => {
     const lvl = getLevel(s.xp || 0);
@@ -2072,7 +2141,6 @@ function renderFriendsTabContent(tab, myFriends, myChallenges, otherStudents) {
   }).join('');
 }
 
-/* ✅ رسم بطاقة تحدي واحدة - مع عرض النتائج */
 function renderChallengeCard(c) {
   const isFromMe = c.fromId === currentUser.id;
   const isToMe = c.toId === currentUser.id;
@@ -2090,13 +2158,11 @@ function renderChallengeCard(c) {
       <button class="btn btn-danger btn-sm" onclick="respondChallenge('${c.id}', 'declined')">❌ رفض</button>
     </div>`;
   } else if (c.status === 'accepted' && isToMe) {
-    // ✅ أنا المستقبل، أحل التحدي
     actionButtons = `<button class="btn btn-warning btn-sm btn-full" onclick="solveChallenge('${c.id}')">✏️ حل التحدي الآن</button>`;
   } else if (c.status === 'accepted' && isFromMe) {
     actionButtons = `<div class="alert alert-info" style="margin:0;padding:8px;font-size:12px;">⏳ بانتظار ${escapeHtml(c.toName || 'الطرف الآخر')} ليحل التحدي</div>`;
   }
   
-  // ✅ عرض نتيجة التحدي إن وُجدت
   let resultHtml = '';
   if (c.status === 'completed') {
     const myScore = isFromMe ? c.fromScore : c.toScore;
@@ -2115,11 +2181,11 @@ function renderChallengeCard(c) {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:center;">
         <div style="padding:8px;background:var(--primary-light);border-radius:8px;">
           <div style="font-size:11px;color:var(--text-light);margin-bottom:2px;">أنت</div>
-          <div style="font-size:18px;font-weight:900;color:var(--primary);">${myScore}%</div>
+          <div style="font-size:18px;font-weight:900;color:var(--primary);">${myScore ?? '—'}%</div>
         </div>
         <div style="padding:8px;background:var(--info-light);border-radius:8px;">
           <div style="font-size:11px;color:var(--text-light);margin-bottom:2px;">${escapeHtml(otherName)}</div>
-          <div style="font-size:18px;font-weight:900;color:var(--info);">${otherScore}%</div>
+          <div style="font-size:18px;font-weight:900;color:var(--info);">${otherScore ?? '—'}%</div>
         </div>
       </div>
     </div>`;
@@ -2138,7 +2204,7 @@ function renderChallengeCard(c) {
   </div>`;
 }
 
-/* ✅ إضافة صديق - إصلاح كامل */
+/* ✅ إضافة صديق - حفظ مباشر */
 async function addFriend(friendId) {
   if (!currentUser || !friendId) return;
   if (friendId === currentUser.id) { alert('لا يمكنك إضافة نفسك'); return; }
@@ -2151,36 +2217,35 @@ async function addFriend(friendId) {
     
     if (meIdx < 0 || friendIdx < 0) { alert('مستخدم غير موجود'); return; }
     
-    // ✅ التحقق من عدم وجود الصداقة مسبقاً
     if ((users[meIdx].friends || []).includes(friendId)) {
       alert('⚠️ هذا المستخدم صديق بالفعل');
       return;
     }
     
-    // ✅ تهيئة المصفوفات إذا لزم
-    if (!Array.isArray(users[meIdx].friends)) users[meIdx].friends = [];
-    if (!Array.isArray(users[friendIdx].friends)) users[friendIdx].friends = [];
+    const myFriends = [...(users[meIdx].friends || []), friendId];
+    const friendFriends = [...(users[friendIdx].friends || []), currentUser.id];
     
-    // ✅ إضافة في الاتجاهين
-    users[meIdx].friends.push(friendId);
-    users[friendIdx].friends.push(currentUser.id);
+    // ✅ حفظ مباشر للطرفين
+    const saved1 = await dbUpdateNode('users', currentUser.id, { friends: myFriends });
+    const saved2 = await dbUpdateNode('users', friendId, { friends: friendFriends });
     
-    await DB.set('users', users);
+    if (!saved1 || !saved2) {
+      alert('⚠️ فشل الحفظ');
+      return;
+    }
     
-    // ✅ تحديث currentUser
-    currentUser = users[meIdx];
+    // تحديث currentUser
+    currentUser = { ...users[meIdx], friends: myFriends };
     
-    // ✅ إرسال إشعار للصديق
-    const notifs = await DB.get('notifications');
-    notifs.push({ 
-      id: uid(), 
+    // إشعار
+    const notifId = uid();
+    await dbSetNode('notifications', notifId, { 
       userId: friendId, 
       title: '👥 صديق جديد', 
       body: `${currentUser.name} أضافك كصديق`, 
       createdAt: Date.now(), 
       read: false 
     });
-    await DB.set('notifications', notifs);
     
     launchConfetti(20);
     alert('✅ تمت الإضافة');
@@ -2202,27 +2267,28 @@ async function removeFriend(friendId) {
     
     if (meIdx < 0) return;
     
-    // ✅ حذف في الاتجاهين
-    users[meIdx].friends = (users[meIdx].friends || []).filter(id => id !== friendId);
+    const myFriends = (users[meIdx].friends || []).filter(id => id !== friendId);
+    await dbUpdateNode('users', currentUser.id, { friends: myFriends });
+    
     if (friendIdx >= 0) {
-      users[friendIdx].friends = (users[friendIdx].friends || []).filter(id => id !== currentUser.id);
+      const friendFriends = (users[friendIdx].friends || []).filter(id => id !== currentUser.id);
+      await dbUpdateNode('users', friendId, { friends: friendFriends });
     }
     
-    await DB.set('users', users);
-    currentUser = users[meIdx];
+    currentUser = { ...users[meIdx], friends: myFriends };
     alert('✅ تم الحذف');
     refreshFriendsTabContent('friends');
+  } catch (e) {
+    console.error('removeFriend failed:', e);
   } finally { hideLoading(); }
 }
 
-/* ✅ إرسال تحدي - اختيار اختبار */
 async function challengeFriend(friendId) {
   const users = await DB.get('users');
   const quizzes = await DB.get('quizzes');
   const friend = users.find(u => u.id === friendId);
   if (!friend) { alert('صديق غير موجود'); return; }
   
-  // ✅ اختبارات مناسبة لمستوى الصديق
   const friendQuizzes = quizzes.filter(q => q.grade === friend.grade);
   if (friendQuizzes.length === 0) { 
     alert('❌ لا توجد اختبارات متاحة لمستوى صديقك'); 
@@ -2248,7 +2314,7 @@ async function challengeFriend(friendId) {
     <button class="btn btn-warning btn-full" onclick="sendChallenge('${friendId}')">📤 إرسال التحدي</button>`);
 }
 
-/* ✅ إرسال التحدي فعلياً */
+/* ✅ إرسال تحدي - حفظ مباشر */
 async function sendChallenge(friendId) {
   const quizId = document.getElementById('challengeQuizSelect').value;
   if (!quizId) { alert('اختر اختباراً'); return; }
@@ -2263,7 +2329,6 @@ async function sendChallenge(friendId) {
     const friend = users.find(u => u.id === friendId);
     if (!friend) { alert('صديق غير موجود'); return; }
     
-    // ✅ التحقق من عدم وجود تحدي معلق على نفس الاختبار
     const challenges = await DB.get('challenges');
     const existing = challenges.find(c => 
       c.quizId === quizId && 
@@ -2276,9 +2341,8 @@ async function sendChallenge(friendId) {
       return;
     }
     
-    // ✅ إنشاء التحدي
+    const challengeId = uid();
     const newChallenge = {
-      id: uid(),
       fromId: currentUser.id,
       fromName: currentUser.name,
       toId: friendId,
@@ -2297,21 +2361,19 @@ async function sendChallenge(friendId) {
       solveAttemptId: null
     };
     
-    challenges.push(newChallenge);
-    await DB.set('challenges', challenges);
-    _challengesCache = challenges;
+    // ✅ حفظ مباشر
+    const saved = await dbSetNode('challenges', challengeId, newChallenge);
+    if (!saved) { alert('⚠️ فشل الحفظ'); return; }
     
-    // ✅ إشعار للمستقبل
-    const notifs = await DB.get('notifications');
-    notifs.push({ 
-      id: uid(), 
+    // إشعار
+    const notifId = uid();
+    await dbSetNode('notifications', notifId, { 
       userId: friendId, 
       title: '⚔️ تحدٍ جديد!', 
       body: `${currentUser.name} تحدّاك في "${quiz.title}"`, 
       createdAt: Date.now(), 
       read: false 
     });
-    await DB.set('notifications', notifs);
     
     launchConfetti(30);
     alert('✅ تم إرسال التحدي!');
@@ -2323,41 +2385,36 @@ async function sendChallenge(friendId) {
   } finally { hideLoading(); }
 }
 
-/* ✅ الرد على التحدي (قبول/رفض) */
 async function respondChallenge(challengeId, response) {
   showLoading();
   try {
     const challenges = await DB.get('challenges');
-    const idx = challenges.findIndex(c => c.id === challengeId);
-    if (idx < 0) { alert('التحدي غير موجود'); return; }
+    const challenge = challenges.find(c => c.id === challengeId);
+    if (!challenge) { alert('التحدي غير موجود'); return; }
     
-    const challenge = challenges[idx];
     if (challenge.toId !== currentUser.id) { alert('غير مصرح'); return; }
     if (challenge.status !== 'pending') { alert('التحدي ليس معلقاً'); return; }
     
-    challenges[idx].status = response;
-    challenges[idx].respondedAt = Date.now();
-    await DB.set('challenges', challenges);
-    _challengesCache = challenges;
+    await dbUpdateNode('challenges', challengeId, { 
+      status: response, 
+      respondedAt: Date.now() 
+    });
     
-    // ✅ إشعار للمرسل
-    const notifs = await DB.get('notifications');
-    notifs.push({ 
-      id: uid(), 
+    const notifId = uid();
+    await dbSetNode('notifications', notifId, { 
       userId: challenge.fromId, 
       title: response === 'accepted' ? '✅ تم قبول التحدي' : '❌ تم رفض التحدي', 
       body: `${currentUser.name} ${response === 'accepted' ? 'قبل' : 'رفض'} تحديك في "${challenge.quizTitle}"`, 
       createdAt: Date.now(), 
       read: false 
     });
-    await DB.set('notifications', notifs);
     
     alert(response === 'accepted' ? '✅ قبلت التحدي' : '❌ رفضت التحدي');
     refreshFriendsTabContent('challenges');
   } finally { hideLoading(); }
 }
 
-/* ✅ حل التحدي - يفتح الاختبار للطالب المستقبل */
+/* ✅ حل التحدي */
 async function solveChallenge(challengeId) {
   const challenges = await DB.get('challenges');
   const challenge = challenges.find(c => c.id === challengeId);
@@ -2370,12 +2427,10 @@ async function solveChallenge(challengeId) {
   const quiz = quizzes.find(q => q.id === challenge.quizId);
   if (!quiz) { alert('الاختبار غير موجود'); return; }
   
-  // ✅ بدء الاختبار مع علامة أنه تحدي
   closeModal();
   startQuizWithChallenge(challenge, quiz);
 }
 
-/* ✅ بدء اختبار التحدي */
 async function startQuizWithChallenge(challenge, quiz) {
   showLoading();
   try {
@@ -2384,24 +2439,11 @@ async function startQuizWithChallenge(challenge, quiz) {
     currentAnswers = [];
     selectedAnswerIndex = null;
     tfSelected = null;
-    
-    // ✅ حفظ التحدي الحالي
     window._currentChallenge = challenge;
     
     showScreen('quiz');
     loadActiveAnnouncement();
     renderCurrentQuestion();
-    
-    // ✅ عرض إشعار
-    setTimeout(() => {
-      const quizContent = document.getElementById('quizContent');
-      if (quizContent) {
-        const banner = document.createElement('div');
-        banner.className = 'alert alert-warning';
-        banner.innerHTML = `⚔️ <strong>وضع التحدي</strong> ضد ${escapeHtml(challenge.fromName)}<br>الاختبار: ${escapeHtml(quiz.title)}`;
-        quizContent.insertBefore(banner, quizContent.firstChild);
-      }
-    }, 100);
   } finally { hideLoading(); }
 }
 
@@ -2757,8 +2799,11 @@ async function adminDeleteQuiz(quizId) {
   try {
     const quizzes = await DB.get('quizzes');
     const quiz = quizzes.find(q => q.id === quizId);
-    await DB.set('quizzes', quizzes.filter(q => q.id !== quizId));
-    await DB.set('attempts', (await DB.get('attempts')).filter(a => a.quizId !== quizId));
+    await dbRemoveNode('quizzes', quizId);
+    const attempts = await DB.get('attempts');
+    for (const a of attempts.filter(a => a.quizId === quizId)) {
+      await dbRemoveNode('attempts', a.id);
+    }
     await logActivity('حذف اختبار (أدمن)', quiz?.title || quizId);
     alert('✅ تم الحذف');
     renderAdminQuizzes();
@@ -2938,15 +2983,20 @@ async function awardBadgeManually(studentId, badgeKey) {
   showLoading();
   try {
     const users = await DB.get('users');
-    const idx = users.findIndex(u => u.id === studentId);
-    if (idx < 0) return;
-    if (!users[idx].badges) users[idx].badges = [];
-    if (!users[idx].badges.includes(badgeKey)) {
-      users[idx].badges.push(badgeKey);
-      await DB.set('users', users);
-      const notifs = await DB.get('notifications');
-      notifs.push({ id: uid(), userId: studentId, title: `🏆 شارة: ${BADGES[badgeKey].name}`, body: BADGES[badgeKey].desc, createdAt: Date.now(), read: false });
-      await DB.set('notifications', notifs);
+    const user = users.find(u => u.id === studentId);
+    if (!user) return;
+    const badges = user.badges || [];
+    if (!badges.includes(badgeKey)) {
+      const newBadges = [...badges, badgeKey];
+      await dbUpdateNode('users', studentId, { badges: newBadges });
+      const notifId = uid();
+      await dbSetNode('notifications', notifId, { 
+        userId: studentId, 
+        title: `🏆 شارة: ${BADGES[badgeKey].name}`, 
+        body: BADGES[badgeKey].desc, 
+        createdAt: Date.now(), 
+        read: false 
+      });
       launchConfetti(20);
       alert('✅ تم');
       closeModal();
@@ -2959,10 +3009,10 @@ async function removeBadgeFromStudent(studentId, badgeKey) {
   showLoading();
   try {
     const users = await DB.get('users');
-    const idx = users.findIndex(u => u.id === studentId);
-    if (idx < 0) return;
-    users[idx].badges = (users[idx].badges || []).filter(b => b !== badgeKey);
-    await DB.set('users', users);
+    const user = users.find(u => u.id === studentId);
+    if (!user) return;
+    const newBadges = (user.badges || []).filter(b => b !== badgeKey);
+    await dbUpdateNode('users', studentId, { badges: newBadges });
     await logActivity('حذف شارة', badgeKey);
     alert('تم');
     closeModal();
@@ -2973,25 +3023,20 @@ async function resetStudentGamification(studentId) {
   if (!confirm('⚠️ تصفير؟')) return;
   showLoading();
   try {
-    const users = await DB.get('users');
-    const idx = users.findIndex(u => u.id === studentId);
-    if (idx < 0) return;
-    users[idx].xp = 0; users[idx].badges = []; users[idx].streak = 0; users[idx].lastQuizDate = null;
-    await DB.set('users', users);
-    await logActivity('تصفير', users[idx].name);
+    await dbUpdateNode('users', studentId, { xp: 0, badges: [], streak: 0, lastQuizDate: null });
+    await logActivity('تصفير تحفيز', studentId);
     alert('✅ تم');
     renderAdminGamification();
   } finally { hideLoading(); }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ✅ ADMIN: CHALLENGES (جديد)
+   ✅ ADMIN: CHALLENGES
    ═══════════════════════════════════════════════════════════ */
 async function renderAdminChallenges() {
   showLoading();
   try {
     const challenges = await DB.get('challenges');
-    const users = await DB.get('users');
     const container = document.getElementById('dashboardContent');
     
     const pending = challenges.filter(c => c.status === 'pending');
@@ -3036,11 +3081,11 @@ async function renderAdminChallenges() {
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:center;">
                   <div style="padding:8px;background:var(--primary-light);border-radius:8px;">
                     <div style="font-size:11px;">${escapeHtml(c.fromName)}</div>
-                    <div style="font-size:18px;font-weight:900;color:var(--primary);">${c.fromScore || 0}%</div>
+                    <div style="font-size:18px;font-weight:900;color:var(--primary);">${c.fromScore ?? '—'}%</div>
                   </div>
                   <div style="padding:8px;background:var(--info-light);border-radius:8px;">
                     <div style="font-size:11px;">${escapeHtml(c.toName)}</div>
-                    <div style="font-size:18px;font-weight:900;color:var(--info);">${c.toScore || 0}%</div>
+                    <div style="font-size:18px;font-weight:900;color:var(--info);">${c.toScore ?? '—'}%</div>
                   </div>
                 </div>
               </div>` : ''}
@@ -3057,8 +3102,7 @@ async function adminDeleteChallenge(challengeId) {
   if (!confirm('حذف التحدي؟')) return;
   showLoading();
   try {
-    const challenges = await DB.get('challenges');
-    await DB.set('challenges', challenges.filter(c => c.id !== challengeId));
+    await dbRemoveNode('challenges', challengeId);
     await logActivity('حذف تحدي (أدمن)', challengeId);
     alert('✅ تم');
     renderAdminChallenges();
@@ -3214,22 +3258,15 @@ async function saveAnnouncement(id) {
     if (id) {
       const idx = announcements.findIndex(a => a.id === id);
       if (idx >= 0) {
-        announcements[idx] = {
-          ...announcements[idx], emoji, title, text, link, linkText,
-          bgColor, bgColorEnd, type, imageUrl, startDate, endDate,
-          updatedAt: Date.now()
-        };
+        const updates = { emoji, title, text, link, linkText, bgColor, bgColorEnd, type, imageUrl, startDate, endDate, updatedAt: Date.now() };
+        await dbUpdateNode('announcements', id, updates);
       }
     } else {
-      announcements.push({
-        id: uid(), emoji, title, text, link, linkText,
-        bgColor, bgColorEnd, type, imageUrl,
-        startDate, endDate,
-        enabled: true, createdAt: Date.now()
-      });
+      const annId = uid();
+      const newAnn = { emoji, title, text, link, linkText, bgColor, bgColorEnd, type, imageUrl, startDate, endDate, enabled: true, createdAt: Date.now() };
+      await dbSetNode('announcements', annId, newAnn);
     }
-    await DB.set('announcements', announcements);
-    _cachedAnnouncements = announcements;
+    _cachedAnnouncements = await DB.get('announcements');
     localStorage.removeItem('edu_announcement_dismissed');
     _lastAnnouncementId = null;
     await logActivity(id ? 'تعديل إعلان' : 'إنشاء إعلان', title || text.slice(0, 30));
@@ -3247,9 +3284,8 @@ async function toggleAnnouncement(id) {
     const announcements = await DB.get('announcements');
     const idx = announcements.findIndex(a => a.id === id);
     if (idx >= 0) {
-      announcements[idx].enabled = !announcements[idx].enabled;
-      await DB.set('announcements', announcements);
-      _cachedAnnouncements = announcements;
+      await dbUpdateNode('announcements', id, { enabled: !announcements[idx].enabled });
+      _cachedAnnouncements = await DB.get('announcements');
       renderAnnouncementEverywhere();
       renderAdminAnnouncements();
     }
@@ -3260,10 +3296,8 @@ async function deleteAnnouncement(id) {
   if (!confirm('حذف؟')) return;
   showLoading();
   try {
-    const announcements = await DB.get('announcements');
-    const filtered = announcements.filter(a => a.id !== id);
-    await DB.set('announcements', filtered);
-    _cachedAnnouncements = filtered;
+    await dbRemoveNode('announcements', id);
+    _cachedAnnouncements = await DB.get('announcements');
     await logActivity('حذف إعلان', id);
     alert('تم');
     renderAnnouncementEverywhere();
@@ -3413,9 +3447,16 @@ async function sendAdminBroadcast() {
     let recipients = users;
     if (target !== 'all') recipients = users.filter(u => u.role === target);
     if (recipients.length === 0) { alert('لا مستلمين'); return; }
-    const notifs = await DB.get('notifications');
-    recipients.forEach(r => notifs.push({ id: uid(), userId: r.id, title: `📢 ${title}`, body, createdAt: Date.now(), read: false }));
-    await DB.set('notifications', notifs);
+    for (const r of recipients) {
+      const notifId = uid();
+      await dbSetNode('notifications', notifId, { 
+        userId: r.id, 
+        title: `📢 ${title}`, 
+        body, 
+        createdAt: Date.now(), 
+        read: false 
+      });
+    }
     await logActivity('إشعار شامل', `${title} → ${target}`);
     launchConfetti(30);
     alert(`✅ أُرسل إلى ${recipients.length}`);
@@ -3438,20 +3479,20 @@ async function openPendingTeachers() {
 async function approveTeacher(userId) {
   showLoading();
   try {
-    const users = await DB.get('users');
-    const idx = users.findIndex(u => u.id === userId);
-    if (idx >= 0) {
-      users[idx].approved = true;
-      await DB.set('users', users);
-      const notifs = await DB.get('notifications');
-      notifs.push({ id: uid(), userId, title: '✅ تم اعتماد حسابك', body: 'تم اعتمادك', createdAt: Date.now(), read: false });
-      await DB.set('notifications', notifs);
-      await logActivity('اعتماد مدرس', users[idx].name);
-      launchConfetti(30);
-      alert('تم');
-      closeModal();
-      renderAdminDashboard();
-    }
+    await dbUpdateNode('users', userId, { approved: true });
+    const notifId = uid();
+    await dbSetNode('notifications', notifId, { 
+      userId, 
+      title: '✅ تم اعتماد حسابك', 
+      body: 'تم اعتمادك', 
+      createdAt: Date.now(), 
+      read: false 
+    });
+    await logActivity('اعتماد مدرس', userId);
+    launchConfetti(30);
+    alert('تم');
+    closeModal();
+    renderAdminDashboard();
   } finally { hideLoading(); }
 }
 async function deleteUser(userId) {
@@ -3461,8 +3502,11 @@ async function deleteUser(userId) {
     const users = await DB.get('users');
     const user = users.find(u => u.id === userId);
     if (isAdmin(user)) { alert('لا يمكن حذف الأدمن'); return; }
-    await DB.set('users', users.filter(u => u.id !== userId));
-    await DB.set('attempts', (await DB.get('attempts')).filter(a => a.studentId !== userId));
+    await dbRemoveNode('users', userId);
+    const attempts = await DB.get('attempts');
+    for (const a of attempts.filter(a => a.studentId === userId)) {
+      await dbRemoveNode('attempts', a.id);
+    }
     await logActivity('حذف مستخدم', user?.name || userId);
     alert('تم');
     renderAdminDashboard();
@@ -3474,10 +3518,14 @@ async function wipeQuizData() {
   if (prompt('اكتب "حذف":') !== 'حذف') { alert('ألغي'); return; }
   showLoading();
   try {
-    await DB.set('quizzes', []);
-    await DB.set('attempts', []);
-    await DB.set('notifications', []);
-    await DB.set('challenges', []);
+    const quizzes = await DB.get('quizzes');
+    for (const q of quizzes) await dbRemoveNode('quizzes', q.id);
+    const attempts = await DB.get('attempts');
+    for (const a of attempts) await dbRemoveNode('attempts', a.id);
+    const notifs = await DB.get('notifications');
+    for (const n of notifs) await dbRemoveNode('notifications', n.id);
+    const challenges = await DB.get('challenges');
+    for (const c of challenges) await dbRemoveNode('challenges', c.id);
     await logActivity('مسح شامل');
     alert('✅ تم');
     renderAdminDashboard();
@@ -3644,6 +3692,7 @@ function openBroadcastModal() {
     <div class="form-group"><label class="form-label">الرسالة</label><textarea class="form-textarea auto-dir" id="bBody" dir="rtl"></textarea></div>
     <button class="btn btn-primary btn-full" onclick="sendBroadcast()">📤 إرسال</button>`);
 }
+
 async function sendBroadcast() {
   const target = document.querySelector('input[name="bTarget"]:checked').value;
   const grade = document.getElementById('bGradeValue').value;
@@ -3657,9 +3706,16 @@ async function sendBroadcast() {
     let recipients = users.filter(u => u.role === 'student');
     if (target === 'grade') recipients = recipients.filter(u => u.grade === grade);
     if (recipients.length === 0) { alert('لا طلاب'); return; }
-    const notifs = await DB.get('notifications');
-    recipients.forEach(r => notifs.push({ id: uid(), userId: r.id, title: `📢 ${title}`, body, createdAt: Date.now(), read: false }));
-    await DB.set('notifications', notifs);
+    for (const r of recipients) {
+      const notifId = uid();
+      await dbSetNode('notifications', notifId, { 
+        userId: r.id, 
+        title: `📢 ${title}`, 
+        body, 
+        createdAt: Date.now(), 
+        read: false 
+      });
+    }
     await logActivity('إشعار مدرس', title);
     launchConfetti(30);
     alert(`✅ أُرسل إلى ${recipients.length}`);
@@ -3735,18 +3791,15 @@ async function saveTeacherProfile() {
   const bio = document.getElementById('tBio').value.trim();
   showLoading();
   try {
-    const users = await DB.get('users');
-    const idx = users.findIndex(u => u.id === currentUser.id);
-    if (idx >= 0) {
-      users[idx].bio = bio;
-      users[idx].photoURL = _tempAvatar || null;
-      await DB.set('users', users);
-      currentUser = users[idx];
-      updateHeader();
-      closeModal();
-      launchConfetti(20);
-      alert('✅ تم');
-    }
+    const updates = { bio, photoURL: _tempAvatar || null };
+    const saved = await dbUpdateNode('users', currentUser.id, updates);
+    if (!saved) { alert('فشل الحفظ'); return; }
+    currentUser = { ...currentUser, ...updates };
+    saveSession(currentUser.id, true);
+    updateHeader();
+    closeModal();
+    launchConfetti(20);
+    alert('✅ تم');
   } finally { hideLoading(); }
 }
 function openTeacherContent() {
@@ -3797,32 +3850,25 @@ async function addVideoLink() {
   try { new URL(url); } catch { alert('رابط غير صالح'); return; }
   showLoading();
   try {
-    const users = await DB.get('users');
-    const idx = users.findIndex(u => u.id === currentUser.id);
-    if (idx >= 0) {
-      if (!users[idx].videoLinks) users[idx].videoLinks = [];
-      users[idx].videoLinks.push({ title: title || `فيديو ${users[idx].videoLinks.length + 1}`, url, addedAt: Date.now() });
-      await DB.set('users', users);
-      currentUser = users[idx];
-      await logActivity('إضافة فيديو', title || url);
-      launchConfetti(10);
-      alert('✅');
-      renderContentModal('videos');
-    }
+    const videos = [...(currentUser.videoLinks || []), { title: title || `فيديو ${(currentUser.videoLinks || []).length + 1}`, url, addedAt: Date.now() }];
+    const saved = await dbUpdateNode('users', currentUser.id, { videoLinks: videos });
+    if (!saved) { alert('فشل'); return; }
+    currentUser = { ...currentUser, videoLinks: videos };
+    await logActivity('إضافة فيديو', title || url);
+    launchConfetti(10);
+    alert('✅');
+    renderContentModal('videos');
   } finally { hideLoading(); }
 }
 async function removeVideoLink(index) {
   if (!confirm('حذف؟')) return;
   showLoading();
   try {
-    const users = await DB.get('users');
-    const idx = users.findIndex(u => u.id === currentUser.id);
-    if (idx >= 0 && users[idx].videoLinks) {
-      users[idx].videoLinks.splice(index, 1);
-      await DB.set('users', users);
-      currentUser = users[idx];
-      renderContentModal('videos');
-    }
+    const videos = [...(currentUser.videoLinks || [])];
+    videos.splice(index, 1);
+    await dbUpdateNode('users', currentUser.id, { videoLinks: videos });
+    currentUser = { ...currentUser, videoLinks: videos };
+    renderContentModal('videos');
   } finally { hideLoading(); }
 }
 async function handleMaterialUpload(e) {
@@ -3839,18 +3885,14 @@ async function handleMaterialUpload(e) {
       r.readAsDataURL(f);
     });
     if (base64.length > 10 * 1024 * 1024) { alert('كبير'); return; }
-    const users = await DB.get('users');
-    const idx = users.findIndex(u => u.id === currentUser.id);
-    if (idx >= 0) {
-      if (!users[idx].materialFiles) users[idx].materialFiles = [];
-      users[idx].materialFiles.push({ name: f.name, size: f.size, type: f.type, data: base64, uploadedAt: Date.now() });
-      await DB.set('users', users);
-      currentUser = users[idx];
-      await logActivity('رفع ملزمة', f.name);
-      launchConfetti(10);
-      alert(`✅ تم رفع "${f.name}"`);
-      renderContentModal('materials');
-    }
+    const materials = [...(currentUser.materialFiles || []), { name: f.name, size: f.size, type: f.type, data: base64, uploadedAt: Date.now() }];
+    const saved = await dbUpdateNode('users', currentUser.id, { materialFiles: materials });
+    if (!saved) { alert('فشل'); return; }
+    currentUser = { ...currentUser, materialFiles: materials };
+    await logActivity('رفع ملزمة', f.name);
+    launchConfetti(10);
+    alert(`✅ تم رفع "${f.name}"`);
+    renderContentModal('materials');
   } catch (err) { alert('فشل: ' + err.message); }
   finally { hideLoading(); }
 }
@@ -3858,14 +3900,11 @@ async function removeMaterial(index) {
   if (!confirm('حذف؟')) return;
   showLoading();
   try {
-    const users = await DB.get('users');
-    const idx = users.findIndex(u => u.id === currentUser.id);
-    if (idx >= 0 && users[idx].materialFiles) {
-      users[idx].materialFiles.splice(index, 1);
-      await DB.set('users', users);
-      currentUser = users[idx];
-      renderContentModal('materials');
-    }
+    const materials = [...(currentUser.materialFiles || [])];
+    materials.splice(index, 1);
+    await dbUpdateNode('users', currentUser.id, { materialFiles: materials });
+    currentUser = { ...currentUser, materialFiles: materials };
+    renderContentModal('materials');
   } finally { hideLoading(); }
 }
 function downloadMaterial(index) {
@@ -3925,12 +3964,12 @@ async function rateTeacher(teacherId, stars) {
   showLoading();
   try {
     const users = await DB.get('users');
-    const idx = users.findIndex(u => u.id === teacherId);
-    if (idx < 0) return;
-    if (!users[idx].ratings) users[idx].ratings = [];
-    users[idx].ratings = users[idx].ratings.filter(r => r.studentId !== currentUser.id);
-    users[idx].ratings.push({ studentId: currentUser.id, stars, at: Date.now() });
-    await DB.set('users', users);
+    const teacher = users.find(u => u.id === teacherId);
+    if (!teacher) return;
+    const ratings = (teacher.ratings || []).filter(r => r.studentId !== currentUser.id);
+    ratings.push({ studentId: currentUser.id, stars, at: Date.now() });
+    const saved = await dbUpdateNode('users', teacherId, { ratings });
+    if (!saved) { alert('فشل'); return; }
     launchConfetti(10);
     alert(`✅ ${stars} نجوم`);
     if (currentUser.role === 'student') renderStudentDashboard();
@@ -4059,19 +4098,24 @@ async function saveQuiz() {
   if (newQuizData.questions.length > platformSettings.maxQuizQuestions) { alert(`أقصى: ${platformSettings.maxQuizQuestions}`); return; }
   showLoading();
   try {
-    const quizzes = await DB.get('quizzes');
     if (editingQuizId) {
-      const idx = quizzes.findIndex(q => q.id === editingQuizId);
-      if (idx >= 0) {
-        quizzes[idx] = { ...quizzes[idx], title: newQuizData.title, grade: newQuizData.grade, timePerQuestion: newQuizData.timePerQuestion, questions: newQuizData.questions, updatedAt: Date.now() };
-        await DB.set('quizzes', quizzes);
-        await logActivity('تعديل اختبار', newQuizData.title);
-      }
+      const updates = { title: newQuizData.title, grade: newQuizData.grade, timePerQuestion: newQuizData.timePerQuestion, questions: newQuizData.questions, updatedAt: Date.now() };
+      await dbUpdateNode('quizzes', editingQuizId, updates);
+      await logActivity('تعديل اختبار', newQuizData.title);
     } else {
-      const quiz = { id: uid(), teacherId: currentUser.id, title: newQuizData.title, subject: newQuizData.subject, grade: newQuizData.grade, timePerQuestion: newQuizData.timePerQuestion, questions: newQuizData.questions, createdAt: Date.now() };
-      quizzes.push(quiz);
-      await DB.set('quizzes', quizzes);
-      await notifyStudents(quiz);
+      const quizId = uid();
+      const quiz = { 
+        teacherId: currentUser.id, 
+        title: newQuizData.title, 
+        subject: newQuizData.subject, 
+        grade: newQuizData.grade, 
+        timePerQuestion: newQuizData.timePerQuestion, 
+        questions: newQuizData.questions, 
+        createdAt: Date.now() 
+      };
+      const saved = await dbSetNode('quizzes', quizId, quiz);
+      if (!saved) { alert('فشل الحفظ'); return; }
+      await notifyStudents({ ...quiz, id: quizId });
       await logActivity('إنشاء اختبار', newQuizData.title);
     }
     editingQuizId = null; newQuizData = null;
@@ -4122,8 +4166,11 @@ async function deleteQuiz(quizId) {
   try {
     const quizzes = await DB.get('quizzes');
     const quiz = quizzes.find(q => q.id === quizId);
-    await DB.set('quizzes', quizzes.filter(q => q.id !== quizId));
-    await DB.set('attempts', (await DB.get('attempts')).filter(a => a.quizId !== quizId));
+    await dbRemoveNode('quizzes', quizId);
+    const attempts = await DB.get('attempts');
+    for (const a of attempts.filter(a => a.quizId === quizId)) {
+      await dbRemoveNode('attempts', a.id);
+    }
     await logActivity('حذف اختبار', quiz?.title || quizId);
     closeModal();
     renderTeacherDashboard();
@@ -4188,9 +4235,8 @@ async function setEssayGrade(attemptId, questionIndex, grade, btn) {
   const allAttempts = await DB.get('attempts');
   const attempt = allAttempts.find(a => a.id === attemptId);
   if (!attempt) return;
-  if (!attempt.essayGrades) attempt.essayGrades = {};
-  attempt.essayGrades[questionIndex] = grade;
-  await DB.set('attempts', allAttempts);
+  const essayGrades = { ...(attempt.essayGrades || {}), [questionIndex]: grade };
+  await dbUpdateNode('attempts', attemptId, { essayGrades });
   btn.parentElement.querySelectorAll('.grade-chip').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 }
@@ -4203,19 +4249,27 @@ async function finalizeGrading(attemptId) {
     const allQuizzes = await DB.get('quizzes');
     const quiz = allQuizzes.find(q => q.id === attempt.quizId);
     if (!quiz || quiz.teacherId !== currentUser.id) { alert('غير مصرح'); return; }
-    if (attempt.autoScore === undefined) attempt.autoScore = attempt.score - (attempt.essayBonusPrev || 0);
+    const autoScore = attempt.autoScore !== undefined ? attempt.autoScore : (attempt.score - (attempt.essayBonusPrev || 0));
     const bonus = Object.values(attempt.essayGrades || {}).reduce((a, b) => a + Number(b || 0), 0);
-    attempt.score = attempt.autoScore + bonus;
-    attempt.essayBonusPrev = bonus;
-    attempt.needsGrading = false;
-    attempt.graded = true;
-    attempt.gradedAt = Date.now();
-    await DB.set('attempts', allAttempts);
+    const finalScore = autoScore + bonus;
+    await dbUpdateNode('attempts', attemptId, { 
+      score: finalScore, 
+      essayBonusPrev: bonus, 
+      needsGrading: false, 
+      graded: true, 
+      gradedAt: Date.now(),
+      autoScore
+    });
     const xpGain = Math.round(bonus * 10);
     if (xpGain > 0) await awardXP(attempt.studentId, xpGain, 'مكافأة تصحيح');
-    const notifs = await DB.get('notifications');
-    notifs.push({ id: uid(), userId: attempt.studentId, title: '✅ تم التصحيح', body: `"${quiz.title}": ${attempt.score}/${attempt.total}`, createdAt: Date.now(), read: false });
-    await DB.set('notifications', notifs);
+    const notifId = uid();
+    await dbSetNode('notifications', notifId, { 
+      userId: attempt.studentId, 
+      title: '✅ تم التصحيح', 
+      body: `"${quiz.title}": ${finalScore}/${attempt.total}`, 
+      createdAt: Date.now(), 
+      read: false 
+    });
     launchConfetti(20);
     closeModal();
     renderTeacherDashboard();
@@ -4283,7 +4337,6 @@ async function renderStudentDashboard() {
     const xpPct = Math.min(100, (xpInLevel / xpNeeded) * 100);
     const myBadges = currentUser.badges || [];
     
-    // ✅ التحديات المعلقة
     const allChallenges = await DB.get('challenges');
     const pendingChallenges = allChallenges.filter(c => c.toId === currentUser.id && c.status === 'pending').length;
     const acceptedChallenges = allChallenges.filter(c => c.toId === currentUser.id && c.status === 'accepted').length;
@@ -4449,7 +4502,6 @@ async function renderParentDashboard() {
           const ca = allAttempts.filter(a => a.studentId === child.id);
           const cAvg = ca.length ? calculateAvg(ca) : 0;
           const lvl = getLevel(child.xp || 0);
-          // ✅ التحديات الخاصة بالابن
           const childChallenges = allChallenges.filter(c => (c.fromId === child.id || c.toId === child.id) && c.status === 'completed');
           return `<div class="parent-child-card">
             <div class="parent-child-header">
@@ -4482,10 +4534,10 @@ async function searchChild() {
     const student = users.find(u => u.role === 'student' && (u.email?.toLowerCase() === query || u.parentPhone === query));
     if (!student) { alert('❌ لم يتم العثور'); return; }
     if ((currentUser.children || []).includes(student.id)) { alert('⚠️ مرتبط'); return; }
-    if (!currentUser.children) currentUser.children = [];
-    currentUser.children.push(student.id);
-    const userIdx = users.findIndex(u => u.id === currentUser.id);
-    if (userIdx >= 0) { users[userIdx].children = currentUser.children; await DB.set('users', users); }
+    const children = [...(currentUser.children || []), student.id];
+    const saved = await dbUpdateNode('users', currentUser.id, { children });
+    if (!saved) { alert('فشل'); return; }
+    currentUser = { ...currentUser, children };
     launchConfetti(30);
     alert(`✅ تم ربط ${student.name}`);
     renderParentDashboard();
@@ -4496,10 +4548,9 @@ async function removeChild(childId) {
   if (!confirm('إلغاء؟')) return;
   showLoading();
   try {
-    currentUser.children = (currentUser.children || []).filter(id => id !== childId);
-    const users = await DB.get('users');
-    const userIdx = users.findIndex(u => u.id === currentUser.id);
-    if (userIdx >= 0) { users[userIdx].children = currentUser.children; await DB.set('users', users); }
+    const children = (currentUser.children || []).filter(id => id !== childId);
+    await dbUpdateNode('users', currentUser.id, { children });
+    currentUser = { ...currentUser, children };
     alert('✅');
     renderParentDashboard();
   } finally { hideLoading(); }
@@ -4533,7 +4584,7 @@ async function openChildDetails(childId) {
             <div><strong>${escapeHtml(c.quizTitle)}</strong> ضد ${escapeHtml(otherName)}</div>
             <div style="display:flex;justify-content:space-between;margin-top:4px;">
               <span>${result}</span>
-              <span>${myScore}% vs ${otherScore}%</span>
+              <span>${myScore ?? '—'}% vs ${otherScore ?? '—'}%</span>
             </div>
           </div>`;
         }).join('')}` : ''}
@@ -4571,7 +4622,7 @@ async function startQuiz(quizId) {
     currentAnswers = [];
     selectedAnswerIndex = null; 
     tfSelected = null;
-    window._currentChallenge = null; // ✅ ليس تحدياً
+    window._currentChallenge = null;
     showScreen('quiz');
     loadActiveAnnouncement();
     renderCurrentQuestion();
@@ -4693,13 +4744,14 @@ function checkAnswer(q, a) {
   return false;
 }
 
-/* ✅ إنهاء الاختبار - مع تحديث التحدي إن وُجد */
+/* ✅ إنهاء الاختبار - مع تحديث التحدي */
 async function finishQuiz() {
   clearInterval(timerInterval);
   showLoading();
   try {
     const existing = await DB.get('attempts');
-    if (existing.some(a => a.quizId === currentQuiz.id && a.studentId === currentUser.id && !window._currentChallenge)) { 
+    // منع الحل المكرر (فقط للاختبارات العادية)
+    if (!window._currentChallenge && existing.some(a => a.quizId === currentQuiz.id && a.studentId === currentUser.id)) { 
       hideLoading(); 
       alert('حللت بالفعل.'); 
       exitQuiz(); 
@@ -4718,7 +4770,6 @@ async function finishQuiz() {
     
     const attemptId = uid();
     const attempt = { 
-      id: attemptId, 
       quizId: currentQuiz.id, 
       studentId: currentUser.id, 
       score, 
@@ -4734,8 +4785,10 @@ async function finishQuiz() {
       essayBonusPrev: 0,
       isChallenge: !!window._currentChallenge
     };
-    existing.push(attempt);
-    await DB.set('attempts', existing);
+    
+    // ✅ حفظ مباشر
+    const attemptSaved = await dbSetNode('attempts', attemptId, attempt);
+    if (!attemptSaved) { alert('فشل حفظ المحاولة'); return; }
     
     // ✅ منح XP
     const xpGain = calculateXPForAttempt(attempt);
@@ -4743,52 +4796,48 @@ async function finishQuiz() {
     await updateStreak(currentUser.id);
     const newBadges = await checkAndAwardBadges(currentUser.id);
     
-    // ✅ إذا كان هذا تحدياً، حدّث حالة التحدي
+    // ✅ إذا كان تحدياً، حدّث حالة التحدي
     let challengeResult = null;
     if (window._currentChallenge) {
       const challenges = await DB.get('challenges');
-      const cIdx = challenges.findIndex(c => c.id === window._currentChallenge.id);
-      if (cIdx >= 0) {
+      const challenge = challenges.find(c => c.id === window._currentChallenge.id);
+      if (challenge) {
         const pct = autoGraded > 0 ? Math.round((score / autoGraded) * 100) : 0;
-        challenges[cIdx].status = 'completed';
-        challenges[cIdx].toScore = pct;
-        challenges[cIdx].completedAt = Date.now();
-        challenges[cIdx].solveAttemptId = attemptId;
         
-        // ✅ تحديد الفائز (fromScore يُحسب من محاولة المرسل السابقة)
-        // لكن المرسل لم يحل بعد... نحن نحل فقط للطرف الثاني
-        // fromScore = null حتى يحل هو أيضاً... أو نجعل التحدي يعتمد على من يحل أولاً
-        // الحل: الطرف الثاني يحل → toScore معروف → fromScore = نتيجة محاولته المستقلة على نفس الاختبار إن وُجدت
-        const senderAttempt = existing.find(a => a.studentId === window._currentChallenge.fromId && a.quizId === window._currentChallenge.quizId && !a.isChallenge);
-        if (senderAttempt) {
-          const senderPct = senderAttempt.total > 0 ? Math.round((senderAttempt.score / senderAttempt.total) * 100) : 0;
-          challenges[cIdx].fromScore = senderPct;
-          if (senderPct > pct) challenges[cIdx].winnerId = window._currentChallenge.fromId;
-          else if (pct > senderPct) challenges[cIdx].winnerId = currentUser.id;
-          else challenges[cIdx].winnerId = null; // تعادل
-        } else {
-          // المرسل لم يحل بعد → نضع fromScore = null، والنتيجة تُعرض لاحقاً
-          challenges[cIdx].fromScore = null;
+        // تحقق من محاولة المرسل السابقة (إن وجدت)
+        const senderAttempt = existing.find(a => a.studentId === challenge.fromId && a.quizId === challenge.quizId && !a.isChallenge);
+        const fromScore = senderAttempt ? (senderAttempt.total > 0 ? Math.round((senderAttempt.score / senderAttempt.total) * 100) : 0) : null;
+        
+        let winnerId = null;
+        if (fromScore !== null) {
+          if (fromScore > pct) winnerId = challenge.fromId;
+          else if (pct > fromScore) winnerId = currentUser.id;
         }
         
-        await DB.set('challenges', challenges);
-        _challengesCache = challenges;
-        challengeResult = challenges[cIdx];
+        await dbUpdateNode('challenges', challenge.id, { 
+          status: 'completed', 
+          toScore: pct, 
+          fromScore: fromScore,
+          completedAt: Date.now(), 
+          solveAttemptId: attemptId,
+          winnerId: winnerId
+        });
         
-        // ✅ إشعار للمرسل
-        const notifs = await DB.get('notifications');
-        notifs.push({ 
-          id: uid(), 
-          userId: window._currentChallenge.fromId, 
+        challengeResult = { ...challenge, toScore: pct, fromScore, winnerId };
+        
+        // إشعار للمرسل
+        const notifId = uid();
+        await dbSetNode('notifications', notifId, { 
+          userId: challenge.fromId, 
           title: '⚔️ تم حل التحدي!', 
-          body: `${currentUser.name} حصل على ${pct}% في "${currentQuiz.title}". افتح التحديات لترى النتيجة`, 
+          body: `${currentUser.name} حصل على ${pct}% في "${currentQuiz.title}"`, 
           createdAt: Date.now(), 
           read: false 
         });
-        await DB.set('notifications', notifs);
       }
     }
     
+    // تحديث currentUser من DB
     const freshUsers = await DB.get('users');
     const freshMe = freshUsers.find(u => u.id === currentUser.id);
     if (freshMe) currentUser = freshMe;
@@ -4804,13 +4853,24 @@ async function finishQuiz() {
     // ✅ عرض نتيجة التحدي
     let challengeHtml = '';
     if (challengeResult) {
+      const myScore = challengeResult.toScore;
+      const otherScore = challengeResult.fromScore;
+      const otherName = challengeResult.fromName;
+      let resultText = '';
+      if (otherScore === null) {
+        resultText = '<br>⏳ بانتظار الخصم ليحل الاختبار';
+      } else if (myScore > otherScore) {
+        resultText = '<br>🎉 <strong>فزت!</strong>';
+      } else if (myScore < otherScore) {
+        resultText = '<br>😔 خسرت';
+      } else {
+        resultText = '<br>🤝 تعادل';
+      }
       challengeHtml = `<div class="alert alert-warning" style="text-align:right;margin-top:16px;">
         ⚔️ <strong>نتيجة التحدي:</strong><br>
-        أنت: ${challengeResult.toScore}%<br>
-        ${escapeHtml(challengeResult.fromName)}: ${challengeResult.fromScore !== null ? challengeResult.fromScore + '%' : '(لم يحل بعد)'}
-        ${challengeResult.fromScore !== null ? 
-          (challengeResult.winnerId === currentUser.id ? '<br>🎉 <strong>فزت!</strong>' : 
-           challengeResult.winnerId ? '<br>😔 خسرت' : '<br>🤝 تعادل') : ''}
+        أنت: ${myScore}%<br>
+        ${escapeHtml(otherName)}: ${otherScore !== null ? otherScore + '%' : '(لم يحل بعد)'}
+        ${resultText}
       </div>`;
     }
     
@@ -4829,7 +4889,6 @@ async function finishQuiz() {
     document.getElementById('quizProgressFill').style.width = '100%';
     document.getElementById('quizProgressText').textContent = 'تم';
     
-    // ✅ إعادة تعيين متغير التحدي
     window._currentChallenge = null;
   } finally { hideLoading(); }
 }
@@ -4919,14 +4978,17 @@ const globalFns = [
   startAnnouncementsListener, stopAnnouncementsListener,
   startChallengesListener, stopChallengesListener,
   startNotificationsListener, stopNotificationsListener,
-  startRealtimeAnalytics, stopRealtimeAnalytics
+  startRealtimeAnalytics, stopRealtimeAnalytics,
+  // DB Direct Write
+  dbSetNode, dbUpdateNode, dbRemoveNode
 ];
 globalFns.forEach(fn => { 
   try { window[fn.name] = fn; } catch(e) { console.warn('Could not export:', fn.name); } 
 });
 
 console.log('✅ EduPlatform Pro loaded successfully');
+console.log('📝 Registration: Direct write to users/{uid} - no more PERMISSION_DENIED');
+console.log('🎯 All write operations use dbSetNode/dbUpdateNode/dbRemoveNode');
 </script>
 </body>
 </html>
-
