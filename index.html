@@ -198,7 +198,6 @@
   .checkbox-label { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer; user-select: none; }
   .checkbox-label input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
   .link-btn { background: none; border: none; color: var(--primary); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; padding: 4px 0; }
-  .link-btn:hover { opacity: 0.7; text-decoration: underline; }
   .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: var(--text-light); font-size: 13px; font-weight: 700; }
   .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
   .dev-footer { text-align: center; padding: 24px 20px 32px; font-size: 13px; color: var(--text-light); font-weight: 600; }
@@ -332,23 +331,40 @@
   .streak-fire { font-size: 48px; }
   .streak-info h3 { font-size: 22px; font-weight: 900; margin-bottom: 4px; }
   .streak-info p { font-size: 14px; opacity: 0.9; }
+
+  /* ===== Announcements: Bar + Banner ===== */
   .announcement-bar { background: linear-gradient(135deg, var(--primary), var(--purple)); color: #fff; padding: 14px 20px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); position: relative; z-index: 100; }
   .announcement-bar-content { flex: 1; font-size: 15px; font-weight: 700; line-height: 1.5; }
   .announcement-bar-close { background: rgba(255,255,255,0.2); color: #fff; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 16px; transition: all 0.2s; flex-shrink: 0; }
   .announcement-bar-close:hover { background: rgba(255,255,255,0.35); }
   .announcement-bar a { color: #fff; text-decoration: underline; font-weight: 800; }
   .announcement-bar-emoji { font-size: 24px; flex-shrink: 0; }
+  .announcement-banner { position: relative; width: 100%; min-height: 180px; background-size: cover; background-position: center; background-repeat: no-repeat; color: #fff; display: flex; align-items: center; justify-content: center; padding: 30px 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.2); z-index: 100; overflow: hidden; }
+  .announcement-banner::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(0,0,0,0.3)); z-index: 1; }
+  .announcement-banner-inner { position: relative; z-index: 2; text-align: center; max-width: 900px; padding: 0 20px; }
+  .announcement-banner-emoji { font-size: 48px; margin-bottom: 12px; display: block; }
+  .announcement-banner-title { font-size: 28px; font-weight: 900; margin-bottom: 10px; text-shadow: 0 2px 8px rgba(0,0,0,0.5); line-height: 1.4; }
+  .announcement-banner-text { font-size: 16px; font-weight: 600; line-height: 1.7; margin-bottom: 16px; text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
+  .announcement-banner-cta { display: inline-block; padding: 12px 32px; background: #fff; color: var(--primary); border-radius: 999px; font-size: 15px; font-weight: 800; text-decoration: none; transition: all 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+  .announcement-banner-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+  .announcement-banner-close { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.4); color: #fff; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 18px; transition: all 0.2s; z-index: 3; }
+  .announcement-banner-close:hover { background: rgba(0,0,0,0.7); transform: rotate(90deg); }
+
   .gamify-student-row { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--bg); border-radius: 12px; margin-bottom: 10px; flex-wrap: wrap; gap: 12px; }
   .gamify-student-info { flex: 1; min-width: 200px; }
   .gamify-student-info h4 { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
   .gamify-student-info p { font-size: 12px; color: var(--text-light); }
   .gamify-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
   @media (max-width: 600px) {
     .card { padding: 20px; } .auth-wrapper { margin: 20px auto; }
     .stats-grid { grid-template-columns: repeat(2, 1fr); } .stat-card { flex-direction: column; text-align: center; }
     .section-title { font-size: 18px; } .modal { padding: 20px; }
     .user-tab { padding: 10px 16px; font-size: 13px; }
     .badges-grid { grid-template-columns: repeat(3, 1fr); }
+    .announcement-banner { min-height: 140px; }
+    .announcement-banner-title { font-size: 20px; }
+    .announcement-banner-text { font-size: 14px; }
   }
 </style>
 </head>
@@ -494,6 +510,8 @@ let pendingGoogleUser = null;
 let notifUnsubscribe = null;
 let isProcessingRedirect = false;
 let _tempAvatar = null;
+let _tempAnnImage = null;
+let _tempAnnImagePath = null;
 
 let currentUser = null, currentQuiz = null, currentQuestionIndex = 0, currentAnswers = [];
 let selectedAnswerIndex = null, timerInterval = null, timeLeft = 0;
@@ -917,6 +935,7 @@ function calculateXPForAttempt(attempt) {
   return xp;
 }
 
+/* ============ ANNOUNCEMENTS: Load + Render (Bar/Banner) ============ */
 async function loadActiveAnnouncement() {
   try {
     const announcements = await DB.get('announcements');
@@ -924,29 +943,50 @@ async function loadActiveAnnouncement() {
     const active = announcements.find(a => a.enabled && (!a.startDate || a.startDate <= now) && (!a.endDate || a.endDate >= now));
     const dismissed = localStorage.getItem('edu_announcement_dismissed');
     if (dismissed && active && dismissed === active.id) return;
-    renderAnnouncementBar(active);
+    renderAnnouncement(active);
   } catch (e) {}
 }
 
-function renderAnnouncementBar(active) {
+function renderAnnouncement(active) {
   const containers = [document.getElementById('announcementContainer'), document.getElementById('announcementContainerQuiz')];
   containers.forEach(container => {
     if (!container) return;
     if (!active) { container.innerHTML = ''; return; }
-    container.innerHTML = `<div class="announcement-bar" style="background: linear-gradient(135deg, ${active.bgColor || 'var(--primary)'}, ${active.bgColorEnd || 'var(--purple)'});">
-      <span class="announcement-bar-emoji">${active.emoji || '📢'}</span>
-      <div class="announcement-bar-content" dir="${detectDirection(active.text)}" style="text-align:${detectDirection(active.text) === 'ltr' ? 'left' : 'right'};">
-        ${active.title ? `<strong>${escapeHtml(active.title)}:</strong> ` : ''}${escapeHtml(active.text)}
-        ${active.link ? ` <a href="${escapeHtml(active.link)}" target="_blank" rel="noopener">${escapeHtml(active.linkText || 'اعرف أكثر')}</a>` : ''}
-      </div>
-      <button class="announcement-bar-close" onclick="dismissAnnouncement('${active.id}')" title="إغلاق">✕</button>
-    </div>`;
+
+    // ✅ بانر كامل إذا كان النوع banner أو لديه صورة
+    if (active.type === 'banner' || active.imageUrl) {
+      const bg = active.imageUrl
+        ? `background-image: url('${active.imageUrl}');`
+        : `background: linear-gradient(135deg, ${active.bgColor || '#4f46e5'}, ${active.bgColorEnd || '#8b5cf6'});`;
+      const textDir = detectDirection(active.text || '');
+      const titleDir = detectDirection(active.title || '');
+      container.innerHTML = `<div class="announcement-banner" style="${bg}">
+        <button class="announcement-banner-close" onclick="dismissAnnouncement('${active.id}')" title="إغلاق">✕</button>
+        <div class="announcement-banner-inner">
+          ${active.emoji ? `<span class="announcement-banner-emoji">${active.emoji}</span>` : ''}
+          ${active.title ? `<h2 class="announcement-banner-title" dir="${titleDir}" style="text-align:${titleDir === 'ltr' ? 'left' : 'right'};">${escapeHtml(active.title)}</h2>` : ''}
+          ${active.text ? `<p class="announcement-banner-text" dir="${textDir}" style="text-align:${textDir === 'ltr' ? 'left' : 'right'};">${escapeHtml(active.text)}</p>` : ''}
+          ${active.link ? `<a href="${escapeHtml(active.link)}" target="_blank" rel="noopener" class="announcement-banner-cta">${escapeHtml(active.linkText || 'اعرف أكثر')} ←</a>` : ''}
+        </div>
+      </div>`;
+    } else {
+      // شريط بسيط
+      const textDir = detectDirection(active.text || '');
+      container.innerHTML = `<div class="announcement-bar" style="background: linear-gradient(135deg, ${active.bgColor || 'var(--primary)'}, ${active.bgColorEnd || 'var(--purple)'});">
+        <span class="announcement-bar-emoji">${active.emoji || '📢'}</span>
+        <div class="announcement-bar-content" dir="${textDir}" style="text-align:${textDir === 'ltr' ? 'left' : 'right'};">
+          ${active.title ? `<strong>${escapeHtml(active.title)}:</strong> ` : ''}${escapeHtml(active.text)}
+          ${active.link ? ` <a href="${escapeHtml(active.link)}" target="_blank" rel="noopener">${escapeHtml(active.linkText || 'اعرف أكثر')}</a>` : ''}
+        </div>
+        <button class="announcement-bar-close" onclick="dismissAnnouncement('${active.id}')" title="إغلاق">✕</button>
+      </div>`;
+    }
   });
 }
 
 function dismissAnnouncement(id) {
   localStorage.setItem('edu_announcement_dismissed', id);
-  document.querySelectorAll('.announcement-bar').forEach(el => el.parentElement.innerHTML = '');
+  document.querySelectorAll('.announcement-bar, .announcement-banner').forEach(el => el.parentElement.innerHTML = '');
 }
 
 /* ============ AUTH ============ */
@@ -1385,7 +1425,7 @@ function updateHeader() {
 
 /* ⬇️ بداية الجزء الثالث من JavaScript */
 
-/* ============ Notifications ============ */
+/* ============ NOTIFICATIONS ============ */
 async function updateNotifBadge() {
   if (!currentUser) return;
   const notifs = await DB.get('notifications');
@@ -1432,7 +1472,7 @@ async function notifyStudents(quiz) {
   await DB.set('notifications', notifs);
 }
 
-/* ============ Modal ============ */
+/* ============ MODAL ============ */
 function openModal(html) { document.getElementById('modalBox').innerHTML = html; document.getElementById('modalOverlay').classList.add('active'); bindAutoDirToInputs(); }
 function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
 
@@ -1461,7 +1501,7 @@ async function renderAdminDashboard() {
         <div class="admin-nav-card" onclick="renderAdminQuizzes()"><div class="admin-nav-icon">📝</div><div class="admin-nav-title">إدارة الاختبارات</div><div class="admin-nav-desc">${allQuizzes.length} اختبار</div></div>
         <div class="admin-nav-card" onclick="renderAdminStats()"><div class="admin-nav-icon">📊</div><div class="admin-nav-title">الإحصائيات</div><div class="admin-nav-desc">رسوم بيانية</div></div>
         <div class="admin-nav-card" onclick="renderAdminGamification()"><div class="admin-nav-icon">🎮</div><div class="admin-nav-title">التحفيز</div><div class="admin-nav-desc">XP + شارات</div></div>
-        <div class="admin-nav-card" onclick="renderAdminAnnouncements()"><div class="admin-nav-icon">📢</div><div class="admin-nav-title">الإعلانات</div><div class="admin-nav-desc">شريط عام</div></div>
+        <div class="admin-nav-card" onclick="renderAdminAnnouncements()"><div class="admin-nav-icon">📢</div><div class="admin-nav-title">الإعلانات</div><div class="admin-nav-desc">شريط/بانر</div></div>
         <div class="admin-nav-card" onclick="renderAdminSettings()"><div class="admin-nav-icon">⚙️</div><div class="admin-nav-title">إعدادات المنصة</div><div class="admin-nav-desc">الاسم + الألوان</div></div>
         <div class="admin-nav-card" onclick="renderAuditLog()"><div class="admin-nav-icon">📜</div><div class="admin-nav-title">سجل النشاط</div><div class="admin-nav-desc">آخر الأحداث</div></div>
         <div class="admin-nav-card" onclick="openAdminBroadcast()"><div class="admin-nav-icon">💬</div><div class="admin-nav-title">إشعار شامل</div><div class="admin-nav-desc">لكل المستخدمين</div></div>
@@ -1596,7 +1636,7 @@ async function applyAdminFilters(tab) {
   if (body) body.innerHTML = renderUsersBody(filtered, allAttempts, tab);
 }
 
-/* ============ Admin: Quizzes ============ */
+/* ============ ADMIN: QUIZZES ============ */
 async function renderAdminQuizzes() {
   showLoading();
   try {
@@ -1695,7 +1735,7 @@ async function adminDeleteQuiz(quizId) {
   } finally { hideLoading(); }
 }
 
-/* ============ Admin: Stats ============ */
+/* ============ ADMIN: STATS ============ */
 async function renderAdminStats() {
   showLoading();
   try {
@@ -1755,7 +1795,7 @@ async function renderAdminStats() {
   } finally { hideLoading(); }
 }
 
-/* ============ Admin: Gamification ============ */
+/* ============ ADMIN: GAMIFICATION ============ */
 async function renderAdminGamification() {
   showLoading();
   try {
@@ -1912,7 +1952,7 @@ async function resetStudentGamification(studentId) {
   } finally { hideLoading(); }
 }
 
-/* ============ Admin: Announcements ============ */
+/* ============ ADMIN: ANNOUNCEMENTS (Bar + Banner) ============ */
 async function renderAdminAnnouncements() {
   showLoading();
   try {
@@ -1927,13 +1967,16 @@ async function renderAdminAnnouncements() {
       </div>
       <button class="btn btn-outline" onclick="renderAdminDashboard()" style="margin-bottom:16px;">← العودة</button>
       <button class="btn btn-primary btn-full" onclick="openAnnouncementEditor()" style="margin-bottom:16px;">➕ إعلان جديد</button>
-      ${announcements.length === 0 ? `<div class="card"><div class="empty-state"><div class="empty-state-icon">📢</div><h3>لا إعلانات بعد</h3></div></div>` :
+      ${announcements.length === 0 ? `<div class="card"><div class="empty-state"><div class="empty-state-icon">📢</div><h3>لا إعلانات بعد</h3><p style="margin-top:8px;">أنشئ إعلاناً ليظهر لكل المستخدمين (شريط أو بانر كامل)</p></div></div>` :
         announcements.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).map(a => {
           const now = Date.now();
           const isActive = a.enabled && (!a.startDate || a.startDate <= now) && (!a.endDate || a.endDate >= now);
+          const isBanner = a.type === 'banner' || a.imageUrl;
           return `<div class="card" style="border-right:4px solid ${isActive ? 'var(--success)' : 'var(--border)'};">
+            ${a.imageUrl ? `<img src="${a.imageUrl}" style="width:100%;max-height:160px;object-fit:cover;border-radius:12px;margin-bottom:12px;">` : ''}
             <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
               <span class="badge badge-${isActive ? 'success' : 'warning'}">${isActive ? '✅ نشط' : '⏸️ غير نشط'}</span>
+              <span class="badge badge-${isBanner ? 'purple' : 'info'}">${isBanner ? '🖼️ بانر كامل' : '📢 شريط بسيط'}</span>
               ${a.startDate ? `<span class="badge badge-info">📅 من ${new Date(a.startDate).toLocaleDateString('ar-EG')}</span>` : ''}
               ${a.endDate ? `<span class="badge badge-info">📅 إلى ${new Date(a.endDate).toLocaleDateString('ar-EG')}</span>` : ''}
             </div>
@@ -1954,11 +1997,38 @@ async function renderAdminAnnouncements() {
 async function openAnnouncementEditor(id = null) {
   const announcements = await DB.get('announcements');
   const a = id ? announcements.find(x => x.id === id) : null;
+  _tempAnnImage = a?.imageUrl || null;
+  _tempAnnImagePath = a?.imagePath || null;
+  const currentType = a?.type || (a?.imageUrl ? 'banner' : 'bar');
+
   openModal(`<div class="modal-header"><h3 class="modal-title">${a ? '✏️ تعديل إعلان' : '➕ إعلان جديد'}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+
+    <div class="form-group">
+      <label class="form-label">نوع الإعلان</label>
+      <div class="qtype-picker" style="grid-template-columns: 1fr 1fr;">
+        <button type="button" class="qtype-option ${currentType === 'bar' ? 'active' : ''}" id="annTypeBar" onclick="pickAnnType('bar')">
+          <span class="emoji">📢</span><span class="label">شريط بسيط</span>
+        </button>
+        <button type="button" class="qtype-option ${currentType === 'banner' ? 'active' : ''}" id="annTypeBanner" onclick="pickAnnType('banner')">
+          <span class="emoji">🖼️</span><span class="label">بانر كامل</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">🖼️ صورة الإعلان (اختياري - للبانر)</label>
+      <div id="annImagePreview" style="margin-bottom:8px;text-align:center;">
+        ${a?.imageUrl ? `<img src="${a.imageUrl}" style="max-width:100%;max-height:160px;border-radius:10px;">` : '<div style="padding:20px;background:var(--bg);border-radius:10px;color:var(--text-light);">لا توجد صورة</div>'}
+      </div>
+      <input type="file" accept="image/*" class="form-input" id="annImageFile" onchange="handleAnnImageUpload(event)">
+      ${a?.imageUrl ? `<button class="btn btn-sm btn-danger" onclick="removeAnnImage()" style="margin-top:6px;">🗑 إزالة الصورة</button>` : ''}
+      <p style="font-size:11px;color:var(--text-light);margin-top:6px;">الحد: ${platformSettings.maxUploadSizeMB}MB • يُستخدم كخلفية للبانر</p>
+    </div>
+
     <div class="form-group"><label class="form-label">الإيموجي</label><input type="text" class="form-input" id="annEmoji" value="${escapeHtml(a?.emoji || '📢')}" maxlength="4" style="text-align:center;font-size:24px;"></div>
     <div class="form-group"><label class="form-label">العنوان (اختياري)</label><input type="text" class="form-input auto-dir" id="annTitle" value="${escapeHtml(a?.title || '')}" dir="rtl"></div>
     <div class="form-group"><label class="form-label">النص *</label><textarea class="form-textarea auto-dir" id="annText" dir="rtl">${escapeHtml(a?.text || '')}</textarea></div>
-    <div class="form-group"><label class="form-label">الرابط</label><input type="url" class="form-input" id="annLink" value="${escapeHtml(a?.link || '')}" dir="ltr"></div>
+    <div class="form-group"><label class="form-label">الرابط (زر CTA في البانر)</label><input type="url" class="form-input" id="annLink" value="${escapeHtml(a?.link || '')}" dir="ltr"></div>
     <div class="form-group"><label class="form-label">نص الرابط</label><input type="text" class="form-input auto-dir" id="annLinkText" value="${escapeHtml(a?.linkText || 'اعرف أكثر')}" dir="rtl"></div>
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
       <div class="form-group"><label class="form-label">لون البداية</label><input type="color" class="form-input" id="annColor" value="${a?.bgColor || '#4f46e5'}"></div>
@@ -1969,6 +2039,51 @@ async function openAnnouncementEditor(id = null) {
       <div class="form-group"><label class="form-label">إلى تاريخ</label><input type="datetime-local" class="form-input" id="annEnd" value="${a?.endDate ? new Date(a.endDate).toISOString().slice(0, 16) : ''}"></div>
     </div>
     <button class="btn btn-success btn-full" onclick="saveAnnouncement('${id || ''}')">💾 حفظ</button>`);
+  window._currentAnnType = currentType;
+}
+
+function pickAnnType(type) {
+  window._currentAnnType = type;
+  document.getElementById('annTypeBar').classList.toggle('active', type === 'bar');
+  document.getElementById('annTypeBanner').classList.toggle('active', type === 'banner');
+}
+
+async function handleAnnImageUpload(e) {
+  const f = e.target.files[0]; if (!f) return;
+  const maxMB = platformSettings.maxUploadSizeMB || 20;
+  if (f.size > maxMB * 1024 * 1024) { alert(`الصورة كبيرة (الحد ${maxMB}MB)`); e.target.value = ''; return; }
+  if (!f.type.startsWith('image/')) { alert('اختر صورة فقط'); e.target.value = ''; return; }
+
+  if (!firebaseStorageEnabled) {
+    if (f.size > 500 * 1024) { alert('Storage غير مفعّل، الحد 500KB'); e.target.value = ''; return; }
+    const r = new FileReader();
+    r.onload = (ev) => {
+      _tempAnnImage = ev.target.result;
+      document.getElementById('annImagePreview').innerHTML = `<img src="${ev.target.result}" style="max-width:100%;max-height:160px;border-radius:10px;">`;
+    };
+    r.readAsDataURL(f);
+    return;
+  }
+
+  showLoading();
+  try {
+    const path = `announcements/${Date.now()}_${f.name}`;
+    const storageRef = fbStorage.ref(fbStorage.storage, path);
+    await fbStorage.uploadBytes(storageRef, f);
+    const downloadURL = await fbStorage.getDownloadURL(storageRef);
+    _tempAnnImage = downloadURL;
+    _tempAnnImagePath = path;
+    document.getElementById('annImagePreview').innerHTML = `<img src="${downloadURL}" style="max-width:100%;max-height:160px;border-radius:10px;">`;
+    alert('✅ تم رفع الصورة. اضغط "حفظ" للتأكيد.');
+  } catch (err) { alert('فشل الرفع: ' + err.message); }
+  finally { hideLoading(); }
+}
+
+function removeAnnImage() {
+  _tempAnnImage = null;
+  _tempAnnImagePath = null;
+  document.getElementById('annImagePreview').innerHTML = '<div style="padding:20px;background:var(--bg);border-radius:10px;color:var(--text-light);">لا توجد صورة</div>';
+  const fi = document.getElementById('annImageFile'); if (fi) fi.value = '';
 }
 
 async function saveAnnouncement(id) {
@@ -1981,15 +2096,25 @@ async function saveAnnouncement(id) {
   const bgColorEnd = document.getElementById('annColorEnd').value;
   const startDate = document.getElementById('annStart').value;
   const endDate = document.getElementById('annEnd').value;
+  const type = window._currentAnnType || 'bar';
+  const imageUrl = _tempAnnImage || null;
+  const imagePath = _tempAnnImagePath || null;
+
   if (!text) { alert('أدخل نص الإعلان'); return; }
+
   showLoading();
   try {
     const announcements = await DB.get('announcements');
     if (id) {
       const idx = announcements.findIndex(a => a.id === id);
-      if (idx >= 0) announcements[idx] = { ...announcements[idx], emoji, title, text, link, linkText, bgColor, bgColorEnd, startDate: startDate ? new Date(startDate).getTime() : null, endDate: endDate ? new Date(endDate).getTime() : null, updatedAt: Date.now() };
+      if (idx >= 0) {
+        if (announcements[idx].imagePath && announcements[idx].imagePath !== imagePath && firebaseStorageEnabled) {
+          try { await fbStorage.deleteObject(fbStorage.ref(fbStorage.storage, announcements[idx].imagePath)); } catch (e) {}
+        }
+        announcements[idx] = { ...announcements[idx], emoji, title, text, link, linkText, bgColor, bgColorEnd, type, imageUrl, imagePath, startDate: startDate ? new Date(startDate).getTime() : null, endDate: endDate ? new Date(endDate).getTime() : null, updatedAt: Date.now() };
+      }
     } else {
-      announcements.push({ id: uid(), emoji, title, text, link, linkText, bgColor, bgColorEnd, startDate: startDate ? new Date(startDate).getTime() : null, endDate: endDate ? new Date(endDate).getTime() : null, enabled: true, createdAt: Date.now() });
+      announcements.push({ id: uid(), emoji, title, text, link, linkText, bgColor, bgColorEnd, type, imageUrl, imagePath, startDate: startDate ? new Date(startDate).getTime() : null, endDate: endDate ? new Date(endDate).getTime() : null, enabled: true, createdAt: Date.now() });
     }
     await DB.set('announcements', announcements);
     await logActivity(id ? 'تعديل إعلان' : 'إنشاء إعلان', title || text.slice(0, 30));
@@ -2014,6 +2139,10 @@ async function deleteAnnouncement(id) {
   showLoading();
   try {
     const announcements = await DB.get('announcements');
+    const ann = announcements.find(a => a.id === id);
+    if (ann?.imagePath && firebaseStorageEnabled) {
+      try { await fbStorage.deleteObject(fbStorage.ref(fbStorage.storage, ann.imagePath)); } catch (e) {}
+    }
     await DB.set('announcements', announcements.filter(a => a.id !== id));
     await logActivity('حذف إعلان', id);
     alert('تم الحذف');
@@ -2021,7 +2150,7 @@ async function deleteAnnouncement(id) {
   } finally { hideLoading(); }
 }
 
-/* ============ Admin: Settings ============ */
+/* ============ ADMIN: SETTINGS ============ */
 async function renderAdminSettings() {
   showLoading();
   try {
@@ -2108,7 +2237,7 @@ async function savePlatformSettingsForm() {
   } finally { hideLoading(); }
 }
 
-/* ============ Admin: Audit + Broadcast + Pending ============ */
+/* ============ ADMIN: AUDIT + BROADCAST + PENDING ============ */
 async function renderAuditLog() {
   showLoading();
   try {
@@ -2243,7 +2372,7 @@ function renderPendingTeacherDashboard() {
 }
 
 
-/* ⬇️ بداية الجزء الرابع (تكملة الجزء الثالث) */
+/* ⬇️ بداية الجزء الرابع (الأخير) */
 
 /* ============ TEACHER DASHBOARD ============ */
 async function renderTeacherDashboard() {
@@ -2382,7 +2511,7 @@ function renderLeaderboard(users, attempts) {
   }).join('')}</div>`;
 }
 
-/* ============ Teacher: Broadcast ============ */
+/* ============ TEACHER BROADCAST + ATTEMPTS ============ */
 function openBroadcastModal() {
   openModal(`<div class="modal-header"><h3 class="modal-title">📢 إشعار جماعي</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
     <div class="alert alert-info">أرسل رسالة لطلابك.</div>
@@ -3510,7 +3639,8 @@ const globalFns = [
   renderAdminGamification, openGrantXPModal, grantXpToStudent, openStudentGamificationDetails,
   awardBadgeManually, removeBadgeFromStudent, resetStudentGamification,
   renderAdminAnnouncements, openAnnouncementEditor, saveAnnouncement, toggleAnnouncement, deleteAnnouncement,
-  renderAdminSettings, savePlatformSettingsForm, dismissAnnouncement
+  renderAdminSettings, savePlatformSettingsForm, dismissAnnouncement,
+  pickAnnType, handleAnnImageUpload, removeAnnImage
 ];
 globalFns.forEach(fn => { try { window[fn.name] = fn; } catch(e) {} });
 </script>
