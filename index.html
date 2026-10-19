@@ -12,6 +12,7 @@
 <style>
   :root {
     --primary: #4f46e5; --primary-dark: #4338ca; --primary-light: #eef2ff;
+    --secondary: #7c3aed;
     --success: #10b981; --success-light: #d1fae5; --danger: #ef4444; --danger-light: #fee2e2;
     --warning: #f59e0b; --warning-light: #fef3c7; --info: #3b82f6; --info-light: #dbeafe;
     --gold: #f59e0b; --silver: #94a3b8; --bronze: #b45309;
@@ -48,7 +49,22 @@
   .screen { display: none; min-height: 100vh; }
   .screen.active { display: block; animation: fadeIn 0.4s ease; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-  .card { background: var(--card); border-radius: 20px; padding: 28px; box-shadow: var(--shadow); margin-bottom: 16px; transition: transform 0.2s, box-shadow 0.2s; }
+
+  /* ===== Skeleton Loading ===== */
+  .skeleton { background: linear-gradient(90deg, var(--bg) 25%, var(--border) 50%, var(--bg) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  .skeleton-card { height: 120px; margin-bottom: 16px; }
+  .skeleton-line { height: 16px; margin-bottom: 8px; }
+
+  /* ===== Animations احترافية ===== */
+  .stats-grid > * { animation: fadeUp 0.5s ease both; }
+  .stats-grid > *:nth-child(1) { animation-delay: 0.05s; }
+  .stats-grid > *:nth-child(2) { animation-delay: 0.1s; }
+  .stats-grid > *:nth-child(3) { animation-delay: 0.15s; }
+  .stats-grid > *:nth-child(4) { animation-delay: 0.2s; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  .card { background: var(--card); border-radius: 20px; padding: 28px; box-shadow: var(--shadow); margin-bottom: 16px; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s; }
   .auth-header { text-align: center; margin-bottom: 28px; }
   .auth-logo { font-size: 64px; margin-bottom: 12px; animation: float 3s ease-in-out infinite; }
   @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
@@ -90,7 +106,7 @@
   .alert-success { background: var(--success-light); color: #065f46; }
   .alert-info { background: var(--info-light); color: #1e40af; }
   .alert-warning { background: var(--warning-light); color: #92400e; }
-  .dashboard-header { background: linear-gradient(135deg, var(--primary), #7c3aed); color: #fff; padding: 24px 0; margin-bottom: 24px; box-shadow: var(--shadow); }
+  .dashboard-header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; padding: 24px 0; margin-bottom: 24px; box-shadow: var(--shadow); }
   .header-content { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
   .header-user { display: flex; align-items: center; gap: 14px; }
   .user-avatar { width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 26px; border: 2px solid rgba(255,255,255,0.3); overflow: hidden; }
@@ -115,7 +131,7 @@
   .section-title { font-size: 22px; font-weight: 900; }
   .section-subtitle { font-size: 14px; color: var(--text-light); margin-top: 4px; font-weight: 600; }
   .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px; }
-  .subject-card { background: var(--card); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
+  .subject-card { background: var(--card); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); cursor: pointer; transition: all 0.3s; border: 2px solid transparent; }
   .subject-card:hover { transform: translateY(-4px); border-color: var(--primary); box-shadow: var(--shadow-lg); }
   .subject-emoji { font-size: 36px; margin-bottom: 10px; } .subject-name { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
   .subject-meta { font-size: 13px; color: var(--text-light); font-weight: 600; margin-bottom: 12px; }
@@ -139,7 +155,7 @@
   .modal-close { width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--bg); font-size: 18px; cursor: pointer; color: var(--text-light); transition: all 0.2s; }
   .modal-close:hover { background: var(--danger); color: #fff; transform: rotate(90deg); }
   .quiz-progress-bar { height: 8px; background: var(--border); border-radius: 999px; overflow: hidden; margin-bottom: 20px; }
-  .quiz-progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), #8b5cf6); transition: width 0.5s ease; }
+  .quiz-progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); transition: width 0.5s ease; }
   .option-btn { width: 100%; background: var(--card); border: 2px solid var(--border); padding: 16px 20px; border-radius: 12px; font-family: inherit; font-size: 15px; font-weight: 600; text-align: right; cursor: pointer; transition: all 0.2s; margin-bottom: 10px; display: flex; gap: 12px; align-items: center; color: var(--text); }
   .option-btn:hover { border-color: var(--primary); background: var(--primary-light); transform: translateX(-4px); }
   .option-btn.selected { background: var(--primary); border-color: var(--primary); color: #fff; }
@@ -239,7 +255,7 @@
   .subject-group-emoji { font-size: 32px; flex-shrink: 0; }
   .subject-group-title { font-size: 20px; font-weight: 900; color: var(--text); flex: 1; min-width: 120px; }
   .subject-group-count { padding: 4px 12px; background: var(--primary); color: #fff; border-radius: 999px; font-size: 13px; font-weight: 800; }
-  .teacher-profile-header { display: flex; align-items: center; gap: 20px; padding: 24px; background: linear-gradient(135deg, var(--primary), #7c3aed); color: #fff; border-radius: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+  .teacher-profile-header { display: flex; align-items: center; gap: 20px; padding: 24px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; border-radius: 20px; margin-bottom: 20px; flex-wrap: wrap; }
   .teacher-profile-avatar { width: 100px; height: 100px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 48px; border: 3px solid rgba(255,255,255,0.4); overflow: hidden; flex-shrink: 0; }
   .teacher-profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
   .teacher-profile-info { flex: 1; min-width: 200px; }
@@ -331,9 +347,7 @@
   .streak-fire { font-size: 48px; }
   .streak-info h3 { font-size: 22px; font-weight: 900; margin-bottom: 4px; }
   .streak-info p { font-size: 14px; opacity: 0.9; }
-
-  /* ===== Announcements: Bar + Banner ===== */
-  .announcement-bar { background: linear-gradient(135deg, var(--primary), var(--purple)); color: #fff; padding: 14px 20px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); position: relative; z-index: 100; }
+  .announcement-bar { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; padding: 14px 20px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); position: relative; z-index: 100; }
   .announcement-bar-content { flex: 1; font-size: 15px; font-weight: 700; line-height: 1.5; }
   .announcement-bar-close { background: rgba(255,255,255,0.2); color: #fff; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 16px; transition: all 0.2s; flex-shrink: 0; }
   .announcement-bar-close:hover { background: rgba(255,255,255,0.35); }
@@ -349,12 +363,63 @@
   .announcement-banner-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
   .announcement-banner-close { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.4); color: #fff; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 18px; transition: all 0.2s; z-index: 3; }
   .announcement-banner-close:hover { background: rgba(0,0,0,0.7); transform: rotate(90deg); }
-
   .gamify-student-row { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--bg); border-radius: 12px; margin-bottom: 10px; flex-wrap: wrap; gap: 12px; }
   .gamify-student-info { flex: 1; min-width: 200px; }
   .gamify-student-info h4 { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
   .gamify-student-info p { font-size: 12px; color: var(--text-light); }
   .gamify-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  /* ===== Lazy Loading ===== */
+  .lazy-img { opacity: 0; transition: opacity 0.4s; }
+  .lazy-img.loaded { opacity: 1; }
+
+  /* ===== Pagination ===== */
+  .pagination-container { display: flex; gap: 8px; justify-content: center; align-items: center; margin-top: 16px; flex-wrap: wrap; }
+  .pagination-btn { padding: 8px 14px; border: 2px solid var(--border); background: var(--card); border-radius: 10px; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; color: var(--text); }
+  .pagination-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
+  .pagination-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .pagination-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .pagination-info { padding: 8px 16px; background: var(--bg); border-radius: 10px; font-size: 14px; font-weight: 700; color: var(--text-light); }
+
+  /* ===== Global Search ===== */
+  .search-result-item { padding: 12px 16px; background: var(--bg); border-radius: 10px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
+  .search-result-item:hover { border-color: var(--primary); background: var(--primary-light); }
+
+  /* ===== Theme Picker ===== */
+  .theme-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  .theme-option { padding: 20px 12px; border-radius: 14px; cursor: pointer; text-align: center; color: #fff; font-weight: 800; font-size: 14px; transition: all 0.2s; border: 3px solid transparent; }
+  .theme-option:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+  .theme-option.active { border-color: var(--text); box-shadow: var(--shadow-lg); }
+  .theme-option .theme-check { display: block; font-size: 20px; margin-top: 4px; }
+
+  /* ===== Friends & Challenges ===== */
+  .challenge-card { background: linear-gradient(135deg, var(--card), var(--bg)); border: 2px solid var(--warning); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+  .challenge-card.pending { border-color: var(--warning); }
+  .challenge-card.accepted { border-color: var(--success); }
+  .challenge-card.declined { border-color: var(--danger); opacity: 0.6; }
+  .challenge-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .challenge-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; overflow: hidden; }
+  .challenge-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .challenge-info { flex: 1; }
+  .challenge-info h4 { font-size: 15px; font-weight: 800; margin-bottom: 2px; }
+  .challenge-info p { font-size: 12px; color: var(--text-light); }
+
+  /* ===== Real-time Analytics ===== */
+  .live-indicator { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--success-light); color: var(--success); border-radius: 999px; font-size: 11px; font-weight: 800; }
+  .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); animation: pulse 1.5s infinite; }
+
+  /* ===== Skeleton Loading ===== */
+  .skeleton { background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  .skeleton-row { display: flex; gap: 12px; margin-bottom: 12px; }
+  .skeleton-circle { width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0; }
+  .skeleton-lines { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .skeleton-line { height: 14px; border-radius: 4px; }
+
+  /* ===== Ripple Effect ===== */
+  .btn { position: relative; overflow: hidden; }
+  .btn::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255,255,255,0.4), transparent 40%); opacity: 0; transition: opacity 0.5s; pointer-events: none; }
+  .btn:active::after { opacity: 1; transition: opacity 0s; }
 
   @media (max-width: 600px) {
     .card { padding: 20px; } .auth-wrapper { margin: 20px auto; }
@@ -365,10 +430,10 @@
     .announcement-banner { min-height: 140px; }
     .announcement-banner-title { font-size: 20px; }
     .announcement-banner-text { font-size: 14px; }
+    .theme-grid { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
 </head>
-
 <body>
 
 <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
@@ -387,7 +452,6 @@
         <button class="tab" data-tab="register" onclick="switchAuthTab('register')">حساب جديد</button>
       </div>
       <div id="authAlert"></div>
-
       <button type="button" class="btn btn-google btn-full btn-lg" onclick="handleGoogleSignIn()" id="googleBtn">
         <svg class="google-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
           <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
@@ -397,9 +461,7 @@
         </svg>
         <span>تسجيل الدخول باستخدام Google</span>
       </button>
-
       <div class="divider">أو بالبريد الإلكتروني</div>
-
       <form id="loginForm" onsubmit="handleLogin(event)">
         <div class="form-group"><label class="form-label">البريد الإلكتروني</label><input type="email" class="form-input" id="loginEmail" required placeholder="you@example.com" dir="ltr" style="text-align:left;"></div>
         <div class="form-group"><label class="form-label">كلمة المرور</label><input type="password" class="form-input" id="loginPassword" required placeholder="••••••••"></div>
@@ -409,7 +471,6 @@
         </div>
         <button type="submit" class="btn btn-primary btn-full btn-lg">دخول</button>
       </form>
-
       <form id="registerForm" style="display:none;" onsubmit="handleRegister(event)">
         <div class="form-group">
           <label class="form-label">الاسم الثلاثي <span style="color:var(--danger)">*</span></label>
@@ -444,7 +505,6 @@
         <button type="submit" class="btn btn-primary btn-full btn-lg">إنشاء الحساب</button>
       </form>
     </div>
-
     <div class="dev-footer">
       <a class="dev-brand" href="#" onclick="event.preventDefault();"><span>💻</span><span>تطوير <strong>EMAA.Tech</strong></span></a>
       <div class="dev-copy">© <span id="devYear"></span> EMAA.Tech</div>
@@ -461,6 +521,8 @@
         <div class="user-info"><h3 id="userName">المستخدم</h3><p id="userMeta">-</p></div>
       </div>
       <div class="header-actions">
+        <button class="btn btn-sm" onclick="openGlobalSearch()" title="بحث شامل">🔍</button>
+        <button class="btn btn-sm" onclick="openThemePicker()" title="السمات">🎨</button>
         <button class="btn btn-sm" onclick="toggleDarkMode()" id="darkModeBtn">🌙</button>
         <button class="btn btn-sm" onclick="openNotifications()" id="notifBtn">🔔<span class="notification-badge" id="notifBadge" style="display:none;">0</span></button>
         <button class="btn btn-sm" onclick="logout()">🚪 خروج</button>
@@ -489,6 +551,7 @@
 </section>
 
 <div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox"></div></div>
+
 <script>
 /* ⬇️ الجزء الأول من JavaScript */
 
@@ -503,15 +566,14 @@ const DEFAULT_FIREBASE_CONFIG = {
 };
 
 const ADMIN_EMAIL = "admin@emaa.tech";
-let fbApp = null, fbDB = null, fbAuth = null, fbStorage = null;
-let firebaseEnabled = false, firebaseAuthEnabled = false, firebaseStorageEnabled = false;
+let fbApp = null, fbDB = null, fbAuth = null;
+let firebaseEnabled = false, firebaseAuthEnabled = false;
 let FB = {};
 let pendingGoogleUser = null;
 let notifUnsubscribe = null;
 let isProcessingRedirect = false;
 let _tempAvatar = null;
 let _tempAnnImage = null;
-let _tempAnnImagePath = null;
 
 let currentUser = null, currentQuiz = null, currentQuestionIndex = 0, currentAnswers = [];
 let selectedAnswerIndex = null, timerInterval = null, timeLeft = 0;
@@ -519,6 +581,23 @@ let selectedRole = 'student';
 let selectedQuestionType = 'mcq', tfAnswer = true, uploadedImageData = null, tfSelected = null, newQuizData = null;
 let editingQuizId = null;
 let currentUserTab = 'students';
+
+/* ✅ Pagination State */
+const PAGE_SIZE = 20;
+let paginationState = {
+  students: 1, teachers: 1, parents: 1, quizzes: 1,
+  adminQuizzes: 1, auditLog: 1, leaderboard: 1, notifications: 1
+};
+
+/* ✅ Themes */
+const THEMES = {
+  indigo: { primary: '#4f46e5', secondary: '#7c3aed', name: 'بنفسجي', emoji: '💜' },
+  emerald: { primary: '#10b981', secondary: '#059669', name: 'أخضر', emoji: '💚' },
+  rose: { primary: '#f43f5e', secondary: '#e11d48', name: 'وردي', emoji: '❤️' },
+  amber: { primary: '#f59e0b', secondary: '#d97706', name: 'ذهبي', emoji: '💛' },
+  sky: { primary: '#0ea5e9', secondary: '#0284c7', name: 'أزرق', emoji: '💙' },
+  slate: { primary: '#475569', secondary: '#334155', name: 'رمادي', emoji: '🖤' }
+};
 
 const STAGES = {
   "ابتدائي": ["الصف الأول الابتدائي","الصف الثاني الابتدائي","الصف الثالث الابتدائي","الصف الرابع الابتدائي","الصف الخامس الابتدائي","الصف السادس الابتدائي"],
@@ -537,7 +616,6 @@ const QUESTION_TYPES = {
   mcq:{name:'اختيار من متعدد',emoji:'📝'}, tf:{name:'صح / خطأ',emoji:'✅'},
   fill:{name:'إكمال',emoji:'✏️'}, essay:{name:'مقالي',emoji:'📄'}
 };
-
 const LEVELS = [
   { name: 'مبتدئ', emoji: '🌱', minXP: 0, maxXP: 100 },
   { name: 'متوسط', emoji: '⭐', minXP: 100, maxXP: 300 },
@@ -545,7 +623,6 @@ const LEVELS = [
   { name: 'خبير', emoji: '💎', minXP: 600, maxXP: 1000 },
   { name: 'أسطورة', emoji: '👑', minXP: 1000, maxXP: Infinity }
 ];
-
 const BADGES = {
   first_quiz: { name: 'البداية', emoji: '🎯', desc: 'أول اختبار' },
   five_quizzes: { name: 'مثابر', emoji: '🔥', desc: '5 اختبارات' },
@@ -556,34 +633,23 @@ const BADGES = {
   streak_7: { name: 'مخلص', emoji: '🌟', desc: '7 أيام متتالية' },
   high_scorer: { name: 'نجم', emoji: '💫', desc: 'حصل على 800 نقطة' }
 };
-
 const DEFAULT_PLATFORM_SETTINGS = {
-  platformName: 'منصة تعليمية',
-  platformTagline: 'اختبارات ذكية • تصحيح فوري • متابعة شاملة',
-  platformLogo: '🎓',
-  primaryColor: '#4f46e5',
-  secondaryColor: '#7c3aed',
-  registrationEnabled: true,
-  maintenanceMode: false,
+  platformName: 'منصة تعليمية', platformTagline: 'اختبارات ذكية • تصحيح فوري • متابعة شاملة',
+  platformLogo: '🎓', primaryColor: '#4f46e5', secondaryColor: '#7c3aed', theme: 'indigo',
+  registrationEnabled: true, maintenanceMode: false,
   maintenanceMessage: 'المنصة تحت الصيانة. يرجى المحاولة لاحقاً.',
-  maxUploadSizeMB: 20,
-  minQuizQuestions: 1,
-  maxQuizQuestions: 100,
-  ratingsEnabled: true,
-  leaderboardEnabled: true,
-  footerText: 'EMAA.Tech',
-  supportEmail: '',
-  supportPhone: ''
+  maxUploadSizeMB: 4, minQuizQuestions: 1, maxQuizQuestions: 100,
+  ratingsEnabled: true, leaderboardEnabled: true,
+  footerText: 'EMAA.Tech', supportEmail: '', supportPhone: ''
 };
-
 let platformSettings = { ...DEFAULT_PLATFORM_SETTINGS };
 
-/* ✅ إصلاح: حجم الصور والملفات */
-const MAX_IMAGE_SIZE_MB = 5;          // صور (شعار/إعلان/سؤال) - 5MB
-const MAX_AVATAR_SIZE_MB = 2;         // صور شخصية - 2MB
-const MAX_MATERIAL_SIZE_MB = 20;      // ملازم PDF/Word - 20MB
-const MAX_IMAGE_DIMENSION = 1920;     // أقصى بعد للصورة بعد الضغط
-const IMAGE_QUALITY = 0.82;           // جودة JPEG بعد الضغط
+const MAX_IMAGE_SIZE_MB = 1.5;
+const MAX_AVATAR_SIZE_MB = 0.5;
+const MAX_QUESTION_IMAGE_KB = 400;
+const MAX_MATERIAL_SIZE_MB = 4;
+const MAX_IMAGE_DIMENSION = 1280;
+const IMAGE_QUALITY = 0.75;
 
 function uid() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 9); }
 function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
@@ -591,24 +657,18 @@ function getSubjectEmoji(id) { const s = SUBJECTS.find(x=>x.id===id); return s?s
 function getSubjectName(id) { const s = SUBJECTS.find(x=>x.id===id); return s?s.name:id; }
 function showAlert(msg, type='error') { const b = document.getElementById('authAlert'); if (!b) return; b.innerHTML = `<div class="alert alert-${type}">${escapeHtml(msg)}</div>`; setTimeout(()=>{b.innerHTML='';},5000); }
 function showScreen(name) { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(name+'Screen').classList.add('active'); window.scrollTo(0,0); }
-
-/* ✅ إصلاح: حماية من القسمة على صفر */
 function calculateAvg(attempts) {
   if (!attempts.length) return 0;
   return Math.round(attempts.reduce((a, x) => a + (x.total > 0 ? (x.score / x.total) * 100 : 0), 0) / attempts.length);
 }
-
 function isMobileDevice() { return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && /Macintosh/.test(navigator.userAgent)); }
 function isAdmin(user) { return user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase(); }
-
 function toggleDarkMode() { document.body.classList.toggle('dark-mode'); const d = document.body.classList.contains('dark-mode'); localStorage.setItem('edu_dark_mode', d?'1':'0'); document.getElementById('darkModeBtn').textContent = d?'☀️':'🌙'; }
 function loadDarkMode() { if(localStorage.getItem('edu_dark_mode')==='1'){ document.body.classList.add('dark-mode'); document.getElementById('darkModeBtn').textContent='☀️'; } }
-
 const SESSION_KEY = 'edu_session';
 function saveSession(id, rem) { if (rem) { localStorage.setItem(SESSION_KEY, id); sessionStorage.removeItem(SESSION_KEY); } else { sessionStorage.setItem(SESSION_KEY, id); localStorage.removeItem(SESSION_KEY); } }
 function getSessionUserId() { return sessionStorage.getItem(SESSION_KEY) || localStorage.getItem(SESSION_KEY); }
 function clearSession() { localStorage.removeItem(SESSION_KEY); sessionStorage.removeItem(SESSION_KEY); }
-
 function detectDirection(text) {
   if (!text) return 'rtl';
   const clean = String(text).replace(/[\s\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/g, '');
@@ -617,14 +677,12 @@ function detectDirection(text) {
   const latinChars = (clean.match(/[A-Za-z]/g) || []).length;
   return latinChars > arabicChars ? 'ltr' : 'rtl';
 }
-
 function applyAutoDir(el) {
   if (!el) return;
   const dir = detectDirection(el.value);
   el.setAttribute('dir', dir);
   el.style.textAlign = dir === 'ltr' ? 'left' : 'right';
 }
-
 function bindAutoDirToInputs() {
   document.querySelectorAll('input[type="text"], input[type="url"], input[type="email"], input[type="tel"], textarea').forEach(el => {
     if (el.dataset.autoDirBound) return;
@@ -634,10 +692,8 @@ function bindAutoDirToInputs() {
     if (el.value) applyAutoDir(el);
   });
 }
-
 const _autoDirObserver = new MutationObserver(() => bindAutoDirToInputs());
 
-/* ✅ إصلاح: حماية من xp >= maxXP */
 function getLevel(xp) { return LEVELS.find(l => xp >= l.minXP && xp < l.maxXP) || LEVELS[LEVELS.length - 1]; }
 function getNextLevel(xp) {
   const idx = LEVELS.findIndex(l => xp >= l.minXP && xp < l.maxXP);
@@ -645,7 +701,82 @@ function getNextLevel(xp) {
   return idx < LEVELS.length - 1 ? LEVELS[idx + 1] : null;
 }
 
-/* ✅ إصلاح: switchAuthTab باستخدام data-tab */
+/* ✅ Skeleton Loading */
+function showSkeleton(container, count = 3) {
+  if (!container) return;
+  container.innerHTML = Array(count).fill(0).map(() => `
+    <div class="card">
+      <div class="skeleton-row">
+        <div class="skeleton skeleton-circle"></div>
+        <div class="skeleton-lines">
+          <div class="skeleton skeleton-line" style="width:60%;"></div>
+          <div class="skeleton skeleton-line" style="width:80%;"></div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ✅ Lazy Loading للصور */
+const _lazyImageObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const img = entry.target;
+      if (img.dataset.src) {
+        img.src = img.dataset.src;
+        img.removeAttribute('data-src');
+        img.onload = () => img.classList.add('loaded');
+        _lazyImageObserver.unobserve(img);
+      }
+    }
+  });
+}, { rootMargin: '200px' });
+
+function observeLazyImages() {
+  document.querySelectorAll('.lazy-img[data-src]').forEach(img => _lazyImageObserver.observe(img));
+}
+
+/* ✅ Pagination Helper */
+function paginate(items, pageKey) {
+  const page = paginationState[pageKey] || 1;
+  const start = (page - 1) * PAGE_SIZE;
+  return {
+    items: items.slice(start, start + PAGE_SIZE),
+    total: items.length,
+    page,
+    totalPages: Math.ceil(items.length / PAGE_SIZE)
+  };
+}
+
+function renderPagination(total, page, pageKey, onChangeFn) {
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  if (totalPages <= 1) return '';
+  let buttons = '';
+  const maxVisible = 5;
+  let startPage = Math.max(1, page - Math.floor(maxVisible / 2));
+  let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+  if (endPage - startPage + 1 < maxVisible) startPage = Math.max(1, endPage - maxVisible + 1);
+
+  if (startPage > 1) buttons += `<button class="pagination-btn" onclick="${onChangeFn}(1)">1</button>`;
+  if (startPage > 2) buttons += `<span class="pagination-info">...</span>`;
+  for (let i = startPage; i <= endPage; i++) {
+    buttons += `<button class="pagination-btn ${i === page ? 'active' : ''}" onclick="${onChangeFn}(${i})">${i}</button>`;
+  }
+  if (endPage < totalPages - 1) buttons += `<span class="pagination-info">...</span>`;
+  if (endPage < totalPages) buttons += `<button class="pagination-btn" onclick="${onChangeFn}(${totalPages})">${totalPages}</button>`;
+
+  return `<div class="pagination-container">
+    <button class="pagination-btn" ${page <= 1 ? 'disabled' : ''} onclick="${onChangeFn}(${page - 1})">← السابق</button>
+    ${buttons}
+    <button class="pagination-btn" ${page >= totalPages ? 'disabled' : ''} onclick="${onChangeFn}(${page + 1})">التالي →</button>
+  </div>`;
+}
+
+function changePage(pageKey, page, renderFn) {
+  paginationState[pageKey] = page;
+  if (typeof renderFn === 'function') renderFn();
+}
+
 function switchAuthTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   const activeTab = document.querySelector(`.tab[data-tab="${tab}"]`);
@@ -655,7 +786,6 @@ function switchAuthTab(tab) {
   document.getElementById('authAlert').innerHTML = '';
   if (tab === 'register') pickRole(selectedRole || 'student');
 }
-
 function pickRole(role) {
   selectedRole = role;
   document.querySelectorAll('.role-option').forEach(o => o.classList.remove('active'));
@@ -676,7 +806,6 @@ document.getElementById('regStage').addEventListener('change', function() {
 
 function showLoading() { document.getElementById('loadingOverlay').classList.add('active'); }
 function hideLoading() { document.getElementById('loadingOverlay').classList.remove('active'); }
-
 function launchConfetti(count = 80) {
   const container = document.getElementById('confettiContainer');
   const colors = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6', '#ec4899'];
@@ -694,8 +823,6 @@ function launchConfetti(count = 80) {
     setTimeout(() => el.remove(), 5000);
   }
 }
-
-/* ✅ دوال ضغط الصور قبل الرفع */
 function compressImage(file, maxDimension = MAX_IMAGE_DIMENSION, quality = IMAGE_QUALITY) {
   return new Promise((resolve, reject) => {
     if (!file.type.startsWith('image/')) { resolve(file); return; }
@@ -725,14 +852,12 @@ function compressImage(file, maxDimension = MAX_IMAGE_DIMENSION, quality = IMAGE
     reader.readAsDataURL(file);
   });
 }
-
 function validateFileSize(file, maxMB, label = 'الملف') {
   if (file.size > maxMB * 1024 * 1024) {
     return { ok: false, msg: `${label} كبير جداً (${(file.size/1024/1024).toFixed(2)}MB). الحد: ${maxMB}MB` };
   }
   return { ok: true };
 }
-
 function loadFirebaseConfig() { try { const c = localStorage.getItem('edu_firebase_config'); return c ? JSON.parse(c) : DEFAULT_FIREBASE_CONFIG; } catch { return DEFAULT_FIREBASE_CONFIG; } }
 
 async function initFirebase() {
@@ -741,13 +866,10 @@ async function initFirebase() {
   try {
     const appMod = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
     const dbMod = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
-    const storageMod = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js");
-    FB = { ...appMod, ...dbMod, ...storageMod };
+    FB = { ...appMod, ...dbMod };
     fbApp = appMod.initializeApp(config);
     fbDB = { db: dbMod.getDatabase(fbApp), ref: dbMod.ref, set: dbMod.set, get: dbMod.get, onValue: dbMod.onValue };
-    fbStorage = { storage: storageMod.getStorage(fbApp), ref: storageMod.ref, uploadBytes: storageMod.uploadBytes, getDownloadURL: storageMod.getDownloadURL, deleteObject: storageMod.deleteObject };
     firebaseEnabled = true;
-    firebaseStorageEnabled = true;
     try {
       const authMod = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
       FB = { ...FB, ...authMod };
@@ -761,9 +883,9 @@ async function initFirebase() {
         getRedirectResult: authMod.getRedirectResult
       };
       firebaseAuthEnabled = true;
-      console.log('✅ Firebase + Auth + Storage متصل');
+      console.log('✅ Firebase + Auth متصل');
     } catch (e) { firebaseAuthEnabled = false; }
-  } catch (err) { firebaseEnabled = false; firebaseAuthEnabled = false; firebaseStorageEnabled = false; }
+  } catch (err) { firebaseEnabled = false; firebaseAuthEnabled = false; }
 }
 
 const DB = {
@@ -820,6 +942,7 @@ const DB = {
     try { return fbDB.onValue(fbDB.ref(fbDB.db, key), (snapshot) => { callback(DB._toArray(snapshot.val())); }); } catch (e) { return () => {}; }
   }
 };
+
 async function hashPassword(password) {
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const km = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), { name: 'PBKDF2' }, false, ['deriveBits']);
@@ -845,8 +968,10 @@ async function loadPlatformSettings() {
     if (saved && saved.length > 0 && saved[0]) platformSettings = { ...DEFAULT_PLATFORM_SETTINGS, ...saved[0] };
   } catch (e) {}
   applyPlatformSettings();
+  const savedTheme = localStorage.getItem('edu_theme');
+  if (savedTheme && THEMES[savedTheme]) applyThemeColors(savedTheme);
+  else if (platformSettings.theme && THEMES[platformSettings.theme]) applyThemeColors(platformSettings.theme);
 }
-
 async function savePlatformSettings() { await DB.set('platformSettings', [{ ...platformSettings, id: 'settings', updatedAt: Date.now() }]); }
 
 function applyPlatformSettings() {
@@ -861,12 +986,12 @@ function applyPlatformSettings() {
   });
   document.title = platformSettings.platformName + ' | EduPlatform Pro';
   document.documentElement.style.setProperty('--primary', platformSettings.primaryColor);
+  document.documentElement.style.setProperty('--secondary', platformSettings.secondaryColor);
   const header = document.querySelector('.dashboard-header');
   if (header) header.style.background = `linear-gradient(135deg, ${platformSettings.primaryColor}, ${platformSettings.secondaryColor})`;
   document.querySelectorAll('.dev-footer .dev-brand strong').forEach(el => { el.textContent = platformSettings.footerText || 'EMAA.Tech'; });
   if (platformSettings.maintenanceMode && currentUser && !isAdmin(currentUser)) showMaintenanceScreen();
 }
-
 function showMaintenanceScreen() {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const authScreen = document.getElementById('authScreen');
@@ -876,23 +1001,28 @@ function showMaintenanceScreen() {
       <div style="font-size:80px;margin-bottom:20px;">🔧</div>
       <h2 style="font-size:24px;font-weight:900;margin-bottom:12px;color:var(--primary);">${escapeHtml(platformSettings.platformName)}</h2>
       <p style="font-size:16px;color:var(--text-light);line-height:1.8;">${escapeHtml(platformSettings.maintenanceMessage)}</p>
-      ${platformSettings.supportEmail ? `<p style="margin-top:20px;font-size:14px;">📧 ${escapeHtml(platformSettings.supportEmail)}</p>` : ''}
-      ${platformSettings.supportPhone ? `<p style="font-size:14px;">📱 ${escapeHtml(platformSettings.supportPhone)}</p>` : ''}
     </div></div>`;
   }
 }
 
-/* ============ ✅ الإعلانات: تظهر في كل الصفحات ============ */
-let _cachedAnnouncements = [];
-let _announcementListenerStarted = false;
+/* ✅ Theme Application */
+function applyThemeColors(key) {
+  const t = THEMES[key];
+  if (!t) return;
+  document.documentElement.style.setProperty('--primary', t.primary);
+  document.documentElement.style.setProperty('--secondary', t.secondary);
+  const header = document.querySelector('.dashboard-header');
+  if (header) header.style.background = `linear-gradient(135deg, ${t.primary}, ${t.secondary})`;
+}
 
+/* ============ الإعلانات ============ */
+let _cachedAnnouncements = [];
 async function loadActiveAnnouncement() {
   try {
     _cachedAnnouncements = await DB.get('announcements');
     renderAnnouncementEverywhere();
   } catch (e) {}
 }
-
 function getActiveAnnouncement() {
   const now = Date.now();
   const active = _cachedAnnouncements.find(a => a.enabled && (!a.startDate || a.startDate <= now) && (!a.endDate || a.endDate >= now));
@@ -901,20 +1031,14 @@ function getActiveAnnouncement() {
   if (dismissed === active.id) return null;
   return active;
 }
-
 function renderAnnouncementEverywhere() {
   const active = getActiveAnnouncement();
-  const containers = [
-    document.getElementById('announcementContainer'),
-    document.getElementById('announcementContainerQuiz')
-  ];
+  const containers = [document.getElementById('announcementContainer'), document.getElementById('announcementContainerQuiz')];
   containers.forEach(container => {
     if (!container) return;
     if (!active) { container.innerHTML = ''; return; }
     if (active.type === 'banner' || active.imageUrl) {
-      const bg = active.imageUrl
-        ? `background-image: url('${active.imageUrl}');`
-        : `background: linear-gradient(135deg, ${active.bgColor || '#4f46e5'}, ${active.bgColorEnd || '#8b5cf6'});`;
+      const bg = active.imageUrl ? `background-image: url('${active.imageUrl}');` : `background: linear-gradient(135deg, ${active.bgColor || '#4f46e5'}, ${active.bgColorEnd || '#8b5cf6'});`;
       const textDir = detectDirection(active.text || '');
       const titleDir = detectDirection(active.title || '');
       container.innerHTML = `<div class="announcement-banner" style="${bg}">
@@ -939,17 +1063,8 @@ function renderAnnouncementEverywhere() {
     }
   });
 }
+function dismissAnnouncement(id) { localStorage.setItem('edu_announcement_dismissed', id); renderAnnouncementEverywhere(); }
 
-function dismissAnnouncement(id) {
-  localStorage.setItem('edu_announcement_dismissed', id);
-  renderAnnouncementEverywhere();
-}
-
-/* ✅ مراقب لتحديث الإعلانات عند تبديل الشاشات */
-function ensureAnnouncementsOnScreens() {
-  // إعادة رسم الإعلانات عند تبديل الشاشة
-  renderAnnouncementEverywhere();
-}
 async function ensureUserProfile(fbUser, existingProfile) {
   if (existingProfile) return existingProfile;
   const fallback = {
@@ -957,7 +1072,8 @@ async function ensureUserProfile(fbUser, existingProfile) {
     name: fbUser.displayName || (fbUser.email || '').split('@')[0] || 'مستخدم',
     role: 'student', provider: 'email', photoURL: fbUser.photoURL || null,
     createdAt: Date.now(), needsProfileCompletion: true,
-    xp: 0, badges: [], streak: 0, lastQuizDate: null
+    xp: 0, badges: [], streak: 0, lastQuizDate: null,
+    friends: [], following: []
   };
   if (fbUser.email && fbUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
     fallback.role = 'admin'; fallback.approved = true; fallback.needsProfileCompletion = false;
@@ -971,7 +1087,6 @@ async function ensureUserProfile(fbUser, existingProfile) {
   } catch (e) {}
   return fallback;
 }
-
 async function logActivity(action, details = '') {
   try {
     const logs = await DB.get('auditLog');
@@ -980,7 +1095,6 @@ async function logActivity(action, details = '') {
     await DB.set('auditLog', logs);
   } catch (e) {}
 }
-
 async function awardXP(studentId, amount, reason) {
   if (amount <= 0) return;
   try {
@@ -996,7 +1110,6 @@ async function awardXP(studentId, amount, reason) {
     await DB.set('notifications', notifs);
   } catch (e) {}
 }
-
 async function checkAndAwardBadges(studentId) {
   try {
     const users = await DB.get('users');
@@ -1029,7 +1142,6 @@ async function checkAndAwardBadges(studentId) {
     return toAward;
   } catch (e) { return []; }
 }
-
 async function updateStreak(studentId) {
   try {
     const users = await DB.get('users');
@@ -1039,15 +1151,13 @@ async function updateStreak(studentId) {
     const today = new Date().toDateString();
     const lastDate = user.lastQuizDate ? new Date(user.lastQuizDate).toDateString() : null;
     if (lastDate === today) return;
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
     if (lastDate === yesterday.toDateString()) user.streak = (user.streak || 0) + 1;
     else user.streak = 1;
     user.lastQuizDate = Date.now();
     await DB.set('users', users);
   } catch (e) {}
 }
-
 function calculateXPForAttempt(attempt) {
   const pct = attempt.total > 0 ? (attempt.score / attempt.total) * 100 : 0;
   let xp = Math.round(attempt.score * 10);
@@ -1056,6 +1166,65 @@ function calculateXPForAttempt(attempt) {
   else if (pct >= 80) xp += 20;
   else if (pct >= 50) xp += 10;
   return xp;
+}
+/* ✅ Global Search */
+function openGlobalSearch() {
+  openModal(`<div class="modal-header"><h3 class="modal-title">🔍 بحث شامل</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <input type="text" class="form-input auto-dir" id="globalSearchInput" placeholder="ابحث عن طالب، مدرس، اختبار..." dir="rtl" oninput="performGlobalSearch(this.value)" autofocus>
+    <div id="globalSearchResults" style="margin-top:16px;"></div>`);
+  setTimeout(() => document.getElementById('globalSearchInput')?.focus(), 100);
+}
+async function performGlobalSearch(query) {
+  if (!query || query.length < 2) { document.getElementById('globalSearchResults').innerHTML = ''; return; }
+  const q = query.toLowerCase();
+  const [users, quizzes] = await Promise.all([DB.get('users'), DB.get('quizzes')]);
+  const matchedUsers = users.filter(u => 
+    (u.name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q)
+  ).slice(0, 5);
+  const matchedQuizzes = quizzes.filter(qz => (qz.title || '').toLowerCase().includes(q)).slice(0, 5);
+  const isAdm = isAdmin(currentUser);
+  document.getElementById('globalSearchResults').innerHTML = `
+    ${matchedUsers.length > 0 ? `<h4 style="margin-bottom:8px;font-weight:800;">👥 المستخدمون (${matchedUsers.length})</h4>
+      ${matchedUsers.map(u => `<div class="search-result-item" onclick="closeModal(); ${isAdm && u.role !== 'admin' ? `openStudentGamificationDetails('${u.id}')` : ''}">
+        <h4 style="font-size:14px;font-weight:800;">${escapeHtml(u.name)} ${u.role === 'teacher' ? '👨‍🏫' : u.role === 'parent' ? '👨‍👩‍👦' : '👨‍🎓'}</h4>
+        <p style="font-size:12px;color:var(--text-light);">${escapeHtml(u.email)} • ${u.role} ${u.grade ? '• ' + u.grade : ''}</p>
+      </div>`).join('')}` : ''}
+    ${matchedQuizzes.length > 0 ? `<h4 style="margin:16px 0 8px;font-weight:800;">📝 الاختبارات (${matchedQuizzes.length})</h4>
+      ${matchedQuizzes.map(qz => `<div class="search-result-item" onclick="closeModal(); ${isAdm ? `viewQuizDetails('${qz.id}')` : ''}">
+        <h4 style="font-size:14px;font-weight:800;">${escapeHtml(qz.title)}</h4>
+        <p style="font-size:12px;color:var(--text-light);">${getSubjectName(qz.subject)} • ${qz.questions.length} سؤال • ${escapeHtml(qz.grade)}</p>
+      </div>`).join('')}` : ''}
+    ${matchedUsers.length === 0 && matchedQuizzes.length === 0 ? '<p style="text-align:center;padding:20px;color:var(--text-light);">لا نتائج</p>' : ''}`;
+}
+
+/* ✅ Theme Picker */
+function openThemePicker() {
+  const currentTheme = platformSettings.theme || localStorage.getItem('edu_theme') || 'indigo';
+  openModal(`<div class="modal-header"><h3 class="modal-title">🎨 اختيار السمة</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <p style="margin-bottom:16px;color:var(--text-light);">اختر السمة المفضلة لك</p>
+    <div class="theme-grid">
+      ${Object.entries(THEMES).map(([key, t]) => `<div class="theme-option ${currentTheme === key ? 'active' : ''}" style="background:linear-gradient(135deg,${t.primary},${t.secondary});" onclick="applyTheme('${key}')">
+        <div style="font-size:32px;margin-bottom:6px;">${t.emoji}</div>
+        <div>${t.name}</div>
+        ${currentTheme === key ? '<span class="theme-check">✓</span>' : ''}
+      </div>`).join('')}
+    </div>`);
+}
+async function applyTheme(key) {
+  const t = THEMES[key];
+  if (!t) return;
+  applyThemeColors(key);
+  localStorage.setItem('edu_theme', key);
+  platformSettings.theme = key;
+  platformSettings.primaryColor = t.primary;
+  platformSettings.secondaryColor = t.secondary;
+  try { await savePlatformSettings(); } catch (e) {}
+  closeModal();
+  launchConfetti(20);
+  if (isAdmin(currentUser)) {
+    const header = document.querySelector('.dashboard-header');
+    if (header) header.style.background = `linear-gradient(135deg, ${t.primary}, ${t.secondary})`;
+  }
 }
 
 /* ============ AUTH ============ */
@@ -1068,8 +1237,7 @@ async function handleRegister(e) {
   if (!selectedRole) { showAlert('اختر دورك'); return; }
   const np = name.split(/\s+/).filter(p => p.length > 0);
   if (np.length < 3) { showAlert('يجب إدخال الاسم الثلاثي'); return; }
-  const profile = { name, email, role: selectedRole, createdAt: Date.now(), provider: 'email', xp: 0, badges: [], streak: 0 };
-
+  const profile = { name, email, role: selectedRole, createdAt: Date.now(), provider: 'email', xp: 0, badges: [], streak: 0, friends: [], following: [] };
   if (selectedRole === 'student') {
     const school = document.getElementById('regSchool').value.trim();
     const stage = document.getElementById('regStage').value;
@@ -1084,9 +1252,7 @@ async function handleRegister(e) {
     if (!subject) { showAlert('اختر المادة'); return; }
     profile.subject = subject; profile.approved = false;
     profile.bio = ''; profile.videoLinks = []; profile.materialFiles = []; profile.ratings = [];
-  } else if (selectedRole === 'parent') {
-    profile.children = [];
-  }
+  } else if (selectedRole === 'parent') { profile.children = []; }
   if (email === ADMIN_EMAIL.toLowerCase()) { profile.role = 'admin'; profile.approved = true; }
 
   showLoading();
@@ -1189,7 +1355,6 @@ async function handleGoogleSignIn() {
   } catch (err) { showAlert('تعذر تسجيل الدخول: ' + (err.message || 'خطأ')); }
   finally { btn.disabled = false; btn.innerHTML = orig; }
 }
-
 async function processGoogleUser(g) {
   if (!g || !g.email) { showAlert('تعذر الحصول على البيانات'); return; }
   const users = await DB.get('users');
@@ -1216,7 +1381,6 @@ async function processGoogleUser(g) {
     openProfileCompletionModal(false);
   }
 }
-
 async function handleGoogleRedirectResult() {
   if (!firebaseAuthEnabled || !fbAuth.getRedirectResult) return;
   if (sessionStorage.getItem('edu_google_redirect') !== '1') return;
@@ -1231,7 +1395,6 @@ async function handleGoogleRedirectResult() {
 }
 
 let googleSelectedRole = null;
-
 function openProfileCompletionModal(isExisting = false) {
   googleSelectedRole = null;
   const isName3 = pendingGoogleUser?.name && pendingGoogleUser.name.split(/\s+/).filter(p => p.length > 0).length >= 3;
@@ -1250,11 +1413,6 @@ function openProfileCompletionModal(isExisting = false) {
       <div class="form-group"><label class="form-label">المدرسة</label><input type="text" class="form-input auto-dir" id="gSchool" dir="rtl"></div>
       <div class="form-group"><label class="form-label">المرحلة</label><select class="form-select" id="gStage"><option value="">اختر</option><option value="ابتدائي">ابتدائي</option><option value="إعدادي">إعدادي</option><option value="ثانوي">ثانوي</option></select></div>
       <div class="form-group"><label class="form-label">السنة</label><select class="form-select" id="gGrade"><option value="">اختر</option></select></div>
-      <div style="padding:12px;background:var(--info-light);border-radius:12px;margin-bottom:16px;">
-        <p style="font-size:13px;font-weight:700;color:var(--info);margin-bottom:10px;">👨‍👩‍👦 بيانات ولي الأمر</p>
-        <div class="form-group" style="margin-bottom:10px;"><label class="form-label">اسم ولي الأمر</label><input type="text" class="form-input auto-dir" id="gParentName" dir="rtl"></div>
-        <div class="form-group" style="margin-bottom:0;"><label class="form-label">هاتف ولي الأمر</label><input type="tel" class="form-input" id="gParentPhone" dir="ltr"></div>
-      </div>
     </div>
     <div id="gTeacherFields" style="display:none;">
       <div class="form-group"><label class="form-label">المادة</label><select class="form-select" id="gSubject"><option value="">اختر</option></select></div>
@@ -1271,7 +1429,6 @@ function openProfileCompletionModal(isExisting = false) {
     });
   }, 50);
 }
-
 function pickGoogleRole(role) {
   googleSelectedRole = role;
   document.getElementById('gRoleTeacher').classList.toggle('active', role === 'teacher');
@@ -1284,20 +1441,18 @@ function pickGoogleRole(role) {
     document.getElementById('gSubject').innerHTML = '<option value="">اختر المادة</option>' + SUBJECTS.map(s => `<option value="${s.id}">${s.emoji} ${s.name}</option>`).join('');
   }
 }
-
 async function cancelGoogleProfile() {
   try { if (fbAuth) await fbAuth.signOut(fbAuth.auth); } catch {}
   pendingGoogleUser = null; googleSelectedRole = null;
   closeModal();
 }
-
 async function completeGoogleProfile() {
   if (!pendingGoogleUser) return;
   if (!googleSelectedRole) { alert('اختر دورك'); return; }
   const fullName = document.getElementById('gFullName').value.trim();
   const np = fullName.split(/\s+/).filter(p => p.length > 0);
   if (np.length < 3) { alert('يجب إدخال الاسم الثلاثي'); return; }
-  const profile = { id: pendingGoogleUser.id, email: pendingGoogleUser.email, name: fullName, role: googleSelectedRole, provider: 'google', photoURL: pendingGoogleUser.photoURL, createdAt: Date.now(), xp: 0, badges: [], streak: 0 };
+  const profile = { id: pendingGoogleUser.id, email: pendingGoogleUser.email, name: fullName, role: googleSelectedRole, provider: 'google', photoURL: pendingGoogleUser.photoURL, createdAt: Date.now(), xp: 0, badges: [], streak: 0, friends: [], following: [] };
   if (pendingGoogleUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) { profile.role = 'admin'; profile.approved = true; }
   if (googleSelectedRole === 'student' && profile.role !== 'admin') {
     const school = document.getElementById('gSchool').value.trim();
@@ -1305,8 +1460,6 @@ async function completeGoogleProfile() {
     const grade = document.getElementById('gGrade').value;
     if (!school || !stage || !grade) { alert('أكمل البيانات'); return; }
     profile.school = school; profile.stage = stage; profile.grade = grade;
-    profile.parentName = document.getElementById('gParentName').value.trim();
-    profile.parentPhone = document.getElementById('gParentPhone').value.trim();
   } else if (googleSelectedRole === 'teacher' && profile.role !== 'admin') {
     const subject = document.getElementById('gSubject').value;
     if (!subject) { alert('اختر المادة'); return; }
@@ -1327,7 +1480,6 @@ async function completeGoogleProfile() {
     setTimeout(() => enterDashboard(), 400);
   } finally { hideLoading(); }
 }
-
 function openProfileCompletionForExisting() {
   googleSelectedRole = null;
   openModal(`<div class="modal-header"><h3 class="modal-title">👋 ${escapeHtml(currentUser.name)}</h3></div>
@@ -1358,7 +1510,6 @@ function openProfileCompletionForExisting() {
     });
   }, 50);
 }
-
 async function saveExistingProfile() {
   if (!googleSelectedRole) { alert('اختر دورك'); return; }
   const fullName = document.getElementById('gFullName').value.trim();
@@ -1390,7 +1541,6 @@ async function saveExistingProfile() {
     }
   } finally { hideLoading(); }
 }
-
 async function handleForgotPassword() {
   const email = document.getElementById('loginEmail').value.trim().toLowerCase();
   if (!email) { showAlert('أدخل بريدك أولاً', 'warning'); return; }
@@ -1405,9 +1555,9 @@ async function handleForgotPassword() {
   } catch (err) { showAlert('تعذر الإرسال'); }
   finally { btn.disabled = false; btn.textContent = orig; }
 }
-
 async function logout() {
   stopNotificationsListener();
+  stopRealtimeAnalytics();
   if (firebaseAuthEnabled && fbAuth) { try { await fbAuth.signOut(fbAuth.auth); } catch {} }
   currentUser = null;
   clearSession();
@@ -1415,7 +1565,6 @@ async function logout() {
   document.getElementById('loginForm').reset();
   document.getElementById('registerForm').reset();
 }
-
 async function checkSession() {
   await handleGoogleRedirectResult();
   if (isProcessingRedirect) return false;
@@ -1456,15 +1605,14 @@ async function checkSession() {
   if (u) { currentUser = u; enterDashboard(); return true; }
   return false;
 }
-
 function enterDashboard() {
   if (platformSettings.maintenanceMode && !isAdmin(currentUser)) { showMaintenanceScreen(); return; }
   showScreen('dashboard');
-  /* ✅ تحميل الإعلانات في كل الصفحات بعد تبديل الشاشة */
   loadActiveAnnouncement();
   updateHeader();
   updateNotifBadge();
   startNotificationsListener();
+  startRealtimeAnalytics();
   if (currentUser.needsProfileCompletion && !isAdmin(currentUser)) {
     setTimeout(() => openProfileCompletionForExisting(), 500); return;
   }
@@ -1475,7 +1623,6 @@ function enterDashboard() {
   } else if (currentUser.role === 'parent') renderParentDashboard();
   else renderStudentDashboard();
 }
-
 function updateHeader() {
   const av = document.getElementById('userAvatar');
   if (currentUser.photoURL) av.innerHTML = `<img src="${currentUser.photoURL}" alt="avatar" referrerpolicy="no-referrer">`;
@@ -1491,6 +1638,7 @@ function updateHeader() {
   }
   document.getElementById('userMeta').textContent = meta;
 }
+
 /* ============ NOTIFICATIONS ============ */
 async function updateNotifBadge() {
   if (!currentUser) return;
@@ -1512,7 +1660,6 @@ function startNotificationsListener() {
   } catch (e) {}
 }
 function stopNotificationsListener() { if (notifUnsubscribe) { try { notifUnsubscribe(); } catch {} notifUnsubscribe = null; } }
-
 async function openNotifications() {
   const notifs = (await DB.get('notifications')).filter(n => n.userId === currentUser.id).sort((a,b) => b.createdAt - a.createdAt);
   const unread = notifs.filter(n => !n.read);
@@ -1522,14 +1669,13 @@ async function openNotifications() {
     await DB.set('notifications', all);
     updateNotifBadge();
   }
-  openModal(`<div class="modal-header"><h3 class="modal-title">🔔 الإشعارات</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-    ${notifs.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">🔔</div><h3>لا إشعارات</h3></div>` : notifs.map(n => `
+  openModal(`<div class="modal-header"><h3 class="modal-title">🔔 الإشعارات (${notifs.length})</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    ${notifs.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">🔔</div><h3>لا إشعارات</h3></div>` : notifs.slice(0, 50).map(n => `
       <div class="history-item" style="${n.read?'opacity:0.6':''}">
         <div class="history-info"><h4>${escapeHtml(n.title)}</h4><p>${escapeHtml(n.body)}</p><p style="font-size:11px;">${new Date(n.createdAt).toLocaleString('ar-EG')}</p></div>
       </div>
     `).join('')}`);
 }
-
 async function notifyStudents(quiz) {
   const users = await DB.get('users');
   const students = users.filter(u => u.role === 'student' && u.grade === quiz.grade);
@@ -1537,10 +1683,203 @@ async function notifyStudents(quiz) {
   students.forEach(s => notifs.push({ id: uid(), userId: s.id, title: 'اختبار جديد', body: `تم إضافة "${quiz.title}"`, createdAt: Date.now(), read: false }));
   await DB.set('notifications', notifs);
 }
-
-/* ============ MODAL ============ */
-function openModal(html) { document.getElementById('modalBox').innerHTML = html; document.getElementById('modalOverlay').classList.add('active'); bindAutoDirToInputs(); }
+function openModal(html) { document.getElementById('modalBox').innerHTML = html; document.getElementById('modalOverlay').classList.add('active'); bindAutoDirToInputs(); setTimeout(observeLazyImages, 100); }
 function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
+/* ============ Real-time Analytics ============ */
+let _realtimeUnsubs = [];
+function startRealtimeAnalytics() {
+  stopRealtimeAnalytics();
+  if (!firebaseEnabled || !isAdmin(currentUser)) return;
+  try {
+    _realtimeUnsubs.push(DB.subscribe('users', (users) => {
+      const liveUsers = document.getElementById('liveUsersCount');
+      if (liveUsers) liveUsers.textContent = users.length;
+      const liveStudents = document.getElementById('liveStudentsCount');
+      if (liveStudents) liveStudents.textContent = users.filter(u => u.role === 'student').length;
+    }));
+    _realtimeUnsubs.push(DB.subscribe('attempts', (attempts) => {
+      const liveAttempts = document.getElementById('liveAttemptsCount');
+      if (liveAttempts) liveAttempts.textContent = attempts.length;
+      const liveAvg = document.getElementById('liveAvgScore');
+      if (liveAvg) liveAvg.textContent = calculateAvg(attempts) + '%';
+    }));
+    _realtimeUnsubs.push(DB.subscribe('quizzes', (quizzes) => {
+      const liveQuizzes = document.getElementById('liveQuizzesCount');
+      if (liveQuizzes) liveQuizzes.textContent = quizzes.length;
+    }));
+  } catch (e) {}
+}
+function stopRealtimeAnalytics() {
+  _realtimeUnsubs.forEach(unsub => { try { unsub(); } catch {} });
+  _realtimeUnsubs = [];
+}
+
+/* ============ Friends & Challenges ============ */
+async function openFriendsModal() {
+  if (!currentUser || currentUser.role !== 'student') { alert('للطلاب فقط'); return; }
+  showLoading();
+  try {
+    const users = await DB.get('users');
+    const challenges = await DB.get('challenges');
+    const myFriends = users.filter(u => (currentUser.friends || []).includes(u.id));
+    const myChallenges = challenges.filter(c => c.fromId === currentUser.id || c.toId === currentUser.id).sort((a,b) => b.createdAt - a.createdAt);
+    const pendingForMe = myChallenges.filter(c => c.toId === currentUser.id && c.status === 'pending');
+    const otherStudents = users.filter(u => u.role === 'student' && u.id !== currentUser.id && !(currentUser.friends || []).includes(u.id)).slice(0, 10);
+    
+    openModal(`<div class="modal-header"><h3 class="modal-title">👥 الأصدقاء والتحديات</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+      <div class="content-tabs">
+        <button class="content-tab active" onclick="switchFriendsTab('friends', this)">👥 أصدقائي (${myFriends.length})</button>
+        <button class="content-tab" onclick="switchFriendsTab('challenges', this)">⚔️ التحديات (${myChallenges.length})</button>
+        <button class="content-tab" onclick="switchFriendsTab('add', this)">➕ إضافة صديق</button>
+      </div>
+      <div id="friendsTabContent">
+        ${renderFriendsTabContent('friends', myFriends, myChallenges, otherStudents)}
+      </div>`);
+  } finally { hideLoading(); }
+}
+function switchFriendsTab(tab, btn) {
+  document.querySelectorAll('.content-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  refreshFriendsTabContent(tab);
+}
+async function refreshFriendsTabContent(tab) {
+  const users = await DB.get('users');
+  const challenges = await DB.get('challenges');
+  const myFriends = users.filter(u => (currentUser.friends || []).includes(u.id));
+  const myChallenges = challenges.filter(c => c.fromId === currentUser.id || c.toId === currentUser.id).sort((a,b) => b.createdAt - a.createdAt);
+  const otherStudents = users.filter(u => u.role === 'student' && u.id !== currentUser.id && !(currentUser.friends || []).includes(u.id)).slice(0, 10);
+  document.getElementById('friendsTabContent').innerHTML = renderFriendsTabContent(tab, myFriends, myChallenges, otherStudents);
+}
+function renderFriendsTabContent(tab, myFriends, myChallenges, otherStudents) {
+  if (tab === 'friends') {
+    if (myFriends.length === 0) return '<div class="empty-state"><div class="empty-state-icon">👥</div><h3>لا أصدقاء بعد</h3><p>أضف أصدقاء من تبويب "إضافة صديق"</p></div>';
+    return myFriends.map(f => `<div class="student-row">
+      <div class="student-info"><h4>${escapeHtml(f.name)}</h4><p>${escapeHtml(f.grade || '')} • ${f.xp || 0} XP</p></div>
+      <button class="btn btn-sm btn-danger" onclick="removeFriend('${f.id}')">🗑</button>
+    </div>`).join('');
+  } else if (tab === 'challenges') {
+    if (myChallenges.length === 0) return '<div class="empty-state"><div class="empty-state-icon">⚔️</div><h3>لا تحديات</h3></div>';
+    return myChallenges.map(c => {
+      const isFromMe = c.fromId === currentUser.id;
+      const otherId = isFromMe ? c.toId : c.fromId;
+      const otherUser = c.otherUserName || '';
+      const statusText = c.status === 'pending' ? '⏳ معلق' : c.status === 'accepted' ? '✅ مقبول' : '❌ مرفوض';
+      return `<div class="challenge-card ${c.status}">
+        <div class="challenge-header">
+          <div class="challenge-avatar">${isFromMe ? '📤' : '📥'}</div>
+          <div class="challenge-info">
+            <h4>${isFromMe ? 'تحدٍ أرسلته' : 'تحدٍ تلقّيته'}</h4>
+            <p>${escapeHtml(c.quizTitle || '')} • ${statusText}</p>
+          </div>
+        </div>
+        ${c.status === 'pending' && !isFromMe ? `<div style="display:flex;gap:8px;">
+          <button class="btn btn-success btn-sm" onclick="respondChallenge('${c.id}', 'accepted')">✅ قبول</button>
+          <button class="btn btn-danger btn-sm" onclick="respondChallenge('${c.id}', 'declined')">❌ رفض</button>
+        </div>` : ''}
+      </div>`;
+    }).join('');
+  } else {
+    if (otherStudents.length === 0) return '<div class="empty-state"><h3>لا طلاب آخرون</h3></div>';
+    return otherStudents.map(s => `<div class="student-row">
+      <div class="student-info"><h4>${escapeHtml(s.name)}</h4><p>${escapeHtml(s.grade || '')} • ${s.xp || 0} XP</p></div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-sm btn-primary" onclick="addFriend('${s.id}')">➕ صديق</button>
+        <button class="btn btn-sm btn-warning" onclick="challengeFriend('${s.id}')">⚔️ تحدٍ</button>
+      </div>
+    </div>`).join('');
+  }
+}
+async function addFriend(friendId) {
+  showLoading();
+  try {
+    const users = await DB.get('users');
+    const meIdx = users.findIndex(u => u.id === currentUser.id);
+    const friendIdx = users.findIndex(u => u.id === friendId);
+    if (meIdx < 0 || friendIdx < 0) return;
+    if (!users[meIdx].friends) users[meIdx].friends = [];
+    if (!users[friendIdx].friends) users[friendIdx].friends = [];
+    if (!users[meIdx].friends.includes(friendId)) users[meIdx].friends.push(friendId);
+    if (!users[friendIdx].friends.includes(currentUser.id)) users[friendIdx].friends.push(currentUser.id);
+    await DB.set('users', users);
+    currentUser = users[meIdx];
+    const notifs = await DB.get('notifications');
+    notifs.push({ id: uid(), userId: friendId, title: '👥 صديق جديد', body: `${currentUser.name} أضافك كصديق`, createdAt: Date.now(), read: false });
+    await DB.set('notifications', notifs);
+    launchConfetti(20);
+    alert('✅ تمت الإضافة');
+    refreshFriendsTabContent('add');
+  } finally { hideLoading(); }
+}
+async function removeFriend(friendId) {
+  if (!confirm('حذف الصديق؟')) return;
+  showLoading();
+  try {
+    const users = await DB.get('users');
+    const meIdx = users.findIndex(u => u.id === currentUser.id);
+    if (meIdx < 0) return;
+    users[meIdx].friends = (users[meIdx].friends || []).filter(id => id !== friendId);
+    await DB.set('users', users);
+    currentUser = users[meIdx];
+    alert('تم الحذف');
+    refreshFriendsTabContent('friends');
+  } finally { hideLoading(); }
+}
+async function challengeFriend(friendId) {
+  const users = await DB.get('users');
+  const quizzes = await DB.get('quizzes');
+  const friend = users.find(u => u.id === friendId);
+  if (!friend) return;
+  const friendQuizzes = quizzes.filter(q => q.grade === friend.grade);
+  if (friendQuizzes.length === 0) { alert('لا اختبارات متاحة للتحدي'); return; }
+  const quizOptions = friendQuizzes.slice(0, 10).map(q => `<option value="${q.id}">${escapeHtml(q.title)}</option>`).join('');
+  openModal(`<div class="modal-header"><h3 class="modal-title">⚔️ تحدٍ صديق: ${escapeHtml(friend.name)}</h3><button class="modal-close" onclick="openFriendsModal()">✕</button></div>
+    <div class="form-group"><label class="form-label">اختر الاختبار</label><select class="form-select" id="challengeQuizSelect">${quizOptions}</select></div>
+    <button class="btn btn-warning btn-full" onclick="sendChallenge('${friendId}')">📤 إرسال التحدي</button>`);
+}
+async function sendChallenge(friendId) {
+  const quizId = document.getElementById('challengeQuizSelect').value;
+  if (!quizId) { alert('اختر اختباراً'); return; }
+  showLoading();
+  try {
+    const quizzes = await DB.get('quizzes');
+    const quiz = quizzes.find(q => q.id === quizId);
+    const users = await DB.get('users');
+    const friend = users.find(u => u.id === friendId);
+    const challenges = await DB.get('challenges');
+    challenges.push({
+      id: uid(), fromId: currentUser.id, toId: friendId,
+      fromName: currentUser.name, otherUserName: currentUser.name,
+      quizId, quizTitle: quiz.title,
+      status: 'pending', createdAt: Date.now()
+    });
+    await DB.set('challenges', challenges);
+    const notifs = await DB.get('notifications');
+    notifs.push({ id: uid(), userId: friendId, title: '⚔️ تحدٍ جديد!', body: `${currentUser.name} تحدّاك في "${quiz.title}"`, createdAt: Date.now(), read: false });
+    await DB.set('notifications', notifs);
+    launchConfetti(30);
+    alert('✅ تم إرسال التحدي!');
+    closeModal();
+    openFriendsModal();
+  } finally { hideLoading(); }
+}
+async function respondChallenge(challengeId, response) {
+  showLoading();
+  try {
+    const challenges = await DB.get('challenges');
+    const idx = challenges.findIndex(c => c.id === challengeId);
+    if (idx < 0) return;
+    challenges[idx].status = response;
+    challenges[idx].respondedAt = Date.now();
+    await DB.set('challenges', challenges);
+    const challenge = challenges[idx];
+    const notifs = await DB.get('notifications');
+    notifs.push({ id: uid(), userId: challenge.fromId, title: response === 'accepted' ? '✅ تم قبول التحدي' : '❌ تم رفض التحدي', body: `${currentUser.name} ${response === 'accepted' ? 'قبل' : 'رفض'} تحديك`, createdAt: Date.now(), read: false });
+    await DB.set('notifications', notifs);
+    alert(response === 'accepted' ? '✅ قبلت التحدي' : '❌ رفضت التحدي');
+    refreshFriendsTabContent('challenges');
+  } finally { hideLoading(); }
+}
+
 /* ============ ADMIN DASHBOARD ============ */
 async function renderAdminDashboard() {
   showLoading();
@@ -1552,7 +1891,6 @@ async function renderAdminDashboard() {
     const pendingTeachers = teachers.filter(t => t.approved === false);
     const students = allUsers.filter(u => u.role === 'student');
     const parents = allUsers.filter(u => u.role === 'parent');
-
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
       <div class="card" style="background: linear-gradient(135deg, #f59e0b, #f97316); color:#fff;">
@@ -1561,7 +1899,6 @@ async function renderAdminDashboard() {
           <div><h2 style="font-size:24px; font-weight:900;">لوحة الأدمن</h2><p style="opacity:0.9;">إدارة كاملة للمنصة</p></div>
         </div>
       </div>
-
       <div class="admin-nav-grid">
         <div class="admin-nav-card" onclick="renderAdminQuizzes()"><div class="admin-nav-icon">📝</div><div class="admin-nav-title">إدارة الاختبارات</div><div class="admin-nav-desc">${allQuizzes.length} اختبار</div></div>
         <div class="admin-nav-card" onclick="renderAdminStats()"><div class="admin-nav-icon">📊</div><div class="admin-nav-title">الإحصائيات</div><div class="admin-nav-desc">رسوم بيانية</div></div>
@@ -1571,35 +1908,30 @@ async function renderAdminDashboard() {
         <div class="admin-nav-card" onclick="renderAuditLog()"><div class="admin-nav-icon">📜</div><div class="admin-nav-title">سجل النشاط</div><div class="admin-nav-desc">آخر الأحداث</div></div>
         <div class="admin-nav-card" onclick="openAdminBroadcast()"><div class="admin-nav-icon">💬</div><div class="admin-nav-title">إشعار شامل</div><div class="admin-nav-desc">لكل المستخدمين</div></div>
       </div>
-
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-icon primary">👥</div><div class="stat-info"><h4>${allUsers.length}</h4><p>المستخدمون</p></div></div>
-        <div class="stat-card"><div class="stat-icon success">👨‍🎓</div><div class="stat-info"><h4>${students.length}</h4><p>طلاب</p></div></div>
-        <div class="stat-card"><div class="stat-icon info">👨‍🏫</div><div class="stat-info"><h4>${teachers.length}</h4><p>مدرسون</p></div></div>
-        <div class="stat-card"><div class="stat-icon warning">👨‍👩‍👦</div><div class="stat-info"><h4>${parents.length}</h4><p>أولياء أمور</p></div></div>
+        <div class="stat-card"><div class="stat-icon primary">👥</div><div class="stat-info"><h4 id="liveUsersCount">${allUsers.length}</h4><p>المستخدمون <span class="live-indicator"><span class="live-dot"></span> LIVE</span></p></div></div>
+        <div class="stat-card"><div class="stat-icon success">👨‍🎓</div><div class="stat-info"><h4 id="liveStudentsCount">${students.length}</h4><p>طلاب</p></div></div>
+        <div class="stat-card"><div class="stat-icon info">📝</div><div class="stat-info"><h4 id="liveQuizzesCount">${allQuizzes.length}</h4><p>اختبارات</p></div></div>
+        <div class="stat-card"><div class="stat-icon warning">✅</div><div class="stat-info"><h4 id="liveAttemptsCount">${allAttempts.length}</h4><p>محاولات <span class="live-indicator"><span class="live-dot"></span> LIVE</span></p></div></div>
       </div>
-
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-icon primary">📝</div><div class="stat-info"><h4>${allQuizzes.length}</h4><p>اختبارات</p></div></div>
-        <div class="stat-card"><div class="stat-icon success">✅</div><div class="stat-info"><h4>${allAttempts.length}</h4><p>محاولات</p></div></div>
-        <div class="stat-card"><div class="stat-icon warning">📊</div><div class="stat-info"><h4>${calculateAvg(allAttempts)}%</h4><p>المتوسط</p></div></div>
+        <div class="stat-card"><div class="stat-icon warning">📊</div><div class="stat-info"><h4 id="liveAvgScore">${calculateAvg(allAttempts)}%</h4><p>المتوسط</p></div></div>
+        <div class="stat-card"><div class="stat-icon info">👨‍🏫</div><div class="stat-info"><h4>${teachers.length}</h4><p>مدرسون</p></div></div>
+        <div class="stat-card"><div class="stat-icon pink">👨‍👩‍👦</div><div class="stat-info"><h4>${parents.length}</h4><p>أولياء أمور</p></div></div>
         <div class="stat-card"><div class="stat-icon purple">🎮</div><div class="stat-info"><h4>${students.reduce((s, u) => s + (u.xp || 0), 0)}</h4><p>إجمالي XP</p></div></div>
       </div>
-
       <div class="card" style="border-right:4px solid var(--danger); background: var(--danger-light);">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-          <div><h3 style="font-size:16px; font-weight:900; color:var(--danger);">🗑 منطقة الخطر</h3><p style="font-size:13px; color:var(--text-light);">مسح الاختبارات والمحاولات</p></div>
+          <div><h3 style="font-size:16px; font-weight:900; color:var(--danger);">🗑 منطقة الخطر</h3></div>
           <button class="btn btn-danger" onclick="wipeQuizData()">🗑 مسح</button>
         </div>
       </div>
-
       ${pendingTeachers.length > 0 ? `<div class="card" style="border-right:4px solid var(--warning); background: var(--warning-light);">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
           <div><h3 style="font-size:18px; font-weight:900; color:var(--warning);">⏳ ${pendingTeachers.length} مدرس بانتظار الاعتماد</h3></div>
           <button class="btn btn-primary" onclick="openPendingTeachers()">👀 مراجعة</button>
         </div>
       </div>` : ''}
-
       <div class="section-header" style="margin-top:32px;">
         <div><h2 class="section-title">إدارة المستخدمين</h2><p class="section-subtitle">${allUsers.length} مستخدم</p></div>
       </div>
@@ -1610,18 +1942,17 @@ async function renderAdminDashboard() {
       </div>
       <div class="card" id="usersListContainer">${renderUsersListForTab(allUsers, allAttempts, currentUserTab)}</div>
     `;
+    startRealtimeAnalytics();
+    setTimeout(observeLazyImages, 100);
   } finally { hideLoading(); }
 }
-
-function switchUserTab(tab) { currentUserTab = tab; renderAdminDashboard(); }
-
+function switchUserTab(tab) { currentUserTab = tab; paginationState[tab] = 1; renderAdminDashboard(); }
 function renderUsersListForTab(allUsers, allAttempts, tab) {
   let filtered = [], emptyMsg = '';
   if (tab === 'students') { filtered = allUsers.filter(u => u.role === 'student'); emptyMsg = 'لا يوجد طلاب'; }
   else if (tab === 'teachers') { filtered = allUsers.filter(u => u.role === 'teacher'); emptyMsg = 'لا يوجد مدرسون'; }
   else { filtered = allUsers.filter(u => u.role === 'parent'); emptyMsg = 'لا يوجد أولياء'; }
   if (filtered.length === 0) return `<div class="empty-state"><h3>${emptyMsg}</h3></div>`;
-
   const searchId = `search_${tab}`;
   const filterId = `filter_${tab}`;
   let filterOptions = '';
@@ -1632,13 +1963,44 @@ function renderUsersListForTab(allUsers, allAttempts, tab) {
     filterOptions = `<option value="">كل الحالات</option><option value="approved">✅ معتمد</option><option value="pending">⏳ معلق</option>`;
   }
   filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  const paged = paginate(filtered, tab);
   const headerHtml = `<div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
     <input type="text" class="form-input auto-dir" id="${searchId}" placeholder="🔍 بحث بالاسم أو البريد..." style="flex:1; min-width:200px;" oninput="applyAdminFilters('${tab}')" dir="rtl">
     <select class="form-select" id="${filterId}" style="max-width:200px;" onchange="applyAdminFilters('${tab}')">${filterOptions}</select>
   </div>`;
-  return headerHtml + `<div id="usersListBody_${tab}">${renderUsersBody(filtered, allAttempts, tab)}</div>`;
+  const paginationHtml = renderPagination(filtered.length, paged.page, tab, `changeAdminPage_${tab}`);
+  return headerHtml + `<div id="usersListBody_${tab}">${renderUsersBody(paged.items, allAttempts, tab)}</div>${paginationHtml}`;
 }
-
+window.changeAdminPage_students = (p) => { paginationState.students = p; refreshAdminUsersList('students'); };
+window.changeAdminPage_teachers = (p) => { paginationState.teachers = p; refreshAdminUsersList('teachers'); };
+window.changeAdminPage_parents = (p) => { paginationState.parents = p; refreshAdminUsersList('parents'); };
+async function refreshAdminUsersList(tab) {
+  const allUsers = await DB.get('users');
+  const allAttempts = await DB.get('attempts');
+  const query = (document.getElementById(`search_${tab}`)?.value || '').trim().toLowerCase();
+  const filterVal = document.getElementById(`filter_${tab}`)?.value || '';
+  let filtered = [];
+  if (tab === 'students') filtered = allUsers.filter(u => u.role === 'student');
+  else if (tab === 'teachers') filtered = allUsers.filter(u => u.role === 'teacher');
+  else filtered = allUsers.filter(u => u.role === 'parent');
+  if (query) filtered = filtered.filter(u => (u.name || '').toLowerCase().includes(query) || (u.email || '').toLowerCase().includes(query));
+  if (filterVal) {
+    if (tab === 'students') filtered = filtered.filter(u => u.grade === filterVal);
+    else if (tab === 'teachers') {
+      if (filterVal === 'approved') filtered = filtered.filter(u => u.approved !== false);
+      if (filterVal === 'pending') filtered = filtered.filter(u => u.approved === false);
+    }
+  }
+  filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  const paged = paginate(filtered, tab);
+  const body = document.getElementById(`usersListBody_${tab}`);
+  if (body) body.innerHTML = renderUsersBody(paged.items, allAttempts, tab);
+  const container = document.getElementById('usersListContainer');
+  const paginationHtml = renderPagination(filtered.length, paged.page, tab, `changeAdminPage_${tab}`);
+  const oldPagination = container.querySelector('.pagination-container');
+  if (oldPagination) oldPagination.remove();
+  if (paginationHtml) container.insertAdjacentHTML('beforeend', paginationHtml);
+}
 function renderUsersBody(filtered, allAttempts, tab) {
   if (filtered.length === 0) return `<div class="empty-state"><h3>لا نتائج</h3></div>`;
   return filtered.map(u => {
@@ -1678,29 +2040,11 @@ function renderUsersBody(filtered, allAttempts, tab) {
     }
   }).join('');
 }
-
 async function applyAdminFilters(tab) {
-  const query = (document.getElementById(`search_${tab}`)?.value || '').trim().toLowerCase();
-  const filterVal = document.getElementById(`filter_${tab}`)?.value || '';
-  const allUsers = await DB.get('users');
-  const allAttempts = await DB.get('attempts');
-  let filtered = [];
-  if (tab === 'students') filtered = allUsers.filter(u => u.role === 'student');
-  else if (tab === 'teachers') filtered = allUsers.filter(u => u.role === 'teacher');
-  else filtered = allUsers.filter(u => u.role === 'parent');
-  if (query) filtered = filtered.filter(u => (u.name || '').toLowerCase().includes(query) || (u.email || '').toLowerCase().includes(query));
-  if (filterVal) {
-    if (tab === 'students') filtered = filtered.filter(u => u.grade === filterVal);
-    else if (tab === 'teachers') {
-      if (filterVal === 'approved') filtered = filtered.filter(u => u.approved !== false);
-      if (filterVal === 'pending') filtered = filtered.filter(u => u.approved === false);
-    }
-  }
-  filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-  const body = document.getElementById(`usersListBody_${tab}`);
-  if (body) body.innerHTML = renderUsersBody(filtered, allAttempts, tab);
+  paginationState[tab] = 1;
+  refreshAdminUsersList(tab);
 }
-/* ============ ADMIN: QUIZZES ============ */
+/* ============ ADMIN: QUIZZES (مع Pagination) ============ */
 async function renderAdminQuizzes() {
   showLoading();
   try {
@@ -1725,7 +2069,9 @@ async function renderAdminQuizzes() {
 
 function renderAdminQuizzesList(quizzes, teachers, attempts) {
   if (quizzes.length === 0) return `<div class="card"><div class="empty-state"><div class="empty-state-icon">📝</div><h3>لا يوجد اختبارات</h3></div></div>`;
-  return quizzes.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).map(quiz => {
+  const sorted = quizzes.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  const paged = paginate(sorted, 'adminQuizzes');
+  const html = paged.items.map(quiz => {
     const teacher = teachers.find(t => t.id === quiz.teacherId);
     const qa = attempts.filter(a => a.quizId === quiz.id);
     const avg = qa.length ? calculateAvg(qa) : 0;
@@ -1744,9 +2090,25 @@ function renderAdminQuizzesList(quizzes, teachers, attempts) {
       </div>
     </div>`;
   }).join('');
+  return html + renderPagination(sorted.length, paged.page, 'adminQuizzes', 'changeAdminQuizzesPage');
 }
+window.changeAdminQuizzesPage = async (p) => {
+  paginationState.adminQuizzes = p;
+  const allQuizzes = await DB.get('quizzes');
+  const allUsers = await DB.get('users');
+  const allAttempts = await DB.get('attempts');
+  const teachers = allUsers.filter(u => u.role === 'teacher');
+  const query = (document.getElementById('quizSearchInput')?.value || '').trim().toLowerCase();
+  let filtered = allQuizzes;
+  if (query) filtered = allQuizzes.filter(q => {
+    const t = teachers.find(x => x.id === q.teacherId);
+    return q.title.toLowerCase().includes(query) || (t?.name || '').toLowerCase().includes(query);
+  });
+  document.getElementById('adminQuizzesList').innerHTML = renderAdminQuizzesList(filtered, teachers, allAttempts);
+};
 
 async function filterAdminQuizzes() {
+  paginationState.adminQuizzes = 1;
   const query = document.getElementById('quizSearchInput').value.trim().toLowerCase();
   const allQuizzes = await DB.get('quizzes');
   const allUsers = await DB.get('users');
@@ -1866,6 +2228,7 @@ async function renderAdminGamification() {
     const allUsers = await DB.get('users');
     const students = allUsers.filter(u => u.role === 'student').sort((a, b) => (b.xp || 0) - (a.xp || 0));
     const container = document.getElementById('dashboardContent');
+    const paged = paginate(students, 'students');
     container.innerHTML = `
       <div class="card" style="background: linear-gradient(135deg, #8b5cf6, #6366f1); color:#fff;">
         <div style="display:flex; align-items:center; gap:12px;">
@@ -1892,7 +2255,7 @@ async function renderAdminGamification() {
       </div>
       <div class="section-header" style="margin-top:24px;"><div><h2 class="section-title">👨‍🎓 طلاب (مرتبون حسب XP)</h2></div></div>
       <div class="card">
-        ${students.length === 0 ? `<div class="empty-state"><h3>لا يوجد طلاب</h3></div>` : students.map(u => {
+        ${students.length === 0 ? `<div class="empty-state"><h3>لا يوجد طلاب</h3></div>` : paged.items.map(u => {
           const lvl = getLevel(u.xp || 0);
           return `<div class="gamify-student-row">
             <div class="gamify-student-info">
@@ -1906,10 +2269,12 @@ async function renderAdminGamification() {
             </div>
           </div>`;
         }).join('')}
+        ${students.length > 0 ? renderPagination(students.length, paged.page, 'students', 'changeGamifyPage') : ''}
       </div>
     `;
   } finally { hideLoading(); }
 }
+window.changeGamifyPage = (p) => { paginationState.students = p; renderAdminGamification(); };
 
 function openGrantXPModal(studentId) {
   openModal(`<div class="modal-header"><h3 class="modal-title">➕ منح نقاط XP</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
@@ -1917,7 +2282,6 @@ function openGrantXPModal(studentId) {
     <div class="form-group"><label class="form-label">السبب</label><input type="text" class="form-input auto-dir" id="grantXPReason" value="مكافأة من الأدمن" dir="rtl"></div>
     <button class="btn btn-success btn-full" onclick="grantXpToStudent('${studentId}')">💾 منح</button>`);
 }
-
 async function grantXpToStudent(studentId) {
   const amount = parseInt(document.getElementById('grantXPAmount').value) || 0;
   const reason = document.getElementById('grantXPReason').value.trim() || 'مكافأة';
@@ -1932,7 +2296,6 @@ async function grantXpToStudent(studentId) {
     renderAdminGamification();
   } finally { hideLoading(); }
 }
-
 async function openStudentGamificationDetails(studentId) {
   const users = await DB.get('users');
   const u = users.find(x => x.id === studentId);
@@ -1963,7 +2326,6 @@ async function openStudentGamificationDetails(studentId) {
       }).join('') || '<p style="font-size:13px;color:var(--text-light);">حصل على كل الشارات!</p>'}
     </div>`);
 }
-
 async function awardBadgeManually(studentId, badgeKey) {
   showLoading();
   try {
@@ -1984,7 +2346,6 @@ async function awardBadgeManually(studentId, badgeKey) {
     }
   } finally { hideLoading(); }
 }
-
 async function removeBadgeFromStudent(studentId, badgeKey) {
   if (!confirm('حذف هذه الشارة؟')) return;
   showLoading();
@@ -2000,7 +2361,6 @@ async function removeBadgeFromStudent(studentId, badgeKey) {
     renderAdminGamification();
   } finally { hideLoading(); }
 }
-
 async function resetStudentGamification(studentId) {
   if (!confirm('⚠️ تصفير XP والشارات والسلسلة؟')) return;
   showLoading();
@@ -2015,6 +2375,7 @@ async function resetStudentGamification(studentId) {
     renderAdminGamification();
   } finally { hideLoading(); }
 }
+
 /* ============ ADMIN: ANNOUNCEMENTS ============ */
 async function renderAdminAnnouncements() {
   showLoading();
@@ -2031,22 +2392,19 @@ async function renderAdminAnnouncements() {
       </div>
       <button class="btn btn-outline" onclick="renderAdminDashboard()" style="margin-bottom:16px;">← العودة</button>
       <button class="btn btn-primary btn-full" onclick="openAnnouncementEditor()" style="margin-bottom:16px;">➕ إعلان جديد</button>
-      ${announcements.length === 0 ? `<div class="card"><div class="empty-state"><div class="empty-state-icon">📢</div><h3>لا إعلانات بعد</h3><p style="margin-top:8px;">أنشئ إعلاناً ليظهر لكل المستخدمين (شريط أو بانر كامل)</p></div></div>` :
+      ${announcements.length === 0 ? `<div class="card"><div class="empty-state"><div class="empty-state-icon">📢</div><h3>لا إعلانات بعد</h3></div></div>` :
         announcements.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).map(a => {
           const now = Date.now();
           const isActive = a.enabled && (!a.startDate || a.startDate <= now) && (!a.endDate || a.endDate >= now);
           const isBanner = a.type === 'banner' || a.imageUrl;
           return `<div class="card" style="border-right:4px solid ${isActive ? 'var(--success)' : 'var(--border)'};">
-            ${a.imageUrl ? `<img src="${a.imageUrl}" style="width:100%;max-height:160px;object-fit:cover;border-radius:12px;margin-bottom:12px;">` : ''}
+            ${a.imageUrl ? `<img data-src="${a.imageUrl}" class="lazy-img" style="width:100%;max-height:160px;object-fit:cover;border-radius:12px;margin-bottom:12px;" alt="announcement">` : ''}
             <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
               <span class="badge badge-${isActive ? 'success' : 'warning'}">${isActive ? '✅ نشط' : '⏸️ غير نشط'}</span>
-              <span class="badge badge-${isBanner ? 'purple' : 'info'}">${isBanner ? '🖼️ بانر كامل' : '📢 شريط بسيط'}</span>
-              ${a.startDate ? `<span class="badge badge-info">📅 من ${new Date(a.startDate).toLocaleDateString('ar-EG')}</span>` : ''}
-              ${a.endDate ? `<span class="badge badge-info">📅 إلى ${new Date(a.endDate).toLocaleDateString('ar-EG')}</span>` : ''}
+              <span class="badge badge-${isBanner ? 'purple' : 'info'}">${isBanner ? '🖼️ بانر' : '📢 شريط'}</span>
             </div>
             <h4 style="font-size:16px; font-weight:800; margin-bottom:6px;">${a.emoji || '📢'} ${escapeHtml(a.title || '')}</h4>
             <p style="font-size:14px; color:var(--text-light); line-height:1.6;">${escapeHtml(a.text)}</p>
-            ${a.link ? `<p style="font-size:13px; margin-top:6px;">🔗 <a href="${escapeHtml(a.link)}" target="_blank" style="color:var(--primary);">${escapeHtml(a.linkText || a.link)}</a></p>` : ''}
             <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
               <button class="btn btn-sm btn-${a.enabled ? 'warning' : 'success'}" onclick="toggleAnnouncement('${a.id}')">${a.enabled ? '⏸️ تعطيل' : '▶️ تفعيل'}</button>
               <button class="btn btn-sm btn-outline" onclick="openAnnouncementEditor('${a.id}')">✏️ تعديل</button>
@@ -2055,109 +2413,72 @@ async function renderAdminAnnouncements() {
           </div>`;
         }).join('')}
     `;
+    setTimeout(observeLazyImages, 100);
   } finally { hideLoading(); }
 }
-
 async function openAnnouncementEditor(id = null) {
   const announcements = await DB.get('announcements');
   const a = id ? announcements.find(x => x.id === id) : null;
   _tempAnnImage = a?.imageUrl || null;
-  _tempAnnImagePath = a?.imagePath || null;
   const currentType = a?.type || (a?.imageUrl ? 'banner' : 'bar');
-
   openModal(`<div class="modal-header"><h3 class="modal-title">${a ? '✏️ تعديل إعلان' : '➕ إعلان جديد'}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-
     <div class="form-group">
       <label class="form-label">نوع الإعلان</label>
       <div class="qtype-picker" style="grid-template-columns: 1fr 1fr;">
-        <button type="button" class="qtype-option ${currentType === 'bar' ? 'active' : ''}" id="annTypeBar" onclick="pickAnnType('bar')">
-          <span class="emoji">📢</span><span class="label">شريط بسيط</span>
-        </button>
-        <button type="button" class="qtype-option ${currentType === 'banner' ? 'active' : ''}" id="annTypeBanner" onclick="pickAnnType('banner')">
-          <span class="emoji">🖼️</span><span class="label">بانر كامل</span>
-        </button>
+        <button type="button" class="qtype-option ${currentType === 'bar' ? 'active' : ''}" id="annTypeBar" onclick="pickAnnType('bar')"><span class="emoji">📢</span><span class="label">شريط</span></button>
+        <button type="button" class="qtype-option ${currentType === 'banner' ? 'active' : ''}" id="annTypeBanner" onclick="pickAnnType('banner')"><span class="emoji">🖼️</span><span class="label">بانر</span></button>
       </div>
     </div>
-
     <div class="form-group">
-      <label class="form-label">🖼️ صورة الإعلان (اختياري - للبانر)</label>
-      <div id="annImagePreview" style="margin-bottom:8px;text-align:center;">
-        ${a?.imageUrl ? `<img src="${a.imageUrl}" style="max-width:100%;max-height:160px;border-radius:10px;">` : '<div style="padding:20px;background:var(--bg);border-radius:10px;color:var(--text-light);">لا توجد صورة</div>'}
-      </div>
+      <label class="form-label">🖼️ صورة الإعلان (اختياري)</label>
+      <div id="annImagePreview" style="margin-bottom:8px;text-align:center;">${a?.imageUrl ? `<img src="${a.imageUrl}" style="max-width:100%;max-height:160px;border-radius:10px;">` : '<div style="padding:20px;background:var(--bg);border-radius:10px;color:var(--text-light);">لا توجد صورة</div>'}</div>
       <input type="file" accept="image/*" class="form-input" id="annImageFile" onchange="handleAnnImageUpload(event)">
-      ${a?.imageUrl ? `<button class="btn btn-sm btn-danger" onclick="removeAnnImage()" style="margin-top:6px;">🗑 إزالة الصورة</button>` : ''}
-      <p style="font-size:11px;color:var(--text-light);margin-top:6px;">الحد: ${MAX_IMAGE_SIZE_MB}MB • يتم ضغطها تلقائياً • تُستخدم كخلفية للبانر</p>
+      ${a?.imageUrl ? `<button class="btn btn-sm btn-danger" onclick="removeAnnImage()" style="margin-top:6px;">🗑 إزالة</button>` : ''}
+      <p style="font-size:11px;color:var(--warning);margin-top:6px;">⚠️ الحد: ${MAX_IMAGE_SIZE_MB}MB • ضغط تلقائي</p>
     </div>
-
     <div class="form-group"><label class="form-label">الإيموجي</label><input type="text" class="form-input" id="annEmoji" value="${escapeHtml(a?.emoji || '📢')}" maxlength="4" style="text-align:center;font-size:24px;"></div>
-    <div class="form-group"><label class="form-label">العنوان (اختياري)</label><input type="text" class="form-input auto-dir" id="annTitle" value="${escapeHtml(a?.title || '')}" dir="rtl"></div>
+    <div class="form-group"><label class="form-label">العنوان</label><input type="text" class="form-input auto-dir" id="annTitle" value="${escapeHtml(a?.title || '')}" dir="rtl"></div>
     <div class="form-group"><label class="form-label">النص *</label><textarea class="form-textarea auto-dir" id="annText" dir="rtl">${escapeHtml(a?.text || '')}</textarea></div>
-    <div class="form-group"><label class="form-label">الرابط (زر CTA في البانر)</label><input type="url" class="form-input" id="annLink" value="${escapeHtml(a?.link || '')}" dir="ltr"></div>
+    <div class="form-group"><label class="form-label">الرابط</label><input type="url" class="form-input" id="annLink" value="${escapeHtml(a?.link || '')}" dir="ltr"></div>
     <div class="form-group"><label class="form-label">نص الرابط</label><input type="text" class="form-input auto-dir" id="annLinkText" value="${escapeHtml(a?.linkText || 'اعرف أكثر')}" dir="rtl"></div>
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
       <div class="form-group"><label class="form-label">لون البداية</label><input type="color" class="form-input" id="annColor" value="${a?.bgColor || '#4f46e5'}"></div>
       <div class="form-group"><label class="form-label">لون النهاية</label><input type="color" class="form-input" id="annColorEnd" value="${a?.bgColorEnd || '#8b5cf6'}"></div>
     </div>
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-      <div class="form-group"><label class="form-label">من تاريخ</label><input type="datetime-local" class="form-input" id="annStart" value="${a?.startDate ? new Date(a.startDate).toISOString().slice(0, 16) : ''}"></div>
-      <div class="form-group"><label class="form-label">إلى تاريخ</label><input type="datetime-local" class="form-input" id="annEnd" value="${a?.endDate ? new Date(a.endDate).toISOString().slice(0, 16) : ''}"></div>
-    </div>
     <button class="btn btn-success btn-full" onclick="saveAnnouncement('${id || ''}')">💾 حفظ</button>`);
   window._currentAnnType = currentType;
 }
-
 function pickAnnType(type) {
   window._currentAnnType = type;
   document.getElementById('annTypeBar').classList.toggle('active', type === 'bar');
   document.getElementById('annTypeBanner').classList.toggle('active', type === 'banner');
 }
-
-/* ✅ إصلاح: رفع صورة الإعلان مع ضغط تلقائي */
 async function handleAnnImageUpload(e) {
   const originalFile = e.target.files[0]; if (!originalFile) return;
   if (!originalFile.type.startsWith('image/')) { alert('اختر صورة فقط'); e.target.value = ''; return; }
   const sizeCheck = validateFileSize(originalFile, MAX_IMAGE_SIZE_MB, 'الصورة');
   if (!sizeCheck.ok) { alert(sizeCheck.msg); e.target.value = ''; return; }
-
   showLoading();
   try {
-    /* ضغط الصورة */
     let file;
-    try { file = await compressImage(originalFile); }
+    try { file = await compressImage(originalFile, 1280, 0.7); }
     catch (err) { file = originalFile; }
-
-    if (!firebaseStorageEnabled) {
-      if (file.size > 800 * 1024) { alert('Storage غير مفعّل، الحد بعد الضغط 800KB'); e.target.value = ''; hideLoading(); return; }
-      const r = new FileReader();
-      r.onload = (ev) => {
-        _tempAnnImage = ev.target.result;
-        _tempAnnImagePath = null;
-        document.getElementById('annImagePreview').innerHTML = `<img src="${ev.target.result}" style="max-width:100%;max-height:160px;border-radius:10px;">`;
-      };
-      r.readAsDataURL(file);
-      hideLoading();
-      return;
-    }
-
-    const path = `announcements/${Date.now()}_${file.name}`;
-    const storageRef = fbStorage.ref(fbStorage.storage, path);
-    await fbStorage.uploadBytes(storageRef, file);
-    const downloadURL = await fbStorage.getDownloadURL(storageRef);
-    _tempAnnImage = downloadURL;
-    _tempAnnImagePath = path;
-    document.getElementById('annImagePreview').innerHTML = `<img src="${downloadURL}" style="max-width:100%;max-height:160px;border-radius:10px;">`;
-    alert(`✅ تم رفع الصورة (${(file.size/1024).toFixed(0)}KB). اضغط "حفظ" للتأكيد.`);
-  } catch (err) { alert('فشل الرفع: ' + err.message); }
+    if (file.size > 2 * 1024 * 1024) { alert(`الصورة كبيرة بعد الضغط. الحد: 2MB`); e.target.value = ''; return; }
+    const r = new FileReader();
+    r.onload = (ev) => {
+      _tempAnnImage = ev.target.result;
+      document.getElementById('annImagePreview').innerHTML = `<img src="${ev.target.result}" style="max-width:100%;max-height:160px;border-radius:10px;">`;
+      alert(`✅ تم تجهيز الصورة (${(file.size/1024).toFixed(0)}KB)`);
+    };
+    r.readAsDataURL(file);
+  } catch (err) { alert('فشل: ' + err.message); }
   finally { hideLoading(); }
 }
-
 function removeAnnImage() {
   _tempAnnImage = null;
-  _tempAnnImagePath = null;
   document.getElementById('annImagePreview').innerHTML = '<div style="padding:20px;background:var(--bg);border-radius:10px;color:var(--text-light);">لا توجد صورة</div>';
   const fi = document.getElementById('annImageFile'); if (fi) fi.value = '';
 }
-
 async function saveAnnouncement(id) {
   const emoji = document.getElementById('annEmoji').value.trim() || '📢';
   const title = document.getElementById('annTitle').value.trim();
@@ -2166,27 +2487,18 @@ async function saveAnnouncement(id) {
   const linkText = document.getElementById('annLinkText').value.trim();
   const bgColor = document.getElementById('annColor').value;
   const bgColorEnd = document.getElementById('annColorEnd').value;
-  const startDate = document.getElementById('annStart').value;
-  const endDate = document.getElementById('annEnd').value;
   const type = window._currentAnnType || 'bar';
   const imageUrl = _tempAnnImage || null;
-  const imagePath = _tempAnnImagePath || null;
-
   if (!text) { alert('أدخل نص الإعلان'); return; }
-
+  if (imageUrl && imageUrl.length > 10 * 1024 * 1024) { alert('الصورة كبيرة جداً'); return; }
   showLoading();
   try {
     const announcements = await DB.get('announcements');
     if (id) {
       const idx = announcements.findIndex(a => a.id === id);
-      if (idx >= 0) {
-        if (announcements[idx].imagePath && announcements[idx].imagePath !== imagePath && firebaseStorageEnabled) {
-          try { await fbStorage.deleteObject(fbStorage.ref(fbStorage.storage, announcements[idx].imagePath)); } catch (e) {}
-        }
-        announcements[idx] = { ...announcements[idx], emoji, title, text, link, linkText, bgColor, bgColorEnd, type, imageUrl, imagePath, startDate: startDate ? new Date(startDate).getTime() : null, endDate: endDate ? new Date(endDate).getTime() : null, updatedAt: Date.now() };
-      }
+      if (idx >= 0) announcements[idx] = { ...announcements[idx], emoji, title, text, link, linkText, bgColor, bgColorEnd, type, imageUrl, updatedAt: Date.now() };
     } else {
-      announcements.push({ id: uid(), emoji, title, text, link, linkText, bgColor, bgColorEnd, type, imageUrl, imagePath, startDate: startDate ? new Date(startDate).getTime() : null, endDate: endDate ? new Date(endDate).getTime() : null, enabled: true, createdAt: Date.now() });
+      announcements.push({ id: uid(), emoji, title, text, link, linkText, bgColor, bgColorEnd, type, imageUrl, enabled: true, createdAt: Date.now() });
     }
     await DB.set('announcements', announcements);
     _cachedAnnouncements = announcements;
@@ -2194,12 +2506,10 @@ async function saveAnnouncement(id) {
     launchConfetti(20);
     alert('✅ تم الحفظ');
     closeModal();
-    /* ✅ إعادة رسم الإعلانات فوراً في كل الصفحات */
     renderAnnouncementEverywhere();
     renderAdminAnnouncements();
   } finally { hideLoading(); }
 }
-
 async function toggleAnnouncement(id) {
   showLoading();
   try {
@@ -2214,16 +2524,11 @@ async function toggleAnnouncement(id) {
     }
   } finally { hideLoading(); }
 }
-
 async function deleteAnnouncement(id) {
   if (!confirm('حذف الإعلان؟')) return;
   showLoading();
   try {
     const announcements = await DB.get('announcements');
-    const ann = announcements.find(a => a.id === id);
-    if (ann?.imagePath && firebaseStorageEnabled) {
-      try { await fbStorage.deleteObject(fbStorage.ref(fbStorage.storage, ann.imagePath)); } catch (e) {}
-    }
     const filtered = announcements.filter(a => a.id !== id);
     await DB.set('announcements', filtered);
     _cachedAnnouncements = filtered;
@@ -2244,7 +2549,7 @@ async function renderAdminSettings() {
       <div class="card" style="background: linear-gradient(135deg, #475569, #1e293b); color:#fff;">
         <div style="display:flex; align-items:center; gap:12px;">
           <span style="font-size:48px;">⚙️</span>
-          <div><h2 style="font-size:24px; font-weight:900;">إعدادات المنصة</h2><p style="opacity:0.9;">تحكم كامل</p></div>
+          <div><h2 style="font-size:24px; font-weight:900;">إعدادات المنصة</h2></div>
         </div>
       </div>
       <button class="btn btn-outline" onclick="renderAdminDashboard()" style="margin-bottom:16px;">← العودة</button>
@@ -2253,9 +2558,12 @@ async function renderAdminSettings() {
         <div class="form-group"><label class="form-label">اسم المنصة</label><input type="text" class="form-input auto-dir" id="setName" value="${escapeHtml(s.platformName)}" dir="rtl"></div>
         <div class="form-group"><label class="form-label">الوصف</label><input type="text" class="form-input auto-dir" id="setTagline" value="${escapeHtml(s.platformTagline)}" dir="rtl"></div>
         <div class="form-group"><label class="form-label">الإيموجي أو رابط الشعار</label><input type="text" class="form-input" id="setLogo" value="${escapeHtml(s.platformLogo)}"></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-          <div class="form-group"><label class="form-label">اللون الأساسي</label><input type="color" class="form-input" id="setPrimary" value="${s.primaryColor}"></div>
-          <div class="form-group"><label class="form-label">اللون الثانوي</label><input type="color" class="form-input" id="setSecondary" value="${s.secondaryColor}"></div>
+        <div class="form-group">
+          <label class="form-label">السمة الافتراضية</label>
+          <div class="theme-grid">
+            ${Object.entries(THEMES).map(([key, t]) => `<div class="theme-option ${s.theme === key ? 'active' : ''}" style="background:linear-gradient(135deg,${t.primary},${t.secondary});" onclick="selectAdminTheme('${key}')"><div style="font-size:24px;">${t.emoji}</div><div>${t.name}</div></div>`).join('')}
+          </div>
+          <input type="hidden" id="setTheme" value="${s.theme || 'indigo'}">
         </div>
       </div>
       <div class="card">
@@ -2271,10 +2579,10 @@ async function renderAdminSettings() {
       <div class="card">
         <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;">📋 المحتوى</h3>
         <label class="checkbox-label" style="display:flex; justify-content:space-between; padding:12px; background:var(--bg); border-radius:10px; margin-bottom:10px;">
-          <span>⭐ تفعيل تقييم المدرسين</span><input type="checkbox" id="setRatings" ${s.ratingsEnabled ? 'checked' : ''}>
+          <span>⭐ تفعيل التقييم</span><input type="checkbox" id="setRatings" ${s.ratingsEnabled ? 'checked' : ''}>
         </label>
         <label class="checkbox-label" style="display:flex; justify-content:space-between; padding:12px; background:var(--bg); border-radius:10px; margin-bottom:10px;">
-          <span>🏆 عرض لوحة الشرف</span><input type="checkbox" id="setLeaderboard" ${s.leaderboardEnabled ? 'checked' : ''}>
+          <span>🏆 لوحة الشرف</span><input type="checkbox" id="setLeaderboard" ${s.leaderboardEnabled ? 'checked' : ''}>
         </label>
         <div class="form-group"><label class="form-label">الحد الأقصى للرفع (MB)</label><input type="number" class="form-input" id="setUpload" value="${s.maxUploadSizeMB}" min="1" max="100"></div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
@@ -2292,19 +2600,27 @@ async function renderAdminSettings() {
     `;
   } finally { hideLoading(); }
 }
-
+window.selectAdminTheme = (key) => {
+  document.querySelectorAll('.theme-option').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.theme-option').forEach(el => {
+    if (el.getAttribute('onclick').includes(`'${key}'`)) el.classList.add('active');
+  });
+  document.getElementById('setTheme').value = key;
+};
 async function savePlatformSettingsForm() {
   platformSettings.platformName = document.getElementById('setName').value.trim() || 'منصة تعليمية';
   platformSettings.platformTagline = document.getElementById('setTagline').value.trim();
   platformSettings.platformLogo = document.getElementById('setLogo').value.trim() || '🎓';
-  platformSettings.primaryColor = document.getElementById('setPrimary').value;
-  platformSettings.secondaryColor = document.getElementById('setSecondary').value;
+  platformSettings.theme = document.getElementById('setTheme').value || 'indigo';
+  const theme = THEMES[platformSettings.theme] || THEMES.indigo;
+  platformSettings.primaryColor = theme.primary;
+  platformSettings.secondaryColor = theme.secondary;
   platformSettings.registrationEnabled = document.getElementById('setRegistration').checked;
   platformSettings.maintenanceMode = document.getElementById('setMaintenance').checked;
   platformSettings.maintenanceMessage = document.getElementById('setMaintenanceMsg').value.trim();
   platformSettings.ratingsEnabled = document.getElementById('setRatings').checked;
   platformSettings.leaderboardEnabled = document.getElementById('setLeaderboard').checked;
-  platformSettings.maxUploadSizeMB = parseInt(document.getElementById('setUpload').value) || 20;
+  platformSettings.maxUploadSizeMB = parseInt(document.getElementById('setUpload').value) || 4;
   platformSettings.minQuizQuestions = parseInt(document.getElementById('setMinQ').value) || 1;
   platformSettings.maxQuizQuestions = parseInt(document.getElementById('setMaxQ').value) || 100;
   platformSettings.footerText = document.getElementById('setFooter').value.trim();
@@ -2315,6 +2631,7 @@ async function savePlatformSettingsForm() {
     await savePlatformSettings();
     await logActivity('تعديل إعدادات المنصة');
     applyPlatformSettings();
+    applyThemeColors(platformSettings.theme);
     launchConfetti(30);
     alert('✅ تم حفظ الإعدادات');
     renderAdminSettings();
@@ -2327,6 +2644,7 @@ async function renderAuditLog() {
   try {
     const logs = await DB.get('auditLog');
     logs.sort((a, b) => b.timestamp - a.timestamp);
+    const paged = paginate(logs, 'auditLog');
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
       <div class="card" style="background: linear-gradient(135deg, #475569, #334155); color:#fff;">
@@ -2337,18 +2655,20 @@ async function renderAuditLog() {
       </div>
       <button class="btn btn-outline" onclick="renderAdminDashboard()" style="margin-bottom:16px;">← العودة</button>
       <div class="card">
-        ${logs.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">📜</div><h3>لا يوجد نشاط</h3></div>` :
-          logs.slice(0, 200).map(log => `<div class="history-item">
+        ${logs.length === 0 ? `<div class="empty-state"><h3>لا يوجد نشاط</h3></div>` :
+          paged.items.map(log => `<div class="history-item">
             <div class="history-info">
               <h4>${escapeHtml(log.userName)} <span class="badge badge-${log.userRole === 'admin' ? 'warning' : log.userRole === 'teacher' ? 'info' : log.userRole === 'parent' ? 'primary' : 'success'}">${log.userRole}</span></h4>
               <p><strong>${escapeHtml(log.action)}</strong>${log.details ? ' • ' + escapeHtml(log.details) : ''}</p>
               <p style="font-size:11px;">${new Date(log.timestamp).toLocaleString('ar-EG')}</p>
             </div>
           </div>`).join('')}
+        ${logs.length > 0 ? renderPagination(logs.length, paged.page, 'auditLog', 'changeAuditPage') : ''}
       </div>
     `;
   } finally { hideLoading(); }
 }
+window.changeAuditPage = (p) => { paginationState.auditLog = p; renderAuditLog(); };
 
 function openAdminBroadcast() {
   openModal(`<div class="modal-header"><h3 class="modal-title">📢 إشعار شامل</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
@@ -2360,7 +2680,6 @@ function openAdminBroadcast() {
     <div class="form-group"><label class="form-label">الرسالة</label><textarea class="form-textarea auto-dir" id="adminBroadcastBody" dir="rtl" maxlength="300"></textarea></div>
     <button class="btn btn-primary btn-full" onclick="sendAdminBroadcast()">📤 إرسال</button>`);
 }
-
 async function sendAdminBroadcast() {
   const target = document.getElementById('adminBroadcastTarget').value;
   const title = document.getElementById('adminBroadcastTitle').value.trim();
@@ -2381,7 +2700,6 @@ async function sendAdminBroadcast() {
     closeModal();
   } finally { hideLoading(); }
 }
-
 async function openPendingTeachers() {
   const users = await DB.get('users');
   const pending = users.filter(u => u.role === 'teacher' && u.approved === false);
@@ -2395,7 +2713,6 @@ async function openPendingTeachers() {
       </div>
     </div>`).join('')}`);
 }
-
 async function approveTeacher(userId) {
   showLoading();
   try {
@@ -2415,7 +2732,6 @@ async function approveTeacher(userId) {
     }
   } finally { hideLoading(); }
 }
-
 async function deleteUser(userId) {
   if (!confirm('حذف المستخدم نهائياً؟')) return;
   showLoading();
@@ -2430,7 +2746,6 @@ async function deleteUser(userId) {
     renderAdminDashboard();
   } finally { hideLoading(); }
 }
-
 async function wipeQuizData() {
   if (!isAdmin(currentUser)) { alert('غير مصرح'); return; }
   if (!confirm('⚠️ سيتم حذف: الاختبارات، المحاولات، الإشعارات.\nمتابعة؟')) return;
@@ -2445,7 +2760,6 @@ async function wipeQuizData() {
     renderAdminDashboard();
   } finally { hideLoading(); }
 }
-
 function renderPendingTeacherDashboard() {
   const container = document.getElementById('dashboardContent');
   container.innerHTML = `<div class="card" style="text-align:center; padding:60px 20px;">
@@ -2454,6 +2768,7 @@ function renderPendingTeacherDashboard() {
     <p style="color:var(--text-light);">مرحباً ${escapeHtml(currentUser.name)}! سيتم مراجعة طلبك قريباً.</p>
   </div>`;
 }
+
 /* ============ TEACHER DASHBOARD ============ */
 async function renderTeacherDashboard() {
   showLoading();
@@ -2467,11 +2782,9 @@ async function renderTeacherDashboard() {
     const pendingGrading = attempts.filter(a => a.needsGrading && !a.graded);
     const myRatings = currentUser.ratings || [];
     const myAvgRating = myRatings.length ? (myRatings.reduce((a, r) => a + r.stars, 0) / myRatings.length).toFixed(1) : '0';
-
     const bySubject = {};
     quizzes.forEach(q => { const k = q.subject || 'other'; if (!bySubject[k]) bySubject[k] = []; bySubject[k].push(q); });
     const orderedSubjects = SUBJECTS.filter(s => bySubject[s.id] && bySubject[s.id].length > 0).map(s => ({ ...s, quizzes: bySubject[s.id] }));
-
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
       <div class="teacher-profile-header">
@@ -2481,8 +2794,8 @@ async function renderTeacherDashboard() {
           <p style="opacity:0.9;font-size:14px;">${getSubjectName(currentUser.subject)} • ⭐ ${myAvgRating} (${myRatings.length})</p>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn" style="background:rgba(255,255,255,0.2);color:#fff;" onclick="openTeacherProfileEdit()">✏️ الملف الشخصي</button>
-          <button class="btn" style="background:rgba(255,255,255,0.2);color:#fff;" onclick="openTeacherContent()">📚 محتوى المادة</button>
+          <button class="btn" style="background:rgba(255,255,255,0.2);color:#fff;" onclick="openTeacherProfileEdit()">✏️ الملف</button>
+          <button class="btn" style="background:rgba(255,255,255,0.2);color:#fff;" onclick="openTeacherContent()">📚 المحتوى</button>
         </div>
       </div>
       <div class="stats-grid">
@@ -2499,7 +2812,7 @@ async function renderTeacherDashboard() {
       </div>` : ''}
       <div class="chart-container"><canvas id="teacherChart"></canvas></div>
       <div class="section-header">
-        <div><h2 class="section-title">اختباراتي</h2><p class="section-subtitle">حسب المادة</p></div>
+        <div><h2 class="section-title">اختباراتي</h2></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn btn-outline btn-sm" onclick="renderTeacherDashboard()">🔄 تحديث</button>
           <button class="btn btn-outline btn-sm" onclick="openBroadcastModal()">📢 إشعار</button>
@@ -2525,7 +2838,6 @@ async function renderTeacherDashboard() {
       <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">آخر النتائج</h2></div></div>
       ${attempts.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا نتائج</h3></div></div>` : await renderAttemptsList([...attempts].sort((a,b) => b.createdAt - a.createdAt).slice(0, 20))}
     `;
-
     const ctx = document.getElementById('teacherChart')?.getContext('2d');
     if (ctx && quizzes.length > 0) {
       const names = quizzes.map(q => q.title.length > 15 ? q.title.slice(0, 15) + '...' : q.title);
@@ -2537,7 +2849,6 @@ async function renderTeacherDashboard() {
     }
   } finally { hideLoading(); }
 }
-
 function renderQuizCard(quiz) {
   const tc = {};
   quiz.questions.forEach(q => { const t = q.type || 'mcq'; tc[t] = (tc[t] || 0) + 1; });
@@ -2553,7 +2864,6 @@ function renderQuizCard(quiz) {
     </div>
   </div>`;
 }
-
 function renderStudentsList(students, allAttempts) {
   const bySchool = {};
   students.forEach(s => { const k = s.school || 'غير محدد'; if (!bySchool[k]) bySchool[k] = []; bySchool[k].push(s); });
@@ -2562,36 +2872,34 @@ function renderStudentsList(students, allAttempts) {
       <span class="badge badge-info">🏫 ${escapeHtml(school)}</span>
       <span class="badge badge-primary">${list.length} طالب</span>
     </div>
-    ${list.map(s => {
+    ${list.slice(0, 10).map(s => {
       const sAttempts = allAttempts.filter(a => a.studentId === s.id);
       const avg = sAttempts.length ? calculateAvg(sAttempts) : 0;
       const lvl = getLevel(s.xp || 0);
       return `<div class="student-row">
-        <div class="student-info"><h4>${escapeHtml(s.name)} ${s.provider === 'google' ? '🔵' : ''} <span class="badge badge-purple">${lvl.emoji}</span></h4><p>${escapeHtml(s.grade || '')} • ${sAttempts.length} محاولة • ${s.xp || 0} XP</p></div>
+        <div class="student-info"><h4>${escapeHtml(s.name)} <span class="badge badge-purple">${lvl.emoji}</span></h4><p>${escapeHtml(s.grade || '')} • ${sAttempts.length} محاولة • ${s.xp || 0} XP</p></div>
         <span class="badge badge-${avg>=80?'success':avg>=50?'warning':'danger'}">${avg}%</span>
       </div>`;
     }).join('')}
+    ${list.length > 10 ? `<p style="text-align:center;padding:8px;color:var(--text-light);font-size:12px;">و ${list.length - 10} آخرون...</p>` : ''}
   </div>`).join('')}</div>`;
 }
-
 function renderLeaderboard(users, attempts) {
   const students = users.filter(u => u.role === 'student');
   const stats = students.map(s => {
     const sa = attempts.filter(a => a.studentId === s.id);
     return { ...s, avg: sa.length ? calculateAvg(sa) : 0, attemptCount: sa.length, xp: s.xp || 0 };
-  }).filter(s => s.attemptCount > 0 || s.xp > 0).sort((a, b) => b.xp - a.xp || b.avg - a.avg).slice(0, 20);
+  }).filter(s => s.attemptCount > 0 || s.xp > 0).sort((a, b) => b.xp - a.xp || b.avg - a.avg).slice(0, 10);
   if (stats.length === 0) return `<div class="card"><div class="empty-state"><h3>لا يوجد بيانات</h3></div></div>`;
   return `<div class="card">${stats.map((s, i) => {
     const lvl = getLevel(s.xp);
     return `<div class="leaderboard-item ${i < 3 ? 'rank-' + (i+1) : ''}">
       <div class="leaderboard-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i+1}</div>
-      <div class="leaderboard-info"><h4>${escapeHtml(s.name)} ${s.provider === 'google' ? '🔵' : ''} ${lvl.emoji}</h4><p>${escapeHtml(s.grade || '')} • ${s.attemptCount} محاولة • ${lvl.name}</p></div>
+      <div class="leaderboard-info"><h4>${escapeHtml(s.name)} ${lvl.emoji}</h4><p>${escapeHtml(s.grade || '')} • ${s.attemptCount} محاولة</p></div>
       <div class="leaderboard-score">${s.xp} XP</div>
     </div>`;
   }).join('')}</div>`;
 }
-
-/* ============ TEACHER BROADCAST + ATTEMPTS ============ */
 function openBroadcastModal() {
   openModal(`<div class="modal-header"><h3 class="modal-title">📢 إشعار جماعي</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
     <div class="alert alert-info">أرسل رسالة لطلابك.</div>
@@ -2611,7 +2919,6 @@ function openBroadcastModal() {
     <div class="form-group"><label class="form-label">الرسالة</label><textarea class="form-textarea auto-dir" id="bBody" dir="rtl" maxlength="300"></textarea></div>
     <button class="btn btn-primary btn-full" onclick="sendBroadcast()">📤 إرسال</button>`);
 }
-
 async function sendBroadcast() {
   const target = document.querySelector('input[name="bTarget"]:checked').value;
   const grade = document.getElementById('bGradeValue').value;
@@ -2634,7 +2941,6 @@ async function sendBroadcast() {
     closeModal();
   } finally { hideLoading(); }
 }
-
 async function renderAttemptsList(attempts) {
   if (!attempts.length) return '<div class="card"><div class="empty-state"><h3>لا نتائج</h3></div></div>';
   const allQuizzes = await DB.get('quizzes'), allUsers = await DB.get('users');
@@ -2663,20 +2969,21 @@ async function renderStudentDashboard() {
     const solvedIds = new Set(myAttempts.map(a => a.quizId));
     const availableQuizzes = myQuizzes.filter(q => !solvedIds.has(q.id));
     const completedQuizzes = myQuizzes.filter(q => solvedIds.has(q.id));
-
     const bySubject = {};
     availableQuizzes.forEach(q => { const k = q.subject || 'other'; if (!bySubject[k]) bySubject[k] = []; bySubject[k].push(q); });
     const orderedSubjects = SUBJECTS.filter(s => bySubject[s.id] && bySubject[s.id].length > 0).map(s => ({ ...s, quizzes: bySubject[s.id] }));
-
     const lvl = getLevel(currentUser.xp || 0);
     const next = getNextLevel(currentUser.xp || 0);
     const xpInLevel = (currentUser.xp || 0) - lvl.minXP;
     const xpNeeded = lvl.maxXP === Infinity ? 1 : (lvl.maxXP - lvl.minXP);
     const xpPct = Math.min(100, (xpInLevel / xpNeeded) * 100);
     const myBadges = currentUser.badges || [];
-
+    const pendingChallenges = (await DB.get('challenges')).filter(c => c.toId === currentUser.id && c.status === 'pending').length;
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        <button class="btn btn-warning" onclick="openFriendsModal()">👥 الأصدقاء والتحديات ${pendingChallenges > 0 ? `<span class="badge badge-danger" style="margin-right:4px;">${pendingChallenges}</span>` : ''}</button>
+      </div>
       <div class="xp-bar-container">
         <div class="xp-bar-header">
           <div class="xp-level">
@@ -2688,7 +2995,7 @@ async function renderStudentDashboard() {
         <div class="xp-bar"><div class="xp-bar-fill" style="width:${xpPct}%;"></div></div>
         <div class="xp-bar-info"><span>${xpInLevel} / ${xpNeeded === 1 ? '∞' : xpNeeded}</span><span>${next ? `${next.minXP - (currentUser.xp || 0)} XP للمستوى التالي` : '👑'}</span></div>
       </div>
-      ${(currentUser.streak || 0) > 0 ? `<div class="streak-card"><span class="streak-fire">🔥</span><div class="streak-info"><h3>${currentUser.streak} ${currentUser.streak === 1 ? 'يوم' : 'أيام'} متتالية!</h3><p>استمر في الحل يومياً لتزيد السلسلة</p></div></div>` : ''}
+      ${(currentUser.streak || 0) > 0 ? `<div class="streak-card"><span class="streak-fire">🔥</span><div class="streak-info"><h3>${currentUser.streak} ${currentUser.streak === 1 ? 'يوم' : 'أيام'} متتالية!</h3><p>استمر في الحل يومياً</p></div></div>` : ''}
       <div class="stats-grid">
         <div class="stat-card"><div class="stat-icon primary">📝</div><div class="stat-info"><h4>${availableQuizzes.length}</h4><p>متاحة</p></div></div>
         <div class="stat-card"><div class="stat-icon success">✅</div><div class="stat-info"><h4>${completedQuizzes.length}</h4><p>حلّيتها</p></div></div>
@@ -2699,34 +3006,28 @@ async function renderStudentDashboard() {
         <div class="badges-grid">${myBadges.map(b => `<div class="badge-card earned"><div class="badge-emoji">${BADGES[b].emoji}</div><div class="badge-name">${BADGES[b].name}</div></div>`).join('')}</div>` : ''}
       ${completedQuizzes.length > 0 ? `<div class="card" style="border-right:4px solid var(--success); background: var(--success-light);">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-          <div><h3 style="font-size:18px; font-weight:900; color:var(--success);">✅ ${completedQuizzes.length} اختبار تمت الإجابة عليه</h3><p style="font-size:13px; color:var(--text-light);">اعرض نتائجك في صفحة مستقلة</p></div>
-          <button class="btn btn-success" onclick="renderAnsweredScreen('all')">👁️ ما تمت الإجابة عليه</button>
+          <div><h3 style="font-size:18px; font-weight:900; color:var(--success);">✅ ${completedQuizzes.length} اختبار تمت الإجابة عليه</h3></div>
+          <button class="btn btn-success" onclick="renderAnsweredScreen('all')">👁️ عرض</button>
         </div>
       </div>` : ''}
       <div class="chart-container"><canvas id="studentChart"></canvas></div>
-      <div class="section-header"><div><h2 class="section-title">الاختبارات المتاحة</h2><p class="section-subtitle">${escapeHtml(currentUser.grade || '')} • ${escapeHtml(currentUser.stage || '')}${currentUser.school ? ' • ' + escapeHtml(currentUser.school) : ''}</p></div></div>
-      ${availableQuizzes.length === 0 ? `<div class="card" style="text-align:center; padding:40px 20px; background: linear-gradient(135deg, var(--success-light), transparent);">
+      <div class="section-header"><div><h2 class="section-title">الاختبارات المتاحة</h2><p class="section-subtitle">${escapeHtml(currentUser.grade || '')}</p></div></div>
+      ${availableQuizzes.length === 0 ? `<div class="card" style="text-align:center; padding:40px 20px;">
         <div style="font-size:72px; margin-bottom:16px;">🎉</div>
         <h3 style="font-size:22px; font-weight:900; margin-bottom:8px;">أكملت جميع الاختبارات!</h3>
-        <p style="color:var(--text-light); margin-bottom:20px;">راجع نتائجك في صفحة "ما تمت الإجابة عليه"</p>
         <button class="btn btn-success btn-lg" onclick="renderAnsweredScreen('all')">👁️ عرض الإجابات</button>
-      </div>` : orderedSubjects.map(subj => {
-        const avail = subj.quizzes.filter(q => !solvedIds.has(q.id)).length;
-        return `<div class="subject-group">
+      </div>` : orderedSubjects.map(subj => `<div class="subject-group">
           <div class="subject-group-header">
             <span class="subject-group-emoji">${subj.emoji}</span>
             <span class="subject-group-title">${escapeHtml(subj.name)}</span>
             <span class="subject-group-count">${subj.quizzes.length}</span>
-            ${avail > 0 ? `<span class="badge badge-primary">${avail} متاح</span>` : ''}
           </div>
           <div class="cards-grid">${subj.quizzes.map(q => renderStudentQuizCard(q, myAttempts)).join('')}</div>
-        </div>`;
-      }).join('')}
-      <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">👨‍🏫 المدرسون</h2><p class="section-subtitle">تعرّف وقيّم</p></div></div>
+        </div>`).join('')}
+      <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">👨‍🏫 المدرسون</h2></div></div>
       ${await renderTeachersForStudents()}
       ${platformSettings.leaderboardEnabled ? `<div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">🏆 لوحة الشرف</h2></div></div>${renderLeaderboard(await DB.get('users'), allAttempts)}` : ''}
     `;
-
     const ctx = document.getElementById('studentChart')?.getContext('2d');
     if (ctx && myAttempts.length > 0) {
       const labels = myAttempts.slice(0, 10).reverse().map(a => { const q = allQuizzes.find(x => x.id === a.quizId); return q ? q.title.slice(0, 10) : 'اختبار'; });
@@ -2735,7 +3036,6 @@ async function renderStudentDashboard() {
     }
   } finally { hideLoading(); }
 }
-
 function renderStudentQuizCard(quiz, myAttempts) {
   if (myAttempts.some(a => a.quizId === quiz.id)) return '';
   return `<div class="subject-card" onclick="startQuiz('${quiz.id}')">
@@ -2745,7 +3045,6 @@ function renderStudentQuizCard(quiz, myAttempts) {
     <div class="subject-footer"><span class="badge badge-primary">ابدأ</span></div>
   </div>`;
 }
-
 async function renderAnsweredScreen(filterTab = 'all') {
   showLoading();
   try {
@@ -2755,7 +3054,6 @@ async function renderAnsweredScreen(filterTab = 'all') {
     let filtered = myAttempts;
     if (filterTab !== 'all') filtered = myAttempts.filter(a => { const q = allQuizzes.find(x => x.id === a.quizId); return q && q.subject === filterTab; });
     const subjectsInAttempts = [...new Set(myAttempts.map(a => { const q = allQuizzes.find(x => x.id === a.quizId); return q?.subject; }).filter(Boolean))];
-
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
       <div class="card" style="background: linear-gradient(135deg, var(--success), #059669); color:#fff;">
@@ -2766,7 +3064,6 @@ async function renderAnsweredScreen(filterTab = 'all') {
       </div>
       <div style="display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;">
         <button class="btn btn-outline" onclick="renderStudentDashboard()">🏠 الرئيسية</button>
-        <button class="btn btn-primary" onclick="renderAnsweredScreen('all')">📋 الكل (${myAttempts.length})</button>
       </div>
       <div class="answered-tabs">
         <button class="answered-tab ${filterTab === 'all' ? 'active' : ''}" onclick="renderAnsweredScreen('all')">📚 الكل <span class="count">${myAttempts.length}</span></button>
@@ -2775,7 +3072,7 @@ async function renderAnsweredScreen(filterTab = 'all') {
           return `<button class="answered-tab ${filterTab === subjId ? 'active' : ''}" onclick="renderAnsweredScreen('${subjId}')">${getSubjectEmoji(subjId)} ${getSubjectName(subjId)} <span class="count">${count}</span></button>`;
         }).join('')}
       </div>
-      ${filtered.length === 0 ? `<div class="card"><div class="empty-state"><div class="empty-state-icon">📝</div><h3>لا اختبارات محلولة</h3></div></div>` :
+      ${filtered.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا اختبارات محلولة</h3></div></div>` :
         filtered.map(a => {
           const quiz = allQuizzes.find(q => q.id === a.quizId);
           if (!quiz) return '';
@@ -2787,9 +3084,8 @@ async function renderAnsweredScreen(filterTab = 'all') {
               <div class="quiz-result-score">${pct}%</div>
             </div>
             <div class="quiz-result-footer">
-              <span class="badge badge-primary">${a.score}/${a.total} درجة</span>
+              <span class="badge badge-primary">${a.score}/${a.total}</span>
               ${pending ? `<span class="pending-badge"><span class="pending-dot"></span> بانتظار تصحيح</span>` : `<span class="badge badge-${pct >= 80 ? 'success' : pct >= 50 ? 'warning' : 'danger'}">${pct >= 80 ? 'ممتاز' : pct >= 50 ? 'جيد' : 'يحتاج مراجعة'}</span>`}
-              <span class="badge badge-info">${quiz.questions.length} سؤال</span>
             </div>
           </div>`;
         }).join('')}
@@ -2809,13 +3105,12 @@ async function renderParentDashboard() {
       const ca = allAttempts.filter(a => a.studentId === c.id);
       return sum + (ca.length ? calculateAvg(ca) : 0);
     }, 0) / children.length) : 0;
-
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
       <div class="card" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); color:#fff;">
         <div style="display:flex; align-items:center; gap:12px;">
           <span style="font-size:48px;">👨‍👩‍👦</span>
-          <div><h2 style="font-size:24px; font-weight:900;">لوحة ولي الأمر</h2><p style="opacity:0.9;">متابعة أبنائك</p></div>
+          <div><h2 style="font-size:24px; font-weight:900;">لوحة ولي الأمر</h2></div>
         </div>
       </div>
       <div class="stats-grid">
@@ -2825,23 +3120,22 @@ async function renderParentDashboard() {
       </div>
       <div class="add-child-box">
         <h4>➕ إضافة ابن/ابنة</h4>
-        <p>أدخل بريد الطالب أو رقم هاتف ولي الأمر</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
           <input type="text" class="form-input auto-dir" id="childSearchInput" placeholder="البريد أو رقم الهاتف" style="max-width:400px;" dir="rtl">
-          <button class="btn btn-primary" onclick="searchChild()">🔍 بحث وإضافة</button>
+          <button class="btn btn-primary" onclick="searchChild()">🔍 بحث</button>
         </div>
       </div>
-      <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">👨‍🎓 أبنائي</h2><p class="section-subtitle">${children.length} طالب</p></div></div>
-      ${children.length === 0 ? `<div class="card"><div class="empty-state"><div class="empty-state-icon">👨‍👩‍👦</div><h3>لا يوجد أبناء مرتبطون</h3></div></div>` :
+      <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">👨‍🎓 أبنائي</h2></div></div>
+      ${children.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا يوجد أبناء</h3></div></div>` :
         children.map(child => {
           const ca = allAttempts.filter(a => a.studentId === child.id);
           const cAvg = ca.length ? calculateAvg(ca) : 0;
           const lvl = getLevel(child.xp || 0);
           return `<div class="parent-child-card">
             <div class="parent-child-header">
-              <div class="parent-child-avatar">${child.photoURL ? `<img src="${child.photoURL}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : '👨‍🎓'}</div>
-              <div class="parent-child-info"><h4>${escapeHtml(child.name)} <span class="badge badge-purple">${lvl.emoji} ${lvl.name}</span></h4><p>${escapeHtml(child.grade || '')} • ${escapeHtml(child.school || '')} • ${child.xp || 0} XP</p></div>
-              <button class="btn btn-sm btn-danger" onclick="removeChild('${child.id}')">🗑 إلغاء</button>
+              <div class="parent-child-avatar">${child.photoURL ? `<img data-src="${child.photoURL}" class="lazy-img" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="">` : '👨‍🎓'}</div>
+              <div class="parent-child-info"><h4>${escapeHtml(child.name)} <span class="badge badge-purple">${lvl.emoji}</span></h4><p>${escapeHtml(child.grade || '')} • ${child.xp || 0} XP</p></div>
+              <button class="btn btn-sm btn-danger" onclick="removeChild('${child.id}')">🗑</button>
             </div>
             <div class="parent-child-stats">
               <div class="parent-child-stat"><h5>${ca.length}</h5><p>محلول</p></div>
@@ -2851,12 +3145,10 @@ async function renderParentDashboard() {
             <button class="btn btn-outline btn-full btn-sm" onclick="openChildDetails('${child.id}')">👁️ التفاصيل</button>
           </div>`;
         }).join('')}
-      <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">👨‍🏫 المدرسون</h2></div></div>
-      ${await renderTeachersForParent()}
     `;
+    setTimeout(observeLazyImages, 100);
   } finally { hideLoading(); }
 }
-
 async function searchChild() {
   const query = document.getElementById('childSearchInput').value.trim().toLowerCase();
   if (!query) { alert('أدخل البريد أو الهاتف'); return; }
@@ -2875,7 +3167,6 @@ async function searchChild() {
     renderParentDashboard();
   } finally { hideLoading(); }
 }
-
 async function removeChild(childId) {
   if (!confirm('إلغاء الربط؟')) return;
   showLoading();
@@ -2888,7 +3179,6 @@ async function removeChild(childId) {
     renderParentDashboard();
   } finally { hideLoading(); }
 }
-
 async function openChildDetails(childId) {
   showLoading();
   try {
@@ -2901,31 +3191,26 @@ async function openChildDetails(childId) {
     const avg = ca.length ? calculateAvg(ca) : 0;
     const lvl = getLevel(child.xp || 0);
     openModal(`<div class="modal-header"><h3 class="modal-title">👨‍🎓 ${escapeHtml(child.name)}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-      <div class="alert alert-info">
-        📚 ${escapeHtml(child.grade || '')} • ${escapeHtml(child.school || '')}<br>
-        ${lvl.emoji} ${lvl.name} • ${child.xp || 0} XP • 🔥 ${child.streak || 0}<br>
-        📊 المتوسط: <strong>${avg}%</strong> • ${ca.length} اختبار
-      </div>
-      <h4 style="font-size:16px;font-weight:800;margin:20px 0 12px;">📝 النتائج</h4>
-      ${ca.length === 0 ? `<div class="empty-state"><h3>لا نتائج</h3></div>` : ca.map(a => {
+      <div class="alert alert-info">📚 ${escapeHtml(child.grade || '')}<br>${lvl.emoji} ${lvl.name} • ${child.xp || 0} XP • 🔥 ${child.streak || 0}<br>📊 المتوسط: ${avg}% • ${ca.length} اختبار</div>
+      ${ca.slice(0, 10).map(a => {
         const quiz = allQuizzes.find(q => q.id === a.quizId);
         if (!quiz) return '';
         const pct = a.total > 0 ? Math.round((a.score / a.total) * 100) : 0;
         return `<div class="history-item">
-          <div class="history-info"><h4>${escapeHtml(quiz.title)}</h4><p>${getSubjectName(quiz.subject)} • ${new Date(a.createdAt).toLocaleDateString('ar-EG')}</p></div>
+          <div class="history-info"><h4>${escapeHtml(quiz.title)}</h4><p>${new Date(a.createdAt).toLocaleDateString('ar-EG')}</p></div>
           <div class="history-score">${a.score}/${a.total}</div>
           <span class="badge badge-${pct>=80?'success':pct>=50?'warning':'danger'}">${pct}%</span>
         </div>`;
       }).join('')}`);
   } finally { hideLoading(); }
 }
+
 /* ============ TEACHER PROFILE + CONTENT ============ */
 function openTeacherProfileEdit() {
   if (currentUser.role !== 'teacher') { alert('للمدرسين فقط'); return; }
   const u = currentUser;
   _tempAvatar = u.photoURL || null;
   openModal(`<div class="modal-header"><h3 class="modal-title">✏️ الملف الشخصي</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-    <div class="alert alert-info">ستظهر هذه البيانات للطلاب.</div>
     <div class="avatar-upload-box">
       <div class="avatar-preview" id="avatarPreview">${u.photoURL ? `<img src="${u.photoURL}" referrerpolicy="no-referrer">` : '👨‍🏫'}</div>
       <input type="file" accept="image/*" id="avatarFile" onchange="handleAvatarUpload(event)" style="display:none;">
@@ -2933,13 +3218,11 @@ function openTeacherProfileEdit() {
         <button class="btn btn-primary btn-sm" onclick="document.getElementById('avatarFile').click()">📷 صورة</button>
         ${u.photoURL ? `<button class="btn btn-danger btn-sm" onclick="removeAvatar()">🗑 إزالة</button>` : ''}
       </div>
-      <p style="font-size:11px;color:var(--text-light);">الحد: ${MAX_AVATAR_SIZE_MB}MB • يتم ضغطها تلقائياً</p>
+      <p style="font-size:11px;color:var(--warning);">⚠️ الحد: ${MAX_AVATAR_SIZE_MB}MB</p>
     </div>
-    <div class="form-group"><label class="form-label">نبذة عنك</label><textarea class="form-textarea auto-dir" id="tBio" maxlength="300" dir="rtl">${escapeHtml(u.bio || '')}</textarea></div>
+    <div class="form-group"><label class="form-label">نبذة</label><textarea class="form-textarea auto-dir" id="tBio" maxlength="300" dir="rtl">${escapeHtml(u.bio || '')}</textarea></div>
     <button class="btn btn-success btn-full" onclick="saveTeacherProfile()">💾 حفظ</button>`);
 }
-
-/* ✅ إصلاح: رفع الصورة الشخصية مع ضغط */
 async function handleAvatarUpload(e) {
   const originalFile = e.target.files[0]; if (!originalFile) return;
   if (!originalFile.type.startsWith('image/')) { alert('اختر صورة فقط'); e.target.value = ''; return; }
@@ -2948,34 +3231,24 @@ async function handleAvatarUpload(e) {
   showLoading();
   try {
     let file;
-    try { file = await compressImage(originalFile, 600, 0.85); }
+    try { file = await compressImage(originalFile, 600, 0.75); }
     catch (err) { file = originalFile; }
-
-    if (!firebaseStorageEnabled) {
-      if (file.size > 800 * 1024) { alert('Storage غير مفعّل، الحد بعد الضغط 800KB'); e.target.value = ''; hideLoading(); return; }
-      const r = new FileReader();
-      r.onload = (ev) => { _tempAvatar = ev.target.result; document.getElementById('avatarPreview').innerHTML = `<img src="${ev.target.result}">`; };
-      r.readAsDataURL(file);
-      hideLoading();
-      return;
-    }
-    const path = `avatars/${currentUser.id}_${Date.now()}.jpg`;
-    const storageRef = fbStorage.ref(fbStorage.storage, path);
-    await fbStorage.uploadBytes(storageRef, file);
-    const downloadURL = await fbStorage.getDownloadURL(storageRef);
-    _tempAvatar = downloadURL;
-    document.getElementById('avatarPreview').innerHTML = `<img src="${downloadURL}">`;
-    alert(`✅ تم الرفع (${(file.size/1024).toFixed(0)}KB). اضغط "حفظ" للتأكيد.`);
-  } catch (err) { alert('فشل الرفع: ' + err.message); }
+    if (file.size > 600 * 1024) { alert(`الصورة كبيرة بعد الضغط (${(file.size/1024).toFixed(0)}KB). الحد: 600KB`); e.target.value = ''; return; }
+    const r = new FileReader();
+    r.onload = (ev) => {
+      _tempAvatar = ev.target.result;
+      document.getElementById('avatarPreview').innerHTML = `<img src="${ev.target.result}">`;
+      alert(`✅ تم تجهيز الصورة`);
+    };
+    r.readAsDataURL(file);
+  } catch (err) { alert('فشل: ' + err.message); }
   finally { hideLoading(); }
 }
-
 function removeAvatar() {
   _tempAvatar = null;
   document.getElementById('avatarPreview').innerHTML = '👨‍🏫';
   const fi = document.getElementById('avatarFile'); if (fi) fi.value = '';
 }
-
 async function saveTeacherProfile() {
   const bio = document.getElementById('tBio').value.trim();
   showLoading();
@@ -2994,27 +3267,25 @@ async function saveTeacherProfile() {
     }
   } finally { hideLoading(); }
 }
-
 function openTeacherContent() {
   if (currentUser.role !== 'teacher') { alert('للمدرسين فقط'); return; }
   renderContentModal('videos');
 }
-
 function renderContentModal(activeTab = 'videos') {
   const u = currentUser;
   const videos = u.videoLinks || [];
   const materials = u.materialFiles || [];
-  const videosHtml = videos.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">🎥</div><h3>لا توجد فيديوهات</h3></div>` :
+  const videosHtml = videos.length === 0 ? `<div class="empty-state"><h3>لا فيديوهات</h3></div>` :
     videos.map((v, i) => `<div class="video-link-item">
-      <div class="info"><h4 dir="${detectDirection(v.title || v.url)}">${escapeHtml(v.title || 'فيديو ' + (i + 1))}</h4><p dir="ltr" style="text-align:left;">${escapeHtml(v.url)}</p></div>
-      <a href="${escapeHtml(v.url)}" target="_blank" rel="noopener" class="btn btn-sm" style="background:#fee2e2;color:#dc2626;">▶️ مشاهدة</a>
+      <div class="info"><h4>${escapeHtml(v.title || 'فيديو')}</h4><p dir="ltr" style="text-align:left;">${escapeHtml(v.url)}</p></div>
+      <a href="${escapeHtml(v.url)}" target="_blank" class="btn btn-sm" style="background:#fee2e2;color:#dc2626;">▶️</a>
       <button class="icon-btn icon-btn-danger" onclick="removeVideoLink(${i})">🗑</button>
     </div>`).join('');
-  const materialsHtml = materials.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">📄</div><h3>لا توجد ملازم</h3></div>` :
+  const materialsHtml = materials.length === 0 ? `<div class="empty-state"><h3>لا ملازم</h3></div>` :
     materials.map((m, i) => `<div class="material-file-item">
       <span style="font-size:28px;">📄</span>
-      <div class="info"><h4 dir="${detectDirection(m.name)}">${escapeHtml(m.name)}</h4><p>${(m.size / 1024).toFixed(1)} KB • ${new Date(m.uploadedAt).toLocaleDateString('ar-EG')}</p></div>
-      <button class="btn btn-sm" style="background:#dbeafe;color:#2563eb;" onclick="downloadMaterial(${i})">⬇️ تحميل</button>
+      <div class="info"><h4>${escapeHtml(m.name)}</h4><p>${(m.size / 1024).toFixed(1)} KB</p></div>
+      <button class="btn btn-sm" style="background:#dbeafe;color:#2563eb;" onclick="downloadMaterial(${i})">⬇️</button>
       <button class="icon-btn icon-btn-danger" onclick="removeMaterial(${i})">🗑</button>
     </div>`).join('');
   openModal(`<div class="modal-header"><h3 class="modal-title">📚 محتوى المادة</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
@@ -3024,24 +3295,19 @@ function renderContentModal(activeTab = 'videos') {
     </div>
     ${activeTab === 'videos' ? `
       <div class="form-group">
-        <label class="form-label">➕ إضافة فيديو</label>
         <input type="text" class="form-input auto-dir" id="newVideoTitle" placeholder="عنوان الفيديو" style="margin-bottom:8px;" dir="rtl">
         <input type="url" class="form-input" id="newVideoUrl" placeholder="https://youtube.com/..." dir="ltr">
         <button class="btn btn-primary btn-full" onclick="addVideoLink()" style="margin-top:8px;">➕ إضافة</button>
       </div>
-      <h4 style="font-size:15px;font-weight:800;margin:16px 0 10px;">📋 الفيديوهات (${videos.length})</h4>
       ${videosHtml}
     ` : `
       <div class="form-group">
-        <label class="form-label">➕ رفع ملزمة</label>
         <input type="file" class="form-input" id="newMaterialFile" accept=".pdf,.doc,.docx,image/*,.ppt,.pptx" onchange="handleMaterialUpload(event)">
-        <p style="font-size:11px;color:var(--text-light);margin-top:6px;">الحد: ${MAX_MATERIAL_SIZE_MB}MB</p>
+        <p style="font-size:11px;color:var(--warning);margin-top:6px;">⚠️ الحد: ${MAX_MATERIAL_SIZE_MB}MB</p>
       </div>
-      <h4 style="font-size:15px;font-weight:800;margin:16px 0 10px;">📋 الملازم (${materials.length})</h4>
       ${materialsHtml}
     `}`);
 }
-
 async function addVideoLink() {
   const title = document.getElementById('newVideoTitle').value.trim();
   const url = document.getElementById('newVideoUrl').value.trim();
@@ -3063,9 +3329,8 @@ async function addVideoLink() {
     }
   } finally { hideLoading(); }
 }
-
 async function removeVideoLink(index) {
-  if (!confirm('حذف هذا الفيديو؟')) return;
+  if (!confirm('حذف؟')) return;
   showLoading();
   try {
     const users = await DB.get('users');
@@ -3078,40 +3343,20 @@ async function removeVideoLink(index) {
     }
   } finally { hideLoading(); }
 }
-
-/* ✅ إصلاح: رفع الملازم مع التحقق من الحجم */
 async function handleMaterialUpload(e) {
   const f = e.target.files[0]; if (!f) return;
   const sizeCheck = validateFileSize(f, MAX_MATERIAL_SIZE_MB, 'الملف');
   if (!sizeCheck.ok) { alert(sizeCheck.msg); e.target.value = ''; return; }
-
-  if (firebaseStorageEnabled) {
-    showLoading();
-    try {
-      const path = `materials/${currentUser.id}/${Date.now()}_${f.name}`;
-      const storageRef = fbStorage.ref(fbStorage.storage, path);
-      await fbStorage.uploadBytes(storageRef, f);
-      const downloadURL = await fbStorage.getDownloadURL(storageRef);
-      const users = await DB.get('users');
-      const idx = users.findIndex(u => u.id === currentUser.id);
-      if (idx >= 0) {
-        if (!users[idx].materialFiles) users[idx].materialFiles = [];
-        users[idx].materialFiles.push({ name: f.name, size: f.size, type: f.type, url: downloadURL, storagePath: path, uploadedAt: Date.now() });
-        await DB.set('users', users);
-        currentUser = users[idx];
-        await logActivity('رفع ملزمة', f.name);
-        launchConfetti(10);
-        alert(`✅ تم رفع "${f.name}"`);
-        renderContentModal('materials');
-      }
-    } catch (err) { alert('فشل الرفع: ' + err.message); }
-    finally { hideLoading(); }
-    return;
-  }
-  if (f.size > 500 * 1024) { alert('Storage غير مفعّل، الحد 500KB'); e.target.value = ''; return; }
+  if (f.size > 4 * 1024 * 1024) { alert(`⚠️ الملف كبير. الحد ~4MB`); e.target.value = ''; return; }
   showLoading();
   try {
-    const base64 = await new Promise((res, rej) => { const r = new FileReader(); r.onload = (ev) => res(ev.target.result); r.onerror = rej; r.readAsDataURL(f); });
+    const base64 = await new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = (ev) => res(ev.target.result);
+      r.onerror = rej;
+      r.readAsDataURL(f);
+    });
+    if (base64.length > 10 * 1024 * 1024) { alert('الملف كبير'); return; }
     const users = await DB.get('users');
     const idx = users.findIndex(u => u.id === currentUser.id);
     if (idx >= 0) {
@@ -3119,20 +3364,21 @@ async function handleMaterialUpload(e) {
       users[idx].materialFiles.push({ name: f.name, size: f.size, type: f.type, data: base64, uploadedAt: Date.now() });
       await DB.set('users', users);
       currentUser = users[idx];
+      await logActivity('رفع ملزمة', f.name);
+      launchConfetti(10);
+      alert(`✅ تم رفع "${f.name}"`);
       renderContentModal('materials');
     }
-  } finally { hideLoading(); }
+  } catch (err) { alert('فشل: ' + err.message); }
+  finally { hideLoading(); }
 }
-
 async function removeMaterial(index) {
-  if (!confirm('حذف هذه الملزمة؟')) return;
+  if (!confirm('حذف؟')) return;
   showLoading();
   try {
     const users = await DB.get('users');
     const idx = users.findIndex(u => u.id === currentUser.id);
     if (idx >= 0 && users[idx].materialFiles) {
-      const m = users[idx].materialFiles[index];
-      if (m.storagePath && firebaseStorageEnabled) { try { await fbStorage.deleteObject(fbStorage.ref(fbStorage.storage, m.storagePath)); } catch (e) {} }
       users[idx].materialFiles.splice(index, 1);
       await DB.set('users', users);
       currentUser = users[idx];
@@ -3140,7 +3386,6 @@ async function removeMaterial(index) {
     }
   } finally { hideLoading(); }
 }
-
 function downloadMaterial(index) {
   const m = (currentUser.materialFiles || [])[index];
   if (!m) return;
@@ -3151,7 +3396,6 @@ function downloadMaterial(index) {
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
   }
 }
-
 async function downloadTeacherMaterial(teacherId, index) {
   const users = await DB.get('users');
   const t = users.find(u => u.id === teacherId);
@@ -3164,8 +3408,6 @@ async function downloadTeacherMaterial(teacherId, index) {
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
   }
 }
-
-/* ============ TEACHER CARD + RATING ============ */
 function renderTeacherCard(teacher, showRateButton = true) {
   const ratings = teacher.ratings || [];
   const avg = ratings.length ? (ratings.reduce((a, r) => a + r.stars, 0) / ratings.length).toFixed(1) : '0';
@@ -3176,32 +3418,26 @@ function renderTeacherCard(teacher, showRateButton = true) {
   const canRate = showRateButton && currentUser && currentUser.role === 'student' && platformSettings.ratingsEnabled;
   return `<div class="teacher-card">
     <div class="teacher-card-header">
-      <div class="teacher-card-avatar">${teacher.photoURL ? `<img src="${teacher.photoURL}" referrerpolicy="no-referrer">` : '👨‍🏫'}</div>
+      <div class="teacher-card-avatar">${teacher.photoURL ? `<img data-src="${teacher.photoURL}" class="lazy-img" referrerpolicy="no-referrer" alt="">` : '👨‍🏫'}</div>
       <div class="teacher-card-info">
         <h4>${escapeHtml(teacher.name)}</h4>
-        <p>${getSubjectName(teacher.subject)} • ${teacher.approved ? '✅ معتمد' : '⏳ معلق'}</p>
-        <div class="stars-display">
-          ${[1,2,3,4,5].map(i => `<span class="${i <= fullStars ? '' : 'star-empty'}">★</span>`).join('')}
-          <span style="font-size:13px;color:var(--text-light);font-weight:700;margin-right:6px;">(${avg}) • ${ratings.length} تقييم</span>
-        </div>
+        <p>${getSubjectName(teacher.subject)}</p>
+        <div class="stars-display">${[1,2,3,4,5].map(i => `<span class="${i <= fullStars ? '' : 'star-empty'}">★</span>`).join('')}<span style="font-size:13px;color:var(--text-light);margin-right:6px;">(${avg}) • ${ratings.length}</span></div>
       </div>
     </div>
     ${teacher.bio ? `<div class="teacher-card-bio" dir="${detectDirection(teacher.bio)}" style="text-align:${detectDirection(teacher.bio) === 'ltr' ? 'left' : 'right'};">${escapeHtml(teacher.bio)}</div>` : ''}
     ${videos.length > 0 || materials.length > 0 ? `<div class="teacher-card-links">
-      ${videos.map(v => `<a href="${escapeHtml(v.url)}" target="_blank" rel="noopener" class="teacher-link video">🎥 ${escapeHtml(v.title || 'فيديو')}</a>`).join('')}
+      ${videos.map(v => `<a href="${escapeHtml(v.url)}" target="_blank" class="teacher-link video">🎥 ${escapeHtml(v.title || 'فيديو')}</a>`).join('')}
       ${materials.map((m, i) => `<button class="teacher-link material" onclick="downloadTeacherMaterial('${teacher.id}', ${i})">📄 ${escapeHtml(m.name)}</button>`).join('')}
     </div>` : ''}
     ${canRate ? `<div class="teacher-rating-row">
-      <span style="font-size:13px;color:var(--text-light);">قيّم:${myRating ? ` (تقييمك: ${myRating.stars}★)` : ''}</span>
-      <div class="stars-input">
-        ${[1,2,3,4,5].map(i => `<span class="star ${myRating && i <= myRating.stars ? 'active' : ''}" onclick="rateTeacher('${teacher.id}', ${i})">★</span>`).join('')}
-      </div>
+      <span style="font-size:13px;color:var(--text-light);">قيّم:</span>
+      <div class="stars-input">${[1,2,3,4,5].map(i => `<span class="star ${myRating && i <= myRating.stars ? 'active' : ''}" onclick="rateTeacher('${teacher.id}', ${i})">★</span>`).join('')}</div>
     </div>` : ''}
   </div>`;
 }
-
 async function rateTeacher(teacherId, stars) {
-  if (!platformSettings.ratingsEnabled) { alert('التقييمات معطّلة'); return; }
+  if (!platformSettings.ratingsEnabled) { alert('معطّلة'); return; }
   if (!currentUser || currentUser.role !== 'student') { alert('للطلاب فقط'); return; }
   showLoading();
   try {
@@ -3213,51 +3449,50 @@ async function rateTeacher(teacherId, stars) {
     users[idx].ratings.push({ studentId: currentUser.id, stars, at: Date.now() });
     await DB.set('users', users);
     launchConfetti(10);
-    alert(`✅ تم التقييم بـ ${stars} نجوم`);
+    alert(`✅ تم التقييم ${stars} نجوم`);
     if (currentUser.role === 'student') renderStudentDashboard();
   } finally { hideLoading(); }
 }
-
 async function renderTeachersForStudents() {
   const users = await DB.get('users');
   const teachers = users.filter(u => u.role === 'teacher' && u.approved !== false);
-  if (teachers.length === 0) return `<div class="card"><div class="empty-state"><h3>لا يوجد مدرسون</h3></div></div>`;
-  return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px;">${teachers.map(t => renderTeacherCard(t, true)).join('')}</div>`;
+  if (teachers.length === 0) return `<div class="card"><div class="empty-state"><h3>لا مدرسون</h3></div></div>`;
+  const html = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px;">${teachers.map(t => renderTeacherCard(t, true)).join('')}</div>`;
+  setTimeout(observeLazyImages, 100);
+  return html;
 }
-
 async function renderTeachersForParent() {
   const users = await DB.get('users');
   const teachers = users.filter(u => u.role === 'teacher' && u.approved !== false);
-  if (teachers.length === 0) return `<div class="card"><div class="empty-state"><h3>لا يوجد مدرسون</h3></div></div>`;
+  if (teachers.length === 0) return `<div class="card"><div class="empty-state"><h3>لا مدرسون</h3></div></div>`;
   return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px;">${teachers.map(t => renderTeacherCard(t, false)).join('')}</div>`;
 }
+
 /* ============ QUIZ CREATION ============ */
 function openNewQuizModal() {
   editingQuizId = null;
   newQuizData = { title: '', grade: '', subject: currentUser.subject, timePerQuestion: 30, questions: [] };
   openModal(`<div class="modal-header"><h3 class="modal-title">اختبار جديد</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-    <div class="form-group"><label class="form-label">عنوان الاختبار</label><input type="text" class="form-input auto-dir" id="quizTitle" dir="rtl"></div>
+    <div class="form-group"><label class="form-label">عنوان</label><input type="text" class="form-input auto-dir" id="quizTitle" dir="rtl"></div>
     <div class="form-group"><label class="form-label">السنة</label><select class="form-select" id="quizGrade"><option value="">اختر</option>${Object.entries(STAGES).map(([s, gs]) => gs.map(g => `<option value="${g}">${g}</option>`).join('')).join('')}</select></div>
     <div class="form-group"><label class="form-label">⏱️ وقت كل سؤال (ث)</label><input type="number" class="form-input" id="quizTime" value="30" min="5" max="600"></div>
     <button class="btn btn-primary btn-full" onclick="continueToQuestions()">التالي</button>`);
 }
-
 function continueToQuestions() {
   const title = document.getElementById('quizTitle').value.trim();
   const grade = document.getElementById('quizGrade').value;
   const time = parseInt(document.getElementById('quizTime').value) || 30;
-  if (!title || !grade) { alert('أكمل البيانات'); return; }
+  if (!title || !grade) { alert('أكمل'); return; }
   newQuizData.title = title; newQuizData.grade = grade; newQuizData.timePerQuestion = time;
   showQuestionsEditor();
 }
-
 function showQuestionsEditor() {
   const qHtml = newQuizData.questions.map((q, i) => {
     const ti = QUESTION_TYPES[q.type] || QUESTION_TYPES.mcq;
     let body = '';
     if (q.type === 'mcq') body = `<div class="question-item-options">${q.options.map((o, oi) => `<div class="question-option-line ${oi === q.answer ? 'correct' : ''}" dir="${detectDirection(o)}" style="text-align:${detectDirection(o) === 'ltr' ? 'left' : 'right'};">${oi === q.answer ? '✓' : ''} ${escapeHtml(o)}</div>`).join('')}</div>`;
     else if (q.type === 'tf') body = `<div class="question-item-options"><div class="question-option-line ${q.answer === true ? 'correct' : ''}">${q.answer === true ? '✓' : ''} صح</div><div class="question-option-line ${q.answer === false ? 'correct' : ''}">${q.answer === false ? '✓' : ''} خطأ</div></div>`;
-    else if (q.type === 'fill') body = `<div class="question-option-line correct" dir="${detectDirection(q.answer)}" style="text-align:${detectDirection(q.answer) === 'ltr' ? 'left' : 'right'};">✓ ${escapeHtml(q.answer)}</div>`;
+    else if (q.type === 'fill') body = `<div class="question-option-line correct">✓ ${escapeHtml(q.answer)}</div>`;
     else body = `<div class="question-option-line">📄 مقالي</div>`;
     return `<div class="question-item">
       <div class="question-item-header">
@@ -3275,13 +3510,10 @@ function showQuestionsEditor() {
     <button class="btn btn-outline btn-full" onclick="openAddQuestionForm()" style="margin-top:12px;">➕ إضافة سؤال</button>
     <div style="display:flex;gap:8px;margin-top:16px;">
       <button class="btn btn-ghost" onclick="${editingQuizId ? 'closeModal()' : 'openNewQuizModal()'}" style="flex:1;">رجوع</button>
-      <button class="btn btn-success" onclick="saveQuiz()" style="flex:2;" ${newQuizData.questions.length === 0 ? 'disabled' : ''}>💾 ${editingQuizId ? 'تحديث' : 'حفظ'}</button>
+      <button class="btn btn-success" onclick="saveQuiz()" style="flex:2;" ${newQuizData.questions.length === 0 ? 'disabled' : ''}>💾 حفظ</button>
     </div>`);
 }
-
 function openAddQuestionForm() { selectedQuestionType = 'mcq'; tfAnswer = true; uploadedImageData = null; renderAddQuestionForm(); }
-
-/* ✅ إصلاح: style مكرر + رفع صورة السؤال مع ضغط */
 function renderAddQuestionForm() {
   let fieldsHtml = '';
   if (selectedQuestionType === 'mcq') fieldsHtml = `<div class="form-group"><label class="form-label">الخيارات</label>${[0, 1, 2, 3].map(i => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><input type="radio" name="correctOption" value="${i}" ${i === 0 ? 'checked' : ''} style="width:20px;height:20px;"><input type="text" class="form-input auto-dir" id="opt${i}" placeholder="الخيار ${i + 1}" dir="rtl"></div>`).join('')}</div>`;
@@ -3291,35 +3523,32 @@ function renderAddQuestionForm() {
   openModal(`<div class="modal-header"><h3 class="modal-title">سؤال جديد</h3><button class="modal-close" onclick="showQuestionsEditor()">✕</button></div>
     <div class="form-group"><label class="form-label">النوع</label><div class="qtype-picker">${Object.entries(QUESTION_TYPES).map(([k, v]) => `<button type="button" class="qtype-option ${k === selectedQuestionType ? 'active' : ''}" onclick="changeQType('${k}')"><span class="emoji">${v.emoji}</span><span class="label">${v.name}</span></button>`).join('')}</div></div>
     <div class="form-group"><label class="form-label">نص السؤال</label><textarea class="form-textarea auto-dir" id="qText" dir="rtl"></textarea></div>
-    <div class="form-group"><label class="form-label">🖼️ صورة</label><input type="file" class="form-input" accept="image/*" id="qImageFile" onchange="handleImageUpload(event)"><div id="imagePreview" style="margin-top:10px;">${uploadedImageData ? `<img src="${uploadedImageData}" style="max-width:100%;max-height:160px;border-radius:10px;"><button class="btn btn-sm btn-danger" onclick="clearImage()" style="margin-top:6px;">🗑</button>` : ''}</div></div>
+    <div class="form-group"><label class="form-label">🖼️ صورة</label><input type="file" class="form-input" accept="image/*" id="qImageFile" onchange="handleImageUpload(event)"><div id="imagePreview" style="margin-top:10px;">${uploadedImageData ? `<img src="${uploadedImageData}" style="max-width:100%;max-height:160px;border-radius:10px;"><button class="btn btn-sm btn-danger" onclick="clearImage()" style="margin-top:6px;">🗑</button>` : ''}</div>
+    <p style="font-size:11px;color:var(--warning);margin-top:4px;">⚠️ الحد: ${MAX_QUESTION_IMAGE_KB}KB</p></div>
     ${fieldsHtml}
     <button class="btn btn-primary btn-full" onclick="addQuestion()">إضافة</button>`);
 }
-
 function changeQType(t) { selectedQuestionType = t; const txt = document.getElementById('qText')?.value || ''; renderAddQuestionForm(); const ta = document.getElementById('qText'); if (ta) ta.value = txt; }
 function pickTFAnswer(v, btn) { tfAnswer = v; document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); }
-
-/* ✅ إصلاح: ضغط صورة السؤال + حد 5MB */
 async function handleImageUpload(e) {
   const originalFile = e.target.files[0]; if (!originalFile) return;
-  if (!originalFile.type.startsWith('image/')) { alert('اختر صورة فقط'); e.target.value = ''; return; }
-  const sizeCheck = validateFileSize(originalFile, MAX_IMAGE_SIZE_MB, 'الصورة');
-  if (!sizeCheck.ok) { alert(sizeCheck.msg); e.target.value = ''; return; }
+  if (!originalFile.type.startsWith('image/')) { alert('صورة فقط'); e.target.value = ''; return; }
+  showLoading();
   try {
     let file;
-    try { file = await compressImage(originalFile, 1200, 0.8); }
+    try { file = await compressImage(originalFile, 800, 0.7); }
     catch (err) { file = originalFile; }
-    if (file.size > 900 * 1024) { alert('الصورة كبيرة بعد الضغط (الحد 900KB)'); e.target.value = ''; return; }
+    if (file.size > MAX_QUESTION_IMAGE_KB * 1024) { alert(`الصورة كبيرة (${(file.size/1024).toFixed(0)}KB). الحد: ${MAX_QUESTION_IMAGE_KB}KB`); e.target.value = ''; return; }
     const r = new FileReader();
     r.onload = (ev) => {
       uploadedImageData = ev.target.result;
       document.getElementById('imagePreview').innerHTML = `<img src="${uploadedImageData}" style="max-width:100%;max-height:160px;border-radius:10px;"><button class="btn btn-sm btn-danger" onclick="clearImage()" style="margin-top:6px;">🗑</button>`;
     };
     r.readAsDataURL(file);
-  } catch (err) { alert('فشل معالجة الصورة'); e.target.value = ''; }
+  } catch (err) { alert('فشل: ' + err.message); }
+  finally { hideLoading(); }
 }
 function clearImage() { uploadedImageData = null; document.getElementById('imagePreview').innerHTML = ''; const fi = document.getElementById('qImageFile'); if (fi) fi.value = ''; }
-
 function addQuestion() {
   const text = document.getElementById('qText').value.trim();
   if (!text) { alert('أدخل السؤال'); return; }
@@ -3340,11 +3569,10 @@ function addQuestion() {
   showQuestionsEditor();
 }
 function removeQuestion(i) { newQuizData.questions.splice(i, 1); showQuestionsEditor(); }
-
 async function saveQuiz() {
   if (!newQuizData.questions.length) return;
-  if (newQuizData.questions.length < platformSettings.minQuizQuestions) { alert(`أدنى عدد أسئلة: ${platformSettings.minQuizQuestions}`); return; }
-  if (newQuizData.questions.length > platformSettings.maxQuizQuestions) { alert(`أقصى عدد أسئلة: ${platformSettings.maxQuizQuestions}`); return; }
+  if (newQuizData.questions.length < platformSettings.minQuizQuestions) { alert(`أدنى: ${platformSettings.minQuizQuestions}`); return; }
+  if (newQuizData.questions.length > platformSettings.maxQuizQuestions) { alert(`أقصى: ${platformSettings.maxQuizQuestions}`); return; }
   showLoading();
   try {
     const quizzes = await DB.get('quizzes');
@@ -3367,7 +3595,6 @@ async function saveQuiz() {
     renderTeacherDashboard();
   } finally { hideLoading(); }
 }
-
 async function openQuizManage(quizId) {
   showLoading();
   try {
@@ -3382,7 +3609,7 @@ async function openQuizManage(quizId) {
         <span class="badge badge-info">${escapeHtml(quiz.grade)}</span>
         <span class="badge badge-success">${quiz.questions.length} سؤال</span>
       </div>
-      ${attempts.length > 0 ? `<h4 style="margin:20px 0 12px;">النتائج (${attempts.length})</h4>${attempts.map(a => {
+      ${attempts.length > 0 ? `<h4 style="margin:20px 0 12px;">النتائج (${attempts.length})</h4>${attempts.slice(0, 20).map(a => {
         const st = users.find(u => u.id === a.studentId);
         const pct = a.total > 0 ? Math.round((a.score / a.total) * 100) : 0;
         return `<div class="history-item"><div class="history-info"><h4>${escapeHtml(st?.name || '')}</h4></div><div class="history-score">${a.score}/${a.total}</div><span class="badge badge-${pct>=80?'success':pct>=50?'warning':'danger'}">${pct}%</span></div>`;
@@ -3394,7 +3621,6 @@ async function openQuizManage(quizId) {
       </div>`);
   } finally { hideLoading(); }
 }
-
 async function editQuiz(quizId) {
   showLoading();
   try {
@@ -3406,7 +3632,6 @@ async function editQuiz(quizId) {
     showQuestionsEditor();
   } finally { hideLoading(); }
 }
-
 async function deleteQuiz(quizId) {
   if (!confirm('حذف الاختبار؟')) return;
   showLoading();
@@ -3420,8 +3645,6 @@ async function deleteQuiz(quizId) {
     renderTeacherDashboard();
   } finally { hideLoading(); }
 }
-
-/* ============ GRADING ============ */
 async function openGradingCenter() {
   showLoading();
   try {
@@ -3430,7 +3653,7 @@ async function openGradingCenter() {
     const allAttempts = await DB.get('attempts');
     const pending = allAttempts.filter(a => a.needsGrading && !a.graded && quizzes.some(q => q.id === a.quizId));
     const allUsers = await DB.get('users');
-    if (pending.length === 0) { openModal(`<div class="modal-header"><h3 class="modal-title">✏️ التصحيح</h3><button class="modal-close" onclick="closeModal()">✕</button></div><div class="empty-state"><div class="empty-state-icon">🎉</div><h3>لا محاولات للتصحيح</h3></div>`); return; }
+    if (pending.length === 0) { openModal(`<div class="modal-header"><h3 class="modal-title">✏️ التصحيح</h3><button class="modal-close" onclick="closeModal()">✕</button></div><div class="empty-state"><h3>لا محاولات للتصحيح</h3></div>`); return; }
     openModal(`<div class="modal-header"><h3 class="modal-title">✏️ التصحيح (${pending.length})</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
       ${pending.map(a => {
         const quiz = quizzes.find(q => q.id === a.quizId);
@@ -3443,7 +3666,6 @@ async function openGradingCenter() {
       }).join('')}`);
   } finally { hideLoading(); }
 }
-
 async function openGradingAttempt(attemptId) {
   showLoading();
   try {
@@ -3474,7 +3696,6 @@ async function openGradingAttempt(attemptId) {
       <button class="btn btn-success btn-full" onclick="finalizeGrading('${attempt.id}')">💾 حفظ</button>`);
   } finally { hideLoading(); }
 }
-
 async function setEssayGrade(attemptId, questionIndex, grade, btn) {
   const allAttempts = await DB.get('attempts');
   const attempt = allAttempts.find(a => a.id === attemptId);
@@ -3485,7 +3706,6 @@ async function setEssayGrade(attemptId, questionIndex, grade, btn) {
   btn.parentElement.querySelectorAll('.grade-chip').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 }
-
 async function finalizeGrading(attemptId) {
   showLoading();
   try {
@@ -3504,7 +3724,7 @@ async function finalizeGrading(attemptId) {
     attempt.gradedAt = Date.now();
     await DB.set('attempts', allAttempts);
     const xpGain = Math.round(bonus * 10);
-    if (xpGain > 0) await awardXP(attempt.studentId, xpGain, 'مكافأة تصحيح مقالي');
+    if (xpGain > 0) await awardXP(attempt.studentId, xpGain, 'مكافأة تصحيح');
     const notifs = await DB.get('notifications');
     notifs.push({ id: uid(), userId: attempt.studentId, title: '✅ تم التصحيح', body: `"${quiz.title}": ${attempt.score}/${attempt.total}`, createdAt: Date.now(), read: false });
     await DB.set('notifications', notifs);
@@ -3513,8 +3733,6 @@ async function finalizeGrading(attemptId) {
     renderTeacherDashboard();
   } finally { hideLoading(); }
 }
-
-/* ============ EXPORT ============ */
 async function exportResults() {
   const quizzes = (await DB.get('quizzes')).filter(q => q.teacherId === currentUser.id);
   const allAttempts = await DB.get('attempts');
@@ -3525,12 +3743,10 @@ async function exportResults() {
     const quiz = quizzes.find(q => q.id === a.quizId);
     const student = users.find(u => u.id === a.studentId);
     return {
-      'الطالب': student?.name || '', 'المدرسة': student?.school || '',
-      'ولي الأمر': student?.parentName || '', 'هاتف': student?.parentPhone || '',
+      'الطالب': student?.name || '', 'المدرسة': student?.school || '', 'السنة': student?.grade || '',
       'الاختبار': quiz?.title || '', 'المادة': getSubjectName(quiz?.subject),
       'الدرجة': a.score, 'الإجمالي': a.total, 'النسبة %': a.total > 0 ? Math.round((a.score / a.total) * 100) : 0,
-      'XP': student?.xp || 0,
-      'التاريخ': new Date(a.createdAt).toLocaleDateString('ar-EG')
+      'XP': student?.xp || 0, 'التاريخ': new Date(a.createdAt).toLocaleDateString('ar-EG')
     };
   });
   const ws = XLSX.utils.json_to_sheet(rows);
@@ -3538,15 +3754,12 @@ async function exportResults() {
   XLSX.utils.book_append_sheet(wb, ws, 'النتائج');
   XLSX.writeFile(wb, 'نتائج_الطلاب.xlsx');
 }
-
 async function exportStudents() {
   const users = (await DB.get('users')).filter(u => u.role === 'student');
   if (!users.length) { alert('لا طلاب'); return; }
   const rows = users.map(u => ({
     'الاسم': u.name, 'البريد': u.email, 'المدرسة': u.school || '', 'السنة': u.grade,
-    'ولي الأمر': u.parentName || '', 'هاتف': u.parentPhone || '',
     'XP': u.xp || 0, 'الشارات': (u.badges || []).length, 'السلسلة': u.streak || 0,
-    'طريقة التسجيل': u.provider === 'google' ? 'Google' : 'بريد',
     'تاريخ التسجيل': new Date(u.createdAt).toLocaleDateString('ar-EG')
   }));
   const ws = XLSX.utils.json_to_sheet(rows);
@@ -3554,6 +3767,7 @@ async function exportStudents() {
   XLSX.utils.book_append_sheet(wb, ws, 'الطلاب');
   XLSX.writeFile(wb, 'الطلاب.xlsx');
 }
+
 /* ============ TAKE QUIZ ============ */
 async function startQuiz(quizId) {
   showLoading();
@@ -3566,13 +3780,10 @@ async function startQuiz(quizId) {
     currentQuiz = quiz; currentQuestionIndex = 0; currentAnswers = [];
     selectedAnswerIndex = null; tfSelected = null;
     showScreen('quiz');
-    /* ✅ تحميل الإعلانات في شاشة الاختبار */
     loadActiveAnnouncement();
     renderCurrentQuestion();
   } finally { hideLoading(); }
 }
-
-/* ✅ إصلاح: style مكرر في <h3> */
 function renderCurrentQuestion() {
   const q = currentQuiz.questions[currentQuestionIndex];
   const ti = QUESTION_TYPES[q.type] || QUESTION_TYPES.mcq;
@@ -3586,7 +3797,7 @@ function renderCurrentQuestion() {
   }).join('')}</div>`;
   else if (q.type === 'tf') answerHtml = `<div class="tf-options" id="quizOptions"><button class="tf-btn true" onclick="selectTfAnswer(true,this)">✓ صح</button><button class="tf-btn false" onclick="selectTfAnswer(false,this)">✗ خطأ</button></div>`;
   else if (q.type === 'fill') answerHtml = `<input type="text" class="form-input auto-dir" id="fillInput" placeholder="إجابتك..." oninput="onFillInput()" style="font-size:16px;padding:16px;" dir="rtl">`;
-  else if (q.type === 'essay') answerHtml = `<textarea class="form-textarea auto-dir" id="essayInput" placeholder="إجابتك المفصلة..." style="min-height:150px;" oninput="onEssayInput()" dir="rtl"></textarea>`;
+  else if (q.type === 'essay') answerHtml = `<textarea class="form-textarea auto-dir" id="essayInput" placeholder="إجابتك..." style="min-height:150px;" oninput="onEssayInput()" dir="rtl"></textarea>`;
   document.getElementById('quizContent').innerHTML = `
     <div class="question-type-badge qtype-${q.type}">${ti.emoji} ${ti.name}</div>
     ${q.image ? `<img src="${q.image}" class="question-image">` : ''}
@@ -3600,7 +3811,6 @@ function renderCurrentQuestion() {
   startTimer();
   bindAutoDirToInputs();
 }
-
 function startTimer() {
   clearInterval(timerInterval);
   timeLeft = currentQuiz.timePerQuestion || 30;
@@ -3655,14 +3865,12 @@ function checkAnswer(q, a) {
   if (q.type === 'essay') return null;
   return false;
 }
-
-/* ✅ إصلاح: معالجة الاختبار المقالي بالكامل */
 async function finishQuiz() {
   clearInterval(timerInterval);
   showLoading();
   try {
     const existing = await DB.get('attempts');
-    if (existing.some(a => a.quizId === currentQuiz.id && a.studentId === currentUser.id)) { hideLoading(); alert('حللت هذا الاختبار بالفعل.'); exitQuiz(); return; }
+    if (existing.some(a => a.quizId === currentQuiz.id && a.studentId === currentUser.id)) { hideLoading(); alert('حللت بالفعل.'); exitQuiz(); return; }
     let score = 0, autoGraded = 0, hasEssay = false;
     const results = currentQuiz.questions.map((q, i) => {
       const a = currentAnswers[i];
@@ -3696,9 +3904,8 @@ async function finishQuiz() {
         <div style="font-size:56px;font-weight:900;color:var(--primary);">${score}<span style="font-size:28px;color:var(--text-light);"> / ${autoGraded}</span></div>
         <p style="font-size:20px;font-weight:700;color:var(--text-light);">${pct !== null ? pct + '% (التلقائي)' : 'سيتم تصحيح الأسئلة المقالية قريباً'}</p>
         <div class="alert alert-success" style="margin-top:16px;">🎉 <strong>+${xpGain} XP</strong> • إجمالي: ${currentUser.xp || 0} XP</div>
-        ${newBadges.length > 0 ? `<div class="alert alert-warning" style="text-align:right;">🏆 <strong>شارات جديدة:</strong> ${newBadges.map(b => `${BADGES[b].emoji} ${BADGES[b].name}`).join(' • ')}</div>` : ''}
-        ${essayCount > 0 ? `<div class="alert alert-warning" style="text-align:right;">📄 لديك ${essayCount} سؤال مقالي</div>` : ''}
-        <div class="alert alert-info" style="text-align:right;">🔒 لا يمكن إعادة الحل.</div>
+        ${newBadges.length > 0 ? `<div class="alert alert-warning" style="text-align:right;">🏆 <strong>شارات:</strong> ${newBadges.map(b => `${BADGES[b].emoji} ${BADGES[b].name}`).join(' • ')}</div>` : ''}
+        ${essayCount > 0 ? `<div class="alert alert-warning" style="text-align:right;">📄 ${essayCount} سؤال مقالي</div>` : ''}
         <button class="btn btn-primary btn-lg" onclick="exitQuiz()" style="margin-top:20px;">🏠 العودة</button>
       </div>`;
     document.getElementById('quizProgressFill').style.width = '100%';
@@ -3724,15 +3931,19 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (!ok) { loadActiveAnnouncement(); showScreen('auth'); }
 });
 
-/* ✅ مراقب لتبديل الشاشات لتحديث الإعلانات */
-const _screenObserver = new MutationObserver(() => {
-  if (_cachedAnnouncements.length > 0 || true) {
-    renderAnnouncementEverywhere();
-  }
-});
+const _screenObserver = new MutationObserver(() => { renderAnnouncementEverywhere(); });
 document.querySelectorAll('.screen').forEach(s => _screenObserver.observe(s, { attributes: true, attributeFilter: ['class'] }));
 
 document.getElementById('modalOverlay').addEventListener('click', (e) => { if (e.target.id === 'modalOverlay') closeModal(); });
+
+// Ripple effect
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.btn');
+  if (!btn) return;
+  const rect = btn.getBoundingClientRect();
+  btn.style.setProperty('--x', ((e.clientX - rect.left) / rect.width * 100) + '%');
+  btn.style.setProperty('--y', ((e.clientY - rect.top) / rect.height * 100) + '%');
+});
 
 const globalFns = [
   switchAuthTab, pickRole, handleRegister, handleLogin, handleGoogleSignIn, handleForgotPassword, logout, toggleDarkMode,
@@ -3754,10 +3965,12 @@ const globalFns = [
   awardBadgeManually, removeBadgeFromStudent, resetStudentGamification,
   renderAdminAnnouncements, openAnnouncementEditor, saveAnnouncement, toggleAnnouncement, deleteAnnouncement,
   renderAdminSettings, savePlatformSettingsForm, dismissAnnouncement,
-  pickAnnType, handleAnnImageUpload, removeAnnImage
+  pickAnnType, handleAnnImageUpload, removeAnnImage,
+  openGlobalSearch, performGlobalSearch, openThemePicker, applyTheme,
+  openFriendsModal, switchFriendsTab, addFriend, removeFriend, challengeFriend, sendChallenge, respondChallenge,
+  refreshAdminUsersList, refreshFriendsTabContent
 ];
 globalFns.forEach(fn => { try { window[fn.name] = fn; } catch(e) {} });
 </script>
 </body>
 </html>
-
