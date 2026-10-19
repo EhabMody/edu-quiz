@@ -374,7 +374,8 @@
   .theme-option .theme-check { display: block; font-size: 20px; margin-top: 4px; }
   .challenge-card { background: linear-gradient(135deg, var(--card), var(--bg)); border: 2px solid var(--warning); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
   .challenge-card.pending { border-color: var(--warning); }
-  .challenge-card.accepted { border-color: var(--success); }
+  .challenge-card.accepted { border-color: var(--info); }
+  .challenge-card.completed { border-color: var(--success); }
   .challenge-card.declined { border-color: var(--danger); opacity: 0.6; }
   .challenge-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
   .challenge-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; overflow: hidden; }
@@ -382,6 +383,7 @@
   .challenge-info { flex: 1; }
   .challenge-info h4 { font-size: 15px; font-weight: 800; margin-bottom: 2px; }
   .challenge-info p { font-size: 12px; color: var(--text-light); }
+  .challenge-result { padding: 12px; background: var(--bg); border-radius: 10px; margin-top: 10px; font-size: 13px; }
   .live-indicator { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--success-light); color: var(--success); border-radius: 999px; font-size: 11px; font-weight: 800; }
   .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); animation: pulse 1.5s infinite; }
   .btn::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255,255,255,0.4), transparent 40%); opacity: 0; transition: opacity 0.5s; pointer-events: none; }
@@ -518,7 +520,7 @@
 <div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox"></div></div>
 
 <script>
-  /* ⬇️ الجزء الأول من JavaScript */
+  /* ⬇️ الجزء الثاني من JavaScript - Firebase + DB */
 
 const DEFAULT_FIREBASE_CONFIG = {
   apiKey: "AIzaSyBPuzIkp-Qc4CIBAYsY6hLwAVHwqY3oODg",
@@ -550,7 +552,7 @@ let currentUserTab = 'students';
 const PAGE_SIZE = 20;
 let paginationState = {
   students: 1, teachers: 1, parents: 1, quizzes: 1,
-  adminQuizzes: 1, auditLog: 1, leaderboard: 1, notifications: 1
+  adminQuizzes: 1, auditLog: 1, leaderboard: 1, notifications: 1, challenges: 1
 };
 
 const THEMES = {
@@ -709,7 +711,6 @@ function renderPagination(total, page, pageKey, onChangeFn) {
     <button class="pagination-btn" ${page >= totalPages ? 'disabled' : ''} onclick="${onChangeFn}(${page + 1})">التالي →</button>
   </div>`;
 }
-function changePage(pageKey, page, renderFn) { paginationState[pageKey] = page; if (typeof renderFn === 'function') renderFn(); }
 function switchAuthTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   const activeTab = document.querySelector(`.tab[data-tab="${tab}"]`);
@@ -790,6 +791,7 @@ function validateFileSize(file, maxMB, label = 'الملف') {
 }
 function loadFirebaseConfig() { try { const c = localStorage.getItem('edu_firebase_config'); return c ? JSON.parse(c) : DEFAULT_FIREBASE_CONFIG; } catch { return DEFAULT_FIREBASE_CONFIG; } }
 
+/* ✅ تهيئة Firebase */
 async function initFirebase() {
   const config = loadFirebaseConfig();
   if (!config || !config.apiKey || !config.databaseURL) { firebaseEnabled = false; firebaseAuthEnabled = false; return; }
@@ -798,7 +800,15 @@ async function initFirebase() {
     const dbMod = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
     FB = { ...appMod, ...dbMod };
     fbApp = appMod.initializeApp(config);
-    fbDB = { db: dbMod.getDatabase(fbApp), ref: dbMod.ref, set: dbMod.set, get: dbMod.get, onValue: dbMod.onValue };
+    fbDB = { 
+      db: dbMod.getDatabase(fbApp), 
+      ref: dbMod.ref, 
+      set: dbMod.set, 
+      get: dbMod.get, 
+      onValue: dbMod.onValue,
+      update: dbMod.update,
+      child: dbMod.child
+    };
     firebaseEnabled = true;
     try {
       const authMod = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
@@ -814,46 +824,69 @@ async function initFirebase() {
       };
       firebaseAuthEnabled = true;
       console.log('✅ Firebase + Auth متصل');
-    } catch (e) { firebaseAuthEnabled = false; }
-  } catch (err) { firebaseEnabled = false; firebaseAuthEnabled = false; }
+    } catch (e) { firebaseAuthEnabled = false; console.error('Auth init failed:', e); }
+  } catch (err) { firebaseEnabled = false; firebaseAuthEnabled = false; console.error('Firebase init failed:', err); }
 }
 
-/* ✅ إصلاح: DB._toArray يحتفظ بـ id الصحيح دائماً */
+/* ═══════════════════════════════════════════════════════════
+   ✅ DB - مُصلح بالكامل للعمل مع Realtime Database
+   ═══════════════════════════════════════════════════════════ */
 const DB = {
+  /* ✅ _toArray محسّن: يحافظ على id دائماً */
   _toArray(data) {
     if (!data) return [];
-    if (Array.isArray(data)) return data.filter(x => x !== null && x !== undefined);
-    if (typeof data === 'object') {
-      return Object.keys(data).filter(k => data[k] !== null && data[k] !== undefined).map(k => {
-        const item = data[k];
-        if (item && typeof item === 'object') {
-          // ✅ إصلاح: احتفظ بـ id الأصلي من المفتاح إذا لم يكن موجوداً
-          return item.id ? item : { ...item, id: k };
-        }
+    if (Array.isArray(data)) {
+      return data.filter(x => x !== null && x !== undefined).map((item, idx) => {
+        if (item && typeof item === 'object' && !item.id) return { ...item, id: 'idx_' + idx };
         return item;
       });
     }
+    if (typeof data === 'object') {
+      return Object.keys(data)
+        .filter(k => data[k] !== null && data[k] !== undefined)
+        .map(k => {
+          const item = data[k];
+          if (item && typeof item === 'object') {
+            // ✅ إذا كان item.id موجوداً استخدمه، وإلا استخدم المفتاح k
+            return { ...item, id: item.id || k };
+          }
+          return { id: k, value: item };
+        });
+    }
     return [];
   },
+
+  /* ✅ get: يقرأ من Firebase أولاً (المصدر الموثوق) ثم من localStorage */
   async get(key, defaultValue = []) {
-    let localData = defaultValue;
-    try { const d = localStorage.getItem('edu_' + key); if (d) localData = JSON.parse(d); } catch {}
     if (firebaseEnabled && fbDB) {
       try {
         const snapshot = await fbDB.get(fbDB.ref(fbDB.db, key));
         const remoteData = snapshot.val();
-        if (remoteData) {
+        if (remoteData !== null && remoteData !== undefined) {
           const arr = this._toArray(remoteData);
           try { localStorage.setItem('edu_' + key, JSON.stringify(arr)); } catch {}
           return arr;
         }
-      } catch (e) {}
+        // إذا كانت العقدة فارغة في Firebase، أرجع القيمة الافتراضية
+        return Array.isArray(defaultValue) ? defaultValue : this._toArray(defaultValue);
+      } catch (e) {
+        console.warn(`Firebase get(${key}) failed, using localStorage:`, e.message);
+      }
     }
-    return this._toArray(localData);
+    // Fallback: localStorage
+    try { 
+      const d = localStorage.getItem('edu_' + key); 
+      if (d) return this._toArray(JSON.parse(d)); 
+    } catch {}
+    return Array.isArray(defaultValue) ? defaultValue : this._toArray(defaultValue);
   },
+
+  /* ✅ set: يكتب إلى Firebase و localStorage معاً */
   async set(key, value) {
     const arr = Array.isArray(value) ? value : this._toArray(value);
+    // اكتب إلى localStorage أولاً (fallback)
     try { localStorage.setItem('edu_' + key, JSON.stringify(arr)); } catch {}
+    // ثم اكتب إلى Firebase
     if (firebaseEnabled && fbDB) {
       for (let attempt = 1; attempt <= 3; attempt++) {
         try {
@@ -865,15 +898,73 @@ const DB = {
           });
           await fbDB.set(fbDB.ref(fbDB.db, key), asObject);
           return true;
-        } catch (e) { await new Promise(r => setTimeout(r, 500 * attempt)); }
+        } catch (e) {
+          console.warn(`Firebase set(${key}) attempt ${attempt} failed:`, e.message);
+          await new Promise(r => setTimeout(r, 500 * attempt));
+        }
       }
       return false;
     }
     return true;
   },
+
+  /* ✅ update: تحديث جزئي لعنصر واحد */
+  async update(key, itemId, updates) {
+    if (!itemId) return false;
+    // تحديث localStorage
+    try {
+      const d = localStorage.getItem('edu_' + key);
+      if (d) {
+        const arr = JSON.parse(d);
+        const idx = arr.findIndex(x => x && x.id === itemId);
+        if (idx >= 0) { arr[idx] = { ...arr[idx], ...updates }; localStorage.setItem('edu_' + key, JSON.stringify(arr)); }
+      }
+    } catch {}
+    // تحديث Firebase
+    if (firebaseEnabled && fbDB) {
+      try {
+        await fbDB.update(fbDB.ref(fbDB.db, `${key}/${itemId}`), updates);
+        return true;
+      } catch (e) { console.warn(`Firebase update(${key}/${itemId}) failed:`, e.message); }
+    }
+    return false;
+  },
+
+  /* ✅ remove: حذف عنصر واحد */
+  async remove(key, itemId) {
+    if (!itemId) return false;
+    try {
+      const d = localStorage.getItem('edu_' + key);
+      if (d) {
+        const arr = JSON.parse(d);
+        const filtered = arr.filter(x => x && x.id !== itemId);
+        localStorage.setItem('edu_' + key, JSON.stringify(filtered));
+      }
+    } catch {}
+    if (firebaseEnabled && fbDB) {
+      try {
+        await fbDB.set(fbDB.ref(fbDB.db, `${key}/${itemId}`), null);
+        return true;
+      } catch (e) { console.warn(`Firebase remove(${key}/${itemId}) failed:`, e.message); }
+    }
+    return false;
+  },
+
+  /* ✅ subscribe: استماع فوري للتغييرات */
   subscribe(key, callback) {
     if (!firebaseEnabled || !fbDB) return () => {};
-    try { return fbDB.onValue(fbDB.ref(fbDB.db, key), (snapshot) => { callback(DB._toArray(snapshot.val())); }); } catch (e) { return () => {}; }
+    try {
+      return fbDB.onValue(fbDB.ref(fbDB.db, key), (snapshot) => {
+        const arr = this._toArray(snapshot.val());
+        try { localStorage.setItem('edu_' + key, JSON.stringify(arr)); } catch {}
+        callback(arr);
+      }, (error) => {
+        console.error(`Firebase subscribe(${key}) error:`, error);
+      });
+    } catch (e) { 
+      console.error(`Firebase subscribe(${key}) failed:`, e);
+      return () => {}; 
+    }
   }
 };
 
@@ -946,16 +1037,37 @@ function applyThemeColors(key) {
   if (header) header.style.background = `linear-gradient(135deg, ${t.primary}, ${t.secondary})`;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   ✅ الإعلانات - اشتراك فوري
+   ═══════════════════════════════════════════════════════════ */
 let _cachedAnnouncements = [];
+let _announcementUnsubscribe = null;
+let _lastAnnouncementId = null;
+
 async function loadActiveAnnouncement() {
   try {
     _cachedAnnouncements = await DB.get('announcements');
     renderAnnouncementEverywhere();
   } catch (e) {}
 }
+function startAnnouncementsListener() {
+  stopAnnouncementsListener();
+  if (!firebaseEnabled) return;
+  try {
+    _announcementUnsubscribe = DB.subscribe('announcements', (announcements) => {
+      _cachedAnnouncements = announcements;
+      renderAnnouncementEverywhere();
+    });
+  } catch (e) { console.error('Announcement listener error:', e); }
+}
+function stopAnnouncementsListener() {
+  if (_announcementUnsubscribe) {
+    try { _announcementUnsubscribe(); } catch {}
+    _announcementUnsubscribe = null;
+  }
+}
 function getActiveAnnouncement() {
   const now = Date.now();
-  // ✅ إصلاح: التحقق الصحيح من التاريخ (startDate و endDate)
   const active = _cachedAnnouncements.find(a => {
     if (!a.enabled) return false;
     if (a.startDate && a.startDate > now) return false;
@@ -963,6 +1075,11 @@ function getActiveAnnouncement() {
     return true;
   });
   if (!active) return null;
+  if (_lastAnnouncementId !== active.id) {
+    const dismissed = localStorage.getItem('edu_announcement_dismissed');
+    if (dismissed && dismissed !== active.id) localStorage.removeItem('edu_announcement_dismissed');
+    _lastAnnouncementId = active.id;
+  }
   const dismissed = localStorage.getItem('edu_announcement_dismissed');
   if (dismissed === active.id) return null;
   return active;
@@ -1001,39 +1118,23 @@ function renderAnnouncementEverywhere() {
 }
 function dismissAnnouncement(id) { localStorage.setItem('edu_announcement_dismissed', id); renderAnnouncementEverywhere(); }
 
-/* ✅ إصلاح: ensureUserProfile لا يضيف needsProfileCompletion إذا كان الاسم ثلاثي */
-async function ensureUserProfile(fbUser, existingProfile) {
-  if (existingProfile) return existingProfile;
-  const nameParts = (fbUser.displayName || '').split(/\s+/).filter(p => p.length > 0);
-  const isName3 = nameParts.length >= 3;
-  const fallback = {
-    id: fbUser.uid, email: fbUser.email,
-    name: fbUser.displayName || (fbUser.email || '').split('@')[0] || 'مستخدم',
-    role: 'student', provider: 'email', photoURL: fbUser.photoURL || null,
-    createdAt: Date.now(), needsProfileCompletion: !isName3,
-    xp: 0, badges: [], streak: 0, lastQuizDate: null, friends: [], following: []
-  };
-  if (fbUser.email && fbUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-    fallback.role = 'admin'; fallback.approved = true; fallback.needsProfileCompletion = false;
-  }
-  try {
-    const users = await DB.get('users');
-    const exists = users.find(u => u.id === fbUser.uid || u.email === fbUser.email);
-    if (exists) return exists;
-    users.push(fallback);
-    await DB.set('users', users);
-  } catch (e) {}
-  return fallback;
-}
-
+/* ✅ logActivity */
 async function logActivity(action, details = '') {
   try {
     const logs = await DB.get('auditLog');
-    logs.push({ id: uid(), userId: currentUser?.id || 'unknown', userName: currentUser?.name || 'غير معروف', userRole: currentUser?.role || 'unknown', action, details, timestamp: Date.now() });
+    logs.push({ 
+      id: uid(), 
+      userId: currentUser?.id || 'unknown', 
+      userName: currentUser?.name || 'غير معروف', 
+      userRole: currentUser?.role || 'unknown', 
+      action, details, timestamp: Date.now() 
+    });
     if (logs.length > 500) logs.splice(0, logs.length - 500);
     await DB.set('auditLog', logs);
   } catch (e) {}
 }
+
+/* ✅ awardXP */
 async function awardXP(studentId, amount, reason) {
   if (amount <= 0) return;
   try {
@@ -1049,6 +1150,8 @@ async function awardXP(studentId, amount, reason) {
     await DB.set('notifications', notifs);
   } catch (e) {}
 }
+
+/* ✅ checkAndAwardBadges */
 async function checkAndAwardBadges(studentId) {
   try {
     const users = await DB.get('users');
@@ -1079,6 +1182,8 @@ async function checkAndAwardBadges(studentId) {
     return toAward;
   } catch (e) { return []; }
 }
+
+/* ✅ updateStreak */
 async function updateStreak(studentId) {
   try {
     const users = await DB.get('users');
@@ -1104,65 +1209,58 @@ function calculateXPForAttempt(attempt) {
   else if (pct >= 50) xp += 10;
   return xp;
 }
-/* ✅ Global Search */
-function openGlobalSearch() {
-  openModal(`<div class="modal-header"><h3 class="modal-title">🔍 بحث شامل</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-    <input type="text" class="form-input auto-dir" id="globalSearchInput" placeholder="ابحث عن طالب، مدرس، اختبار..." dir="rtl" oninput="performGlobalSearch(this.value)" autofocus>
-    <div id="globalSearchResults" style="margin-top:16px;"></div>`);
-  setTimeout(() => document.getElementById('globalSearchInput')?.focus(), 100);
-}
-async function performGlobalSearch(query) {
-  if (!query || query.length < 2) { document.getElementById('globalSearchResults').innerHTML = ''; return; }
-  const q = query.toLowerCase();
-  const [users, quizzes] = await Promise.all([DB.get('users'), DB.get('quizzes')]);
-  const matchedUsers = users.filter(u => 
-    (u.name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q)
-  ).slice(0, 5);
-  const matchedQuizzes = quizzes.filter(qz => (qz.title || '').toLowerCase().includes(q)).slice(0, 5);
-  const isAdm = isAdmin(currentUser);
-  document.getElementById('globalSearchResults').innerHTML = `
-    ${matchedUsers.length > 0 ? `<h4 style="margin-bottom:8px;font-weight:800;">👥 المستخدمون (${matchedUsers.length})</h4>
-      ${matchedUsers.map(u => `<div class="search-result-item" onclick="closeModal(); ${isAdm && u.role !== 'admin' ? `openStudentGamificationDetails('${u.id}')` : ''}">
-        <h4 style="font-size:14px;font-weight:800;">${escapeHtml(u.name)} ${u.role === 'teacher' ? '👨‍🏫' : u.role === 'parent' ? '👨‍👩‍👦' : '👨‍🎓'}</h4>
-        <p style="font-size:12px;color:var(--text-light);">${escapeHtml(u.email)} • ${u.role} ${u.grade ? '• ' + u.grade : ''}</p>
-      </div>`).join('')}` : ''}
-    ${matchedQuizzes.length > 0 ? `<h4 style="margin:16px 0 8px;font-weight:800;">📝 الاختبارات (${matchedQuizzes.length})</h4>
-      ${matchedQuizzes.map(qz => `<div class="search-result-item" onclick="closeModal(); ${isAdm ? `viewQuizDetails('${qz.id}')` : ''}">
-        <h4 style="font-size:14px;font-weight:800;">${escapeHtml(qz.title)}</h4>
-        <p style="font-size:12px;color:var(--text-light);">${getSubjectName(qz.subject)} • ${qz.questions.length} سؤال • ${escapeHtml(qz.grade)}</p>
-      </div>`).join('')}` : ''}
-    ${matchedUsers.length === 0 && matchedQuizzes.length === 0 ? '<p style="text-align:center;padding:20px;color:var(--text-light);">لا نتائج</p>' : ''}`;
+/* ═══════════════════════════════════════════════════════════
+   ✅ AUTH - مُصلح بالكامل
+   ═══════════════════════════════════════════════════════════ */
+
+/* ✅ البحث عن مستخدم بـ uid أو email - دالة مساعدة */
+function findUserByIdOrEmail(users, idOrEmail) {
+  if (!idOrEmail) return null;
+  const lower = String(idOrEmail).toLowerCase();
+  return users.find(u => u.id === idOrEmail) 
+    || users.find(u => u.email && u.email.toLowerCase() === lower)
+    || null;
 }
 
-/* ✅ Theme Picker */
-function openThemePicker() {
-  const currentTheme = platformSettings.theme || localStorage.getItem('edu_theme') || 'indigo';
-  openModal(`<div class="modal-header"><h3 class="modal-title">🎨 اختيار السمة</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-    <p style="margin-bottom:16px;color:var(--text-light);">اختر السمة المفضلة لك</p>
-    <div class="theme-grid">
-      ${Object.entries(THEMES).map(([key, t]) => `<div class="theme-option ${currentTheme === key ? 'active' : ''}" style="background:linear-gradient(135deg,${t.primary},${t.secondary});" onclick="applyTheme('${key}')">
-        <div style="font-size:32px;margin-bottom:6px;">${t.emoji}</div>
-        <div>${t.name}</div>
-        ${currentTheme === key ? '<span class="theme-check">✓</span>' : ''}
-      </div>`).join('')}
-    </div>`);
-}
-async function applyTheme(key) {
-  const t = THEMES[key];
-  if (!t) return;
-  applyThemeColors(key);
-  localStorage.setItem('edu_theme', key);
-  platformSettings.theme = key;
-  platformSettings.primaryColor = t.primary;
-  platformSettings.secondaryColor = t.secondary;
-  try { await savePlatformSettings(); } catch (e) {}
-  closeModal();
-  launchConfetti(20);
-  const header = document.querySelector('.dashboard-header');
-  if (header) header.style.background = `linear-gradient(135deg, ${t.primary}, ${t.secondary})`;
+/* ✅ ensureUserProfile - إصلاح: الاسم الثلاثي لا يحتاج إكمال */
+async function ensureUserProfile(fbUser, existingProfile) {
+  if (existingProfile) return existingProfile;
+  const nameParts = (fbUser.displayName || '').split(/\s+/).filter(p => p.length > 0);
+  const isName3 = nameParts.length >= 3;
+  const fallback = {
+    id: fbUser.uid, 
+    email: fbUser.email,
+    name: fbUser.displayName || (fbUser.email || '').split('@')[0] || 'مستخدم',
+    role: 'student', 
+    provider: 'email', 
+    photoURL: fbUser.photoURL || null,
+    createdAt: Date.now(), 
+    needsProfileCompletion: !isName3,
+    xp: 0, badges: [], streak: 0, lastQuizDate: null, friends: [], following: []
+  };
+  if (fbUser.email && fbUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+    fallback.role = 'admin'; 
+    fallback.approved = true; 
+    fallback.needsProfileCompletion = false;
+  }
+  try {
+    const users = await DB.get('users');
+    const exists = findUserByIdOrEmail(users, fbUser.uid) || users.find(u => u.email === fbUser.email);
+    if (exists) {
+      // ✅ تحديث id إذا كان مختلفاً
+      if (exists.id !== fbUser.uid) {
+        const idx = users.findIndex(u => u.email && fbUser.email && u.email.toLowerCase() === fbUser.email.toLowerCase());
+        if (idx >= 0) { users[idx].id = fbUser.uid; await DB.set('users', users); }
+      }
+      return exists;
+    }
+    users.push(fallback);
+    await DB.set('users', users);
+    return fallback;
+  } catch (e) { return fallback; }
 }
 
-/* ============ ✅ AUTH - مع إصلاحات ============ */
+/* ✅ handleRegister - إصلاح: needsProfileCompletion = false دائماً */
 async function handleRegister(e) {
   e.preventDefault();
   if (!platformSettings.registrationEnabled) { showAlert('التسجيل متوقف مؤقتاً', 'warning'); return; }
@@ -1173,12 +1271,12 @@ async function handleRegister(e) {
   const np = name.split(/\s+/).filter(p => p.length > 0);
   if (np.length < 3) { showAlert('يجب إدخال الاسم الثلاثي'); return; }
   
-  // ✅ إصلاح: needsProfileCompletion = false دائماً عند التسجيل
   const profile = { 
     name, email, role: selectedRole, 
-    createdAt: Date.now(), provider: 'email', 
+    createdAt: Date.now(), 
+    provider: 'email', 
     xp: 0, badges: [], streak: 0, friends: [], following: [],
-    needsProfileCompletion: false 
+    needsProfileCompletion: false // ✅ دائماً false
   };
   
   if (selectedRole === 'student') {
@@ -1193,10 +1291,19 @@ async function handleRegister(e) {
   } else if (selectedRole === 'teacher') {
     const subject = document.getElementById('regSubject').value;
     if (!subject) { showAlert('اختر المادة'); return; }
-    profile.subject = subject; profile.approved = false;
-    profile.bio = ''; profile.videoLinks = []; profile.materialFiles = []; profile.ratings = [];
-  } else if (selectedRole === 'parent') { profile.children = []; }
-  if (email === ADMIN_EMAIL.toLowerCase()) { profile.role = 'admin'; profile.approved = true; }
+    profile.subject = subject; 
+    profile.approved = false;
+    profile.bio = ''; 
+    profile.videoLinks = []; 
+    profile.materialFiles = []; 
+    profile.ratings = [];
+  } else if (selectedRole === 'parent') { 
+    profile.children = []; 
+  }
+  if (email === ADMIN_EMAIL.toLowerCase()) { 
+    profile.role = 'admin'; 
+    profile.approved = true; 
+  }
 
   showLoading();
   try {
@@ -1205,20 +1312,28 @@ async function handleRegister(e) {
         const cred = await fbAuth.createUserWithEmailAndPassword(fbAuth.auth, email, password);
         profile.id = cred.user.uid;
         const users = await DB.get('users');
-        if (users.find(u => u.email === email || u.id === profile.id)) { showAlert('هذا البريد مسجل بالفعل'); hideLoading(); return; }
+        if (users.find(u => u.email === email || u.id === profile.id)) { 
+          showAlert('هذا البريد مسجل بالفعل'); 
+          return; 
+        }
         users.push(profile);
         await DB.set('users', users);
         currentUser = profile;
         saveSession(profile.id, true);
-        showAlert('تم إنشاء الحساب!', 'success');
+        showAlert('✅ تم إنشاء الحساب!', 'success');
         launchConfetti(50);
         setTimeout(() => enterDashboard(), 500);
       } catch (err) {
-        const msgs = { 'auth/email-already-in-use': 'البريد مسجل بالفعل', 'auth/weak-password': 'كلمة المرور ضعيفة', 'auth/invalid-email': 'البريد غير صالح' };
+        const msgs = { 
+          'auth/email-already-in-use': 'البريد مسجل بالفعل', 
+          'auth/weak-password': 'كلمة المرور ضعيفة', 
+          'auth/invalid-email': 'البريد غير صالح' 
+        };
         showAlert(msgs[err.code] || err.message);
       }
       return;
     }
+    // Fallback: بدون Firebase Auth
     const users = await DB.get('users');
     if (users.find(u => u.email === email)) { showAlert('هذا البريد مسجل'); return; }
     profile.id = uid();
@@ -1227,13 +1342,13 @@ async function handleRegister(e) {
     await DB.set('users', users);
     currentUser = profile;
     saveSession(profile.id, true);
-    showAlert('تم إنشاء الحساب!', 'success');
+    showAlert('✅ تم إنشاء الحساب!', 'success');
     launchConfetti(50);
     setTimeout(() => enterDashboard(), 500);
   } finally { hideLoading(); }
 }
 
-/* ✅ إصلاح: handleLogin يبحث بـ uid أو email بشكل صحيح */
+/* ✅ handleLogin - إصلاح: البحث بـ uid ثم email + تحديث id */
 async function handleLogin(e) {
   e.preventDefault();
   const email = document.getElementById('loginEmail').value.trim().toLowerCase();
@@ -1243,36 +1358,57 @@ async function handleLogin(e) {
   try {
     if (firebaseAuthEnabled) {
       try {
-        if (fbAuth.setPersistence) { try { await fbAuth.setPersistence(fbAuth.auth, remember ? fbAuth.browserLocalPersistence : fbAuth.browserSessionPersistence); } catch (e) {} }
+        if (fbAuth.setPersistence) { 
+          try { await fbAuth.setPersistence(fbAuth.auth, remember ? fbAuth.browserLocalPersistence : fbAuth.browserSessionPersistence); } catch (e) {} 
+        }
         const cred = await fbAuth.signInWithEmailAndPassword(fbAuth.auth, email, password);
         const users = await DB.get('users');
-        // ✅ إصلاح: البحث بـ uid أولاً ثم email
+        // ✅ البحث بـ uid أولاً
         let user = users.find(u => u.id === cred.user.uid);
         if (!user) user = users.find(u => u.email && cred.user.email && u.email.toLowerCase() === cred.user.email.toLowerCase());
-        if (!user) {
-          user = await ensureUserProfile(cred.user, null);
-        }
-        // ✅ إصلاح: تحديث id إذا كان مختلفاً (حالة المستخدمين القدامى)
+        if (!user) user = await ensureUserProfile(cred.user, null);
+        // ✅ تحديث id إذا كان مختلفاً
         if (user.id !== cred.user.uid) {
-          user.id = cred.user.uid;
           const idx = users.findIndex(u => u.email && u.email.toLowerCase() === email);
-          if (idx >= 0) { users[idx].id = cred.user.uid; await DB.set('users', users); }
+          if (idx >= 0) { 
+            users[idx].id = cred.user.uid; 
+            await DB.set('users', users); 
+            user.id = cred.user.uid;
+          }
         }
+        // ✅ تحديث صلاحية الأدمن
         if (email === ADMIN_EMAIL.toLowerCase() && user.role !== 'admin') {
-          user.role = 'admin'; user.approved = true;
+          user.role = 'admin'; 
+          user.approved = true;
           const idx = users.findIndex(u => u.id === user.id);
-          if (idx >= 0) users[idx] = user; else users.push(user);
+          if (idx >= 0) users[idx] = user; 
+          else users.push(user);
           await DB.set('users', users);
+        }
+        // ✅ إصلاح needsProfileCompletion بناءً على الاسم
+        const np = (user.name || '').split(/\s+/).filter(x => x.length > 0);
+        if (np.length >= 3 && user.needsProfileCompletion) {
+          user.needsProfileCompletion = false;
+          const idx = users.findIndex(u => u.id === user.id);
+          if (idx >= 0) { 
+            users[idx].needsProfileCompletion = false; 
+            await DB.set('users', users); 
+          }
         }
         currentUser = user;
         saveSession(user.id, remember);
         enterDashboard();
       } catch (err) {
-        const msgs = { 'auth/user-not-found': 'لا يوجد حساب', 'auth/wrong-password': 'كلمة المرور خاطئة', 'auth/invalid-credential': 'بيانات غير صحيحة' };
+        const msgs = { 
+          'auth/user-not-found': 'لا يوجد حساب', 
+          'auth/wrong-password': 'كلمة المرور خاطئة', 
+          'auth/invalid-credential': 'بيانات غير صحيحة' 
+        };
         showAlert(msgs[err.code] || 'البريد أو كلمة المرور خاطئة');
       }
       return;
     }
+    // Fallback
     const users = await DB.get('users');
     let user = users.find(u => u.email === email);
     if (!user) { showAlert('البريد أو كلمة المرور خاطئة'); return; }
@@ -1281,9 +1417,13 @@ async function handleLogin(e) {
     else if (user.password) valid = (user.password === password);
     if (!valid) { showAlert('البريد أو كلمة المرور خاطئة'); return; }
     if (email === ADMIN_EMAIL.toLowerCase() && user.role !== 'admin') {
-      user.role = 'admin'; user.approved = true;
+      user.role = 'admin'; 
+      user.approved = true;
       const idx = users.findIndex(u => u.id === user.id);
-      if (idx >= 0) { users[idx] = user; await DB.set('users', users); }
+      if (idx >= 0) { 
+        users[idx] = user; 
+        await DB.set('users', users); 
+      }
     }
     currentUser = user;
     saveSession(user.id, remember);
@@ -1291,6 +1431,7 @@ async function handleLogin(e) {
   } finally { hideLoading(); }
 }
 
+/* ✅ Google Sign In */
 async function handleGoogleSignIn() {
   if (!firebaseAuthEnabled) { showAlert('غير متاح', 'warning'); return; }
   const btn = document.getElementById('googleBtn');
@@ -1298,7 +1439,8 @@ async function handleGoogleSignIn() {
   btn.disabled = true;
   try {
     const provider = new fbAuth.GoogleAuthProvider();
-    provider.addScope('email'); provider.addScope('profile');
+    provider.addScope('email'); 
+    provider.addScope('profile');
     if (isMobileDevice()) {
       sessionStorage.setItem('edu_google_redirect', '1');
       await fbAuth.signInWithRedirect(fbAuth.auth, provider);
@@ -1306,31 +1448,52 @@ async function handleGoogleSignIn() {
     }
     const result = await fbAuth.signInWithPopup(fbAuth.auth, provider);
     await processGoogleUser(result.user);
-  } catch (err) { showAlert('تعذر تسجيل الدخول: ' + (err.message || 'خطأ')); }
-  finally { btn.disabled = false; btn.innerHTML = orig; }
+  } catch (err) { 
+    showAlert('تعذر تسجيل الدخول: ' + (err.message || 'خطأ')); 
+  }
+  finally { 
+    btn.disabled = false; 
+    btn.innerHTML = orig; 
+  }
 }
+
 async function processGoogleUser(g) {
   if (!g || !g.email) { showAlert('تعذر الحصول على البيانات'); return; }
   const users = await DB.get('users');
-  let existing = users.find(u => u.id === g.uid || (u.email && g.email && u.email.toLowerCase() === g.email.toLowerCase()));
+  let existing = users.find(u => u.id === g.uid) 
+    || users.find(u => u.email && g.email && u.email.toLowerCase() === g.email.toLowerCase());
   if (!existing && !platformSettings.registrationEnabled) { showAlert('التسجيل متوقف مؤقتاً', 'warning'); return; }
+  
+  // ✅ تحديث id إذا كان مختلفاً
+  if (existing && existing.id !== g.uid) {
+    const idx = users.findIndex(u => u.email && g.email && u.email.toLowerCase() === g.email.toLowerCase());
+    if (idx >= 0) { 
+      users[idx].id = g.uid; 
+      await DB.set('users', users); 
+      existing.id = g.uid;
+    }
+  }
+  
   if (g.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() && existing) {
-    existing.role = 'admin'; existing.approved = true;
+    existing.role = 'admin'; 
+    existing.approved = true;
     const idx = users.findIndex(u => u.id === existing.id);
     if (idx >= 0) { users[idx] = existing; await DB.set('users', users); }
   }
+  
   if (existing) {
-    // ✅ إصلاح: تحديث id إذا كان مختلفاً
-    if (existing.id !== g.uid) {
-      existing.id = g.uid;
-      const idx = users.findIndex(u => u.email && g.email && u.email.toLowerCase() === g.email.toLowerCase());
-      if (idx >= 0) { users[idx].id = g.uid; await DB.set('users', users); }
-    }
     const np = (existing.name || '').split(/\s+/).filter(p => p.length > 0);
+    // ✅ إصلاح: لا نطلب إكمال إذا الاسم ثلاثي أو needsProfileCompletion = false
     if (np.length < 3 && !isAdmin(existing) && existing.needsProfileCompletion !== false) {
       pendingGoogleUser = { id: existing.id, email: existing.email, name: existing.name, photoURL: existing.photoURL, isExisting: true };
       openProfileCompletionModal(true);
       return;
+    }
+    // ✅ إصلاح: حذف needsProfileCompletion إذا الاسم ثلاثي
+    if (np.length >= 3 && existing.needsProfileCompletion) {
+      existing.needsProfileCompletion = false;
+      const idx = users.findIndex(u => u.id === existing.id);
+      if (idx >= 0) { users[idx].needsProfileCompletion = false; await DB.set('users', users); }
     }
     currentUser = existing;
     saveSession(existing.id, true);
@@ -1341,6 +1504,7 @@ async function processGoogleUser(g) {
     openProfileCompletionModal(false);
   }
 }
+
 async function handleGoogleRedirectResult() {
   if (!firebaseAuthEnabled || !fbAuth.getRedirectResult) return;
   if (sessionStorage.getItem('edu_google_redirect') !== '1') return;
@@ -1355,6 +1519,7 @@ async function handleGoogleRedirectResult() {
 }
 
 let googleSelectedRole = null;
+
 function openProfileCompletionModal(isExisting = false) {
   googleSelectedRole = null;
   const isName3 = pendingGoogleUser?.name && pendingGoogleUser.name.split(/\s+/).filter(p => p.length > 0).length >= 3;
@@ -1389,6 +1554,7 @@ function openProfileCompletionModal(isExisting = false) {
     });
   }, 50);
 }
+
 function pickGoogleRole(role) {
   googleSelectedRole = role;
   document.getElementById('gRoleTeacher').classList.toggle('active', role === 'teacher');
@@ -1401,26 +1567,32 @@ function pickGoogleRole(role) {
     document.getElementById('gSubject').innerHTML = '<option value="">اختر المادة</option>' + SUBJECTS.map(s => `<option value="${s.id}">${s.emoji} ${s.name}</option>`).join('');
   }
 }
+
 async function cancelGoogleProfile() {
   try { if (fbAuth) await fbAuth.signOut(fbAuth.auth); } catch {}
-  pendingGoogleUser = null; googleSelectedRole = null;
+  pendingGoogleUser = null; 
+  googleSelectedRole = null;
   closeModal();
 }
+
 async function completeGoogleProfile() {
   if (!pendingGoogleUser) return;
   if (!googleSelectedRole) { alert('اختر دورك'); return; }
   const fullName = document.getElementById('gFullName').value.trim();
   const np = fullName.split(/\s+/).filter(p => p.length > 0);
   if (np.length < 3) { alert('يجب إدخال الاسم الثلاثي'); return; }
-  // ✅ إصلاح: needsProfileCompletion = false
   const profile = { 
     id: pendingGoogleUser.id, email: pendingGoogleUser.email, 
     name: fullName, role: googleSelectedRole, 
     provider: 'google', photoURL: pendingGoogleUser.photoURL, 
     createdAt: Date.now(), xp: 0, badges: [], streak: 0, 
-    friends: [], following: [], needsProfileCompletion: false 
+    friends: [], following: [], 
+    needsProfileCompletion: false 
   };
-  if (pendingGoogleUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) { profile.role = 'admin'; profile.approved = true; }
+  if (pendingGoogleUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) { 
+    profile.role = 'admin'; 
+    profile.approved = true; 
+  }
   if (googleSelectedRole === 'student' && profile.role !== 'admin') {
     const school = document.getElementById('gSchool').value.trim();
     const stage = document.getElementById('gStage').value;
@@ -1430,23 +1602,39 @@ async function completeGoogleProfile() {
   } else if (googleSelectedRole === 'teacher' && profile.role !== 'admin') {
     const subject = document.getElementById('gSubject').value;
     if (!subject) { alert('اختر المادة'); return; }
-    profile.subject = subject; profile.approved = false;
-    profile.bio = ''; profile.videoLinks = []; profile.materialFiles = []; profile.ratings = [];
-  } else if (googleSelectedRole === 'parent') { profile.children = []; }
+    profile.subject = subject; 
+    profile.approved = false;
+    profile.bio = ''; 
+    profile.videoLinks = []; 
+    profile.materialFiles = []; 
+    profile.ratings = [];
+  } else if (googleSelectedRole === 'parent') { 
+    profile.children = []; 
+  }
   showLoading();
   try {
     const users = await DB.get('users');
     const idx = users.findIndex(u => u.id === profile.id || (u.email && profile.email && u.email.toLowerCase() === profile.email.toLowerCase()));
-    if (idx >= 0) { users[idx] = { ...users[idx], ...profile }; await DB.set('users', users); currentUser = users[idx]; }
-    else { users.push(profile); await DB.set('users', users); currentUser = profile; }
+    if (idx >= 0) { 
+      users[idx] = { ...users[idx], ...profile }; 
+      await DB.set('users', users); 
+      currentUser = users[idx]; 
+    }
+    else { 
+      users.push(profile); 
+      await DB.set('users', users); 
+      currentUser = profile; 
+    }
     saveSession(currentUser.id, true);
-    pendingGoogleUser = null; googleSelectedRole = null;
+    pendingGoogleUser = null; 
+    googleSelectedRole = null;
     closeModal();
-    showAlert('تم حفظ البيانات!', 'success');
+    showAlert('✅ تم حفظ البيانات!', 'success');
     launchConfetti(50);
     setTimeout(() => enterDashboard(), 400);
   } finally { hideLoading(); }
 }
+
 function openProfileCompletionForExisting() {
   googleSelectedRole = null;
   openModal(`<div class="modal-header"><h3 class="modal-title">👋 ${escapeHtml(currentUser.name)}</h3></div>
@@ -1477,12 +1665,12 @@ function openProfileCompletionForExisting() {
     });
   }, 50);
 }
+
 async function saveExistingProfile() {
   if (!googleSelectedRole) { alert('اختر دورك'); return; }
   const fullName = document.getElementById('gFullName').value.trim();
   const np = fullName.split(/\s+/).filter(p => p.length > 0);
   if (np.length < 3) { alert('الاسم الثلاثي مطلوب'); return; }
-  // ✅ إصلاح: needsProfileCompletion = false
   const updates = { name: fullName, role: googleSelectedRole, needsProfileCompletion: false };
   if (googleSelectedRole === 'student') {
     const school = document.getElementById('gSchool').value.trim();
@@ -1509,6 +1697,7 @@ async function saveExistingProfile() {
     }
   } finally { hideLoading(); }
 }
+
 async function handleForgotPassword() {
   const email = document.getElementById('loginEmail').value.trim().toLowerCase();
   if (!email) { showAlert('أدخل بريدك أولاً', 'warning'); return; }
@@ -1523,9 +1712,12 @@ async function handleForgotPassword() {
   } catch (err) { showAlert('تعذر الإرسال'); }
   finally { btn.disabled = false; btn.textContent = orig; }
 }
+
 async function logout() {
   stopNotificationsListener();
   stopRealtimeAnalytics();
+  stopAnnouncementsListener();
+  stopChallengesListener();
   if (firebaseAuthEnabled && fbAuth) { try { await fbAuth.signOut(fbAuth.auth); } catch {} }
   currentUser = null;
   clearSession();
@@ -1534,56 +1726,75 @@ async function logout() {
   document.getElementById('registerForm').reset();
 }
 
-/* ✅ إصلاح: checkSession يبحث بـ uid ثم email بشكل صحيح */
+/* ✅ checkSession - إصلاح: البحث بـ uid + إصلاح needsProfileCompletion */
 async function checkSession() {
   await handleGoogleRedirectResult();
   if (isProcessingRedirect) return false;
+  
   if (firebaseAuthEnabled && fbAuth) {
     return new Promise((resolve) => {
       let done = false;
       const unsub = fbAuth.onAuthStateChanged(fbAuth.auth, async (user) => {
         if (done) return;
-        done = true; unsub();
+        done = true; 
+        unsub();
         if (user) {
           try {
             const users = await DB.get('users');
-            // ✅ إصلاح: البحث بـ uid أولاً
+            // ✅ البحث بـ uid أولاً
             let p = users.find(u => u.id === user.uid);
             if (!p) p = users.find(u => u.email && user.email && u.email.toLowerCase() === user.email.toLowerCase());
-            if (!p) {
-              p = await ensureUserProfile(user, null);
-            } else if (p.id !== user.uid) {
-              // ✅ إصلاح: تحديث id إذا كان مختلفاً
+            if (!p) p = await ensureUserProfile(user, null);
+            
+            // ✅ تحديث id إذا كان مختلفاً
+            if (p.id !== user.uid) {
               p.id = user.uid;
               const idx = users.findIndex(u => u.email && user.email && u.email.toLowerCase() === user.email.toLowerCase());
-              if (idx >= 0) { users[idx].id = user.uid; await DB.set('users', users); }
+              if (idx >= 0) { 
+                users[idx].id = user.uid; 
+                await DB.set('users', users); 
+              }
             }
+            
             if (!p) { resolve(false); return; }
+            
+            // ✅ تحديث صلاحية الأدمن
             if (user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() && p.role !== 'admin') {
-              p.role = 'admin'; p.approved = true;
+              p.role = 'admin'; 
+              p.approved = true;
               const i = users.findIndex(u => u.id === p.id);
-              if (i >= 0) users[i] = p; else users.push(p);
+              if (i >= 0) users[i] = p; 
+              else users.push(p);
               await DB.set('users', users);
             }
-            // ✅ إصلاح: تحديث needsProfileCompletion بناءً على الاسم
+            
+            // ✅ إصلاح needsProfileCompletion بناءً على الاسم
             const np = (p.name || '').split(/\s+/).filter(x => x.length > 0);
             if (np.length >= 3 && p.needsProfileCompletion) {
               p.needsProfileCompletion = false;
               const i = users.findIndex(u => u.id === p.id);
-              if (i >= 0) { users[i].needsProfileCompletion = false; await DB.set('users', users); }
+              if (i >= 0) { 
+                users[i].needsProfileCompletion = false; 
+                await DB.set('users', users); 
+              }
             }
+            
             currentUser = p;
             saveSession(p.id, true);
             enterDashboard();
             resolve(true);
             return;
-          } catch (e) { console.error('checkSession error:', e); }
+          } catch (e) { 
+            console.error('checkSession error:', e); 
+          }
         }
         resolve(false);
       });
       setTimeout(() => { if (!done) { done = true; resolve(false); } }, 8000);
     });
   }
+  
+  // Fallback: من الجلسة
   const id = getSessionUserId();
   if (!id) return false;
   const users = await DB.get('users');
@@ -1596,15 +1807,20 @@ function enterDashboard() {
   if (platformSettings.maintenanceMode && !isAdmin(currentUser)) { showMaintenanceScreen(); return; }
   showScreen('dashboard');
   loadActiveAnnouncement();
+  startAnnouncementsListener();
+  startChallengesListener();
   updateHeader();
   updateNotifBadge();
   startNotificationsListener();
   startRealtimeAnalytics();
+  
   // ✅ إصلاح: تحقق من needsProfileCompletion بشكل أدق
   const nameParts = (currentUser.name || '').split(/\s+/).filter(x => x.length > 0);
   if (currentUser.needsProfileCompletion === true && nameParts.length < 3 && !isAdmin(currentUser)) {
-    setTimeout(() => openProfileCompletionForExisting(), 500); return;
+    setTimeout(() => openProfileCompletionForExisting(), 500); 
+    return;
   }
+  
   if (isAdmin(currentUser)) renderAdminDashboard();
   else if (currentUser.role === 'teacher') {
     if (currentUser.approved === false) renderPendingTeacherDashboard();
@@ -1612,6 +1828,7 @@ function enterDashboard() {
   } else if (currentUser.role === 'parent') renderParentDashboard();
   else renderStudentDashboard();
 }
+
 function updateHeader() {
   const av = document.getElementById('userAvatar');
   if (currentUser.photoURL) av.innerHTML = `<img src="${currentUser.photoURL}" alt="avatar" referrerpolicy="no-referrer">`;
@@ -1672,9 +1889,17 @@ async function notifyStudents(quiz) {
   students.forEach(s => notifs.push({ id: uid(), userId: s.id, title: 'اختبار جديد', body: `تم إضافة "${quiz.title}"`, createdAt: Date.now(), read: false }));
   await DB.set('notifications', notifs);
 }
-function openModal(html) { document.getElementById('modalBox').innerHTML = html; document.getElementById('modalOverlay').classList.add('active'); bindAutoDirToInputs(); setTimeout(observeLazyImages, 100); }
+
+function openModal(html) { 
+  document.getElementById('modalBox').innerHTML = html; 
+  document.getElementById('modalOverlay').classList.add('active'); 
+  bindAutoDirToInputs(); 
+  setTimeout(observeLazyImages, 100); 
+}
 function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
-/* ============ Real-time Analytics ============ */
+/* ═══════════════════════════════════════════════════════════
+   ✅ Real-time Analytics
+   ═══════════════════════════════════════════════════════════ */
 let _realtimeUnsubs = [];
 function startRealtimeAnalytics() {
   stopRealtimeAnalytics();
@@ -1703,178 +1928,561 @@ function stopRealtimeAnalytics() {
   _realtimeUnsubs = [];
 }
 
-/* ============ Friends & Challenges ============ */
+/* ═══════════════════════════════════════════════════════════
+   ✅ Friends & Challenges - مُصلح بالكامل
+   ═══════════════════════════════════════════════════════════ */
+let _challengesUnsubscribe = null;
+let _challengesCache = [];
+
+function startChallengesListener() {
+  stopChallengesListener();
+  if (!firebaseEnabled) return;
+  try {
+    _challengesUnsubscribe = DB.subscribe('challenges', (challenges) => {
+      _challengesCache = challenges;
+      // ✅ إذا كان المستخدم في صفحة الأصدقاء، حدّث المحتوى فوراً
+      const tabContent = document.getElementById('friendsTabContent');
+      if (tabContent && currentUser && currentUser.role === 'student') {
+        const activeTabBtn = document.querySelector('.content-tab.active');
+        if (activeTabBtn) {
+          const tabName = activeTabBtn.textContent.includes('تحديات') ? 'challenges' 
+                        : activeTabBtn.textContent.includes('إضافة') ? 'add' : 'friends';
+          refreshFriendsTabContent(tabName);
+        }
+      }
+    });
+  } catch (e) { console.error('Challenges listener error:', e); }
+}
+function stopChallengesListener() {
+  if (_challengesUnsubscribe) {
+    try { _challengesUnsubscribe(); } catch {}
+    _challengesUnsubscribe = null;
+  }
+}
+
+/* ✅ فتح نافذة الأصدقاء والتحديات */
 async function openFriendsModal() {
   if (!currentUser || currentUser.role !== 'student') { alert('للطلاب فقط'); return; }
   showLoading();
   try {
     const users = await DB.get('users');
     const challenges = await DB.get('challenges');
-    const myFriends = users.filter(u => (currentUser.friends || []).includes(u.id));
-    const myChallenges = challenges.filter(c => c.fromId === currentUser.id || c.toId === currentUser.id).sort((a,b) => b.createdAt - a.createdAt);
-    const otherStudents = users.filter(u => u.role === 'student' && u.id !== currentUser.id && !(currentUser.friends || []).includes(u.id)).slice(0, 10);
+    _challengesCache = challenges;
     
-    openModal(`<div class="modal-header"><h3 class="modal-title">👥 الأصدقاء والتحديات</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-      <div class="content-tabs">
-        <button class="content-tab active" onclick="switchFriendsTab('friends', this)">👥 أصدقائي (${myFriends.length})</button>
-        <button class="content-tab" onclick="switchFriendsTab('challenges', this)">⚔️ التحديات (${myChallenges.length})</button>
-        <button class="content-tab" onclick="switchFriendsTab('add', this)">➕ إضافة صديق</button>
+    const myFriends = users.filter(u => (currentUser.friends || []).includes(u.id));
+    const myChallenges = challenges.filter(c => c.fromId === currentUser.id || c.toId === currentUser.id)
+      .sort((a, b) => b.createdAt - a.createdAt);
+    const otherStudents = users.filter(u => 
+      u.role === 'student' && 
+      u.id !== currentUser.id && 
+      !(currentUser.friends || []).includes(u.id)
+    ).slice(0, 20);
+    
+    const pendingForMe = myChallenges.filter(c => c.toId === currentUser.id && c.status === 'pending');
+    
+    openModal(`<div class="modal-header">
+      <h3 class="modal-title">👥 الأصدقاء والتحديات ${pendingForMe.length > 0 ? `<span class="badge badge-danger">${pendingForMe.length} جديد</span>` : ''}</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+      <div class="content-tabs" id="friendsTabs">
+        <button class="content-tab active" data-friendtab="friends" onclick="switchFriendsTab('friends', this)">👥 أصدقائي (${myFriends.length})</button>
+        <button class="content-tab" data-friendtab="challenges" onclick="switchFriendsTab('challenges', this)">⚔️ التحديات (${myChallenges.length})${pendingForMe.length > 0 ? ` 🔴` : ''}</button>
+        <button class="content-tab" data-friendtab="add" onclick="switchFriendsTab('add', this)">➕ إضافة</button>
       </div>
       <div id="friendsTabContent">
         ${renderFriendsTabContent('friends', myFriends, myChallenges, otherStudents)}
       </div>`);
   } finally { hideLoading(); }
 }
+
 function switchFriendsTab(tab, btn) {
-  document.querySelectorAll('.content-tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  document.querySelectorAll('#friendsTabs .content-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
   refreshFriendsTabContent(tab);
 }
+
 async function refreshFriendsTabContent(tab) {
+  if (!currentUser) return;
   const users = await DB.get('users');
   const challenges = await DB.get('challenges');
+  _challengesCache = challenges;
+  
+  // ✅ تحديث currentUser من DB للحصول على أحدث قائمة أصدقاء
+  const freshMe = users.find(u => u.id === currentUser.id);
+  if (freshMe) currentUser = freshMe;
+  
   const myFriends = users.filter(u => (currentUser.friends || []).includes(u.id));
-  const myChallenges = challenges.filter(c => c.fromId === currentUser.id || c.toId === currentUser.id).sort((a,b) => b.createdAt - a.createdAt);
-  const otherStudents = users.filter(u => u.role === 'student' && u.id !== currentUser.id && !(currentUser.friends || []).includes(u.id)).slice(0, 10);
-  document.getElementById('friendsTabContent').innerHTML = renderFriendsTabContent(tab, myFriends, myChallenges, otherStudents);
+  const myChallenges = challenges.filter(c => c.fromId === currentUser.id || c.toId === currentUser.id)
+    .sort((a, b) => b.createdAt - a.createdAt);
+  const otherStudents = users.filter(u => 
+    u.role === 'student' && 
+    u.id !== currentUser.id && 
+    !(currentUser.friends || []).includes(u.id)
+  ).slice(0, 20);
+  
+  // تحديث التبويبات (العدد)
+  const tabBtns = document.querySelectorAll('#friendsTabs .content-tab');
+  if (tabBtns[0]) tabBtns[0].textContent = `👥 أصدقائي (${myFriends.length})`;
+  if (tabBtns[1]) {
+    const pendingForMe = myChallenges.filter(c => c.toId === currentUser.id && c.status === 'pending').length;
+    tabBtns[1].textContent = `⚔️ التحديات (${myChallenges.length})${pendingForMe > 0 ? ' 🔴' : ''}`;
+  }
+  
+  const content = document.getElementById('friendsTabContent');
+  if (content) content.innerHTML = renderFriendsTabContent(tab, myFriends, myChallenges, otherStudents);
 }
+
+/* ✅ رسم محتوى التبويبات */
 function renderFriendsTabContent(tab, myFriends, myChallenges, otherStudents) {
   if (tab === 'friends') {
-    if (myFriends.length === 0) return '<div class="empty-state"><div class="empty-state-icon">👥</div><h3>لا أصدقاء بعد</h3><p>أضف أصدقاء من تبويب "إضافة صديق"</p></div>';
-    return myFriends.map(f => `<div class="student-row">
-      <div class="student-info"><h4>${escapeHtml(f.name)}</h4><p>${escapeHtml(f.grade || '')} • ${f.xp || 0} XP</p></div>
-      <button class="btn btn-sm btn-danger" onclick="removeFriend('${f.id}')">🗑</button>
-    </div>`).join('');
-  } else if (tab === 'challenges') {
-    if (myChallenges.length === 0) return '<div class="empty-state"><div class="empty-state-icon">⚔️</div><h3>لا تحديات</h3></div>';
-    return myChallenges.map(c => {
-      const isFromMe = c.fromId === currentUser.id;
-      const statusText = c.status === 'pending' ? '⏳ معلق' : c.status === 'accepted' ? '✅ مقبول' : '❌ مرفوض';
-      return `<div class="challenge-card ${c.status}">
-        <div class="challenge-header">
-          <div class="challenge-avatar">${isFromMe ? '📤' : '📥'}</div>
-          <div class="challenge-info">
-            <h4>${isFromMe ? 'تحدٍ أرسلته' : 'تحدٍ تلقّيته'}</h4>
-            <p>${escapeHtml(c.quizTitle || '')} • ${statusText}</p>
-          </div>
+    if (myFriends.length === 0) return '<div class="empty-state"><div class="empty-state-icon">👥</div><h3>لا أصدقاء بعد</h3><p>أضف أصدقاء من تبويب "إضافة"</p></div>';
+    return myFriends.map(f => {
+      const lvl = getLevel(f.xp || 0);
+      return `<div class="student-row">
+        <div class="student-info">
+          <h4>${escapeHtml(f.name)} ${lvl.emoji}</h4>
+          <p>${escapeHtml(f.grade || '')} • ${f.xp || 0} XP</p>
         </div>
-        ${c.status === 'pending' && !isFromMe ? `<div style="display:flex;gap:8px;">
-          <button class="btn btn-success btn-sm" onclick="respondChallenge('${c.id}', 'accepted')">✅ قبول</button>
-          <button class="btn btn-danger btn-sm" onclick="respondChallenge('${c.id}', 'declined')">❌ رفض</button>
-        </div>` : ''}
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn btn-sm btn-warning" onclick="challengeFriend('${f.id}')">⚔️ تحدٍ</button>
+          <button class="btn btn-sm btn-danger" onclick="removeFriend('${f.id}')">🗑</button>
+        </div>
       </div>`;
     }).join('');
-  } else {
-    if (otherStudents.length === 0) return '<div class="empty-state"><h3>لا طلاب آخرون</h3></div>';
-    return otherStudents.map(s => `<div class="student-row">
-      <div class="student-info"><h4>${escapeHtml(s.name)}</h4><p>${escapeHtml(s.grade || '')} • ${s.xp || 0} XP</p></div>
-      <div style="display:flex;gap:6px;">
-        <button class="btn btn-sm btn-primary" onclick="addFriend('${s.id}')">➕ صديق</button>
-        <button class="btn btn-sm btn-warning" onclick="challengeFriend('${s.id}')">⚔️ تحدٍ</button>
-      </div>
-    </div>`).join('');
   }
+  
+  if (tab === 'challenges') {
+    if (myChallenges.length === 0) return '<div class="empty-state"><div class="empty-state-icon">⚔️</div><h3>لا تحديات</h3><p>تحدَّ صديقاً من تبويب "أصدقائي"</p></div>';
+    return myChallenges.map(c => renderChallengeCard(c)).join('');
+  }
+  
+  // tab === 'add'
+  if (otherStudents.length === 0) return '<div class="empty-state"><h3>لا طلاب آخرون</h3></div>';
+  return otherStudents.map(s => {
+    const lvl = getLevel(s.xp || 0);
+    return `<div class="student-row">
+      <div class="student-info">
+        <h4>${escapeHtml(s.name)} ${lvl.emoji}</h4>
+        <p>${escapeHtml(s.grade || '')} • ${s.xp || 0} XP</p>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn btn-sm btn-primary" onclick="addFriend('${s.id}')">➕ صديق</button>
+      </div>
+    </div>`;
+  }).join('');
 }
+
+/* ✅ رسم بطاقة تحدي واحدة - مع عرض النتائج */
+function renderChallengeCard(c) {
+  const isFromMe = c.fromId === currentUser.id;
+  const isToMe = c.toId === currentUser.id;
+  const statusLabels = {
+    pending: '⏳ معلق',
+    accepted: '✅ مقبول - بانتظار الحل',
+    completed: '🏁 مكتمل',
+    declined: '❌ مرفوض'
+  };
+  
+  let actionButtons = '';
+  if (c.status === 'pending' && isToMe) {
+    actionButtons = `<div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-success btn-sm" onclick="respondChallenge('${c.id}', 'accepted')">✅ قبول</button>
+      <button class="btn btn-danger btn-sm" onclick="respondChallenge('${c.id}', 'declined')">❌ رفض</button>
+    </div>`;
+  } else if (c.status === 'accepted' && isToMe) {
+    // ✅ أنا المستقبل، أحل التحدي
+    actionButtons = `<button class="btn btn-warning btn-sm btn-full" onclick="solveChallenge('${c.id}')">✏️ حل التحدي الآن</button>`;
+  } else if (c.status === 'accepted' && isFromMe) {
+    actionButtons = `<div class="alert alert-info" style="margin:0;padding:8px;font-size:12px;">⏳ بانتظار ${escapeHtml(c.toName || 'الطرف الآخر')} ليحل التحدي</div>`;
+  }
+  
+  // ✅ عرض نتيجة التحدي إن وُجدت
+  let resultHtml = '';
+  if (c.status === 'completed') {
+    const myScore = isFromMe ? c.fromScore : c.toScore;
+    const otherScore = isFromMe ? c.toScore : c.fromScore;
+    const otherName = isFromMe ? (c.toName || 'الخصم') : (c.fromName || 'الخصم');
+    let winner = 'تعادل';
+    let winnerClass = 'badge-info';
+    if (myScore > otherScore) { winner = '🎉 فزت!'; winnerClass = 'badge-success'; }
+    else if (myScore < otherScore) { winner = '😔 خسرت'; winnerClass = 'badge-danger'; }
+    
+    resultHtml = `<div class="challenge-result">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
+        <span class="badge ${winnerClass}" style="font-size:14px;padding:6px 12px;">${winner}</span>
+        <span style="font-size:12px;color:var(--text-light);">${new Date(c.completedAt || c.createdAt).toLocaleDateString('ar-EG')}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:center;">
+        <div style="padding:8px;background:var(--primary-light);border-radius:8px;">
+          <div style="font-size:11px;color:var(--text-light);margin-bottom:2px;">أنت</div>
+          <div style="font-size:18px;font-weight:900;color:var(--primary);">${myScore}%</div>
+        </div>
+        <div style="padding:8px;background:var(--info-light);border-radius:8px;">
+          <div style="font-size:11px;color:var(--text-light);margin-bottom:2px;">${escapeHtml(otherName)}</div>
+          <div style="font-size:18px;font-weight:900;color:var(--info);">${otherScore}%</div>
+        </div>
+      </div>
+    </div>`;
+  }
+  
+  return `<div class="challenge-card ${c.status}">
+    <div class="challenge-header">
+      <div class="challenge-avatar">${isFromMe ? '📤' : '📥'}</div>
+      <div class="challenge-info">
+        <h4>${isFromMe ? `تحديت ${escapeHtml(c.toName || 'طالب')}` : `${escapeHtml(c.fromName || 'طالب')} تحدّاك`}</h4>
+        <p>📝 ${escapeHtml(c.quizTitle || 'اختبار')} • ${statusLabels[c.status] || c.status}</p>
+      </div>
+    </div>
+    ${actionButtons}
+    ${resultHtml}
+  </div>`;
+}
+
+/* ✅ إضافة صديق - إصلاح كامل */
 async function addFriend(friendId) {
+  if (!currentUser || !friendId) return;
+  if (friendId === currentUser.id) { alert('لا يمكنك إضافة نفسك'); return; }
+  
   showLoading();
   try {
     const users = await DB.get('users');
     const meIdx = users.findIndex(u => u.id === currentUser.id);
     const friendIdx = users.findIndex(u => u.id === friendId);
-    if (meIdx < 0 || friendIdx < 0) return;
-    if (!users[meIdx].friends) users[meIdx].friends = [];
-    if (!users[friendIdx].friends) users[friendIdx].friends = [];
-    if (!users[meIdx].friends.includes(friendId)) users[meIdx].friends.push(friendId);
-    if (!users[friendIdx].friends.includes(currentUser.id)) users[friendIdx].friends.push(currentUser.id);
+    
+    if (meIdx < 0 || friendIdx < 0) { alert('مستخدم غير موجود'); return; }
+    
+    // ✅ التحقق من عدم وجود الصداقة مسبقاً
+    if ((users[meIdx].friends || []).includes(friendId)) {
+      alert('⚠️ هذا المستخدم صديق بالفعل');
+      return;
+    }
+    
+    // ✅ تهيئة المصفوفات إذا لزم
+    if (!Array.isArray(users[meIdx].friends)) users[meIdx].friends = [];
+    if (!Array.isArray(users[friendIdx].friends)) users[friendIdx].friends = [];
+    
+    // ✅ إضافة في الاتجاهين
+    users[meIdx].friends.push(friendId);
+    users[friendIdx].friends.push(currentUser.id);
+    
     await DB.set('users', users);
+    
+    // ✅ تحديث currentUser
     currentUser = users[meIdx];
+    
+    // ✅ إرسال إشعار للصديق
     const notifs = await DB.get('notifications');
-    notifs.push({ id: uid(), userId: friendId, title: '👥 صديق جديد', body: `${currentUser.name} أضافك كصديق`, createdAt: Date.now(), read: false });
+    notifs.push({ 
+      id: uid(), 
+      userId: friendId, 
+      title: '👥 صديق جديد', 
+      body: `${currentUser.name} أضافك كصديق`, 
+      createdAt: Date.now(), 
+      read: false 
+    });
     await DB.set('notifications', notifs);
+    
     launchConfetti(20);
     alert('✅ تمت الإضافة');
     refreshFriendsTabContent('add');
+  } catch (e) {
+    console.error('addFriend error:', e);
+    alert('❌ فشلت الإضافة: ' + e.message);
   } finally { hideLoading(); }
 }
+
+/* ✅ حذف صديق */
 async function removeFriend(friendId) {
-  if (!confirm('حذف الصديق؟')) return;
+  if (!confirm('حذف هذا الصديق؟')) return;
   showLoading();
   try {
     const users = await DB.get('users');
     const meIdx = users.findIndex(u => u.id === currentUser.id);
+    const friendIdx = users.findIndex(u => u.id === friendId);
+    
     if (meIdx < 0) return;
+    
+    // ✅ حذف في الاتجاهين
     users[meIdx].friends = (users[meIdx].friends || []).filter(id => id !== friendId);
+    if (friendIdx >= 0) {
+      users[friendIdx].friends = (users[friendIdx].friends || []).filter(id => id !== currentUser.id);
+    }
+    
     await DB.set('users', users);
     currentUser = users[meIdx];
-    alert('تم الحذف');
+    alert('✅ تم الحذف');
     refreshFriendsTabContent('friends');
   } finally { hideLoading(); }
 }
+
+/* ✅ إرسال تحدي - اختيار اختبار */
 async function challengeFriend(friendId) {
   const users = await DB.get('users');
   const quizzes = await DB.get('quizzes');
   const friend = users.find(u => u.id === friendId);
-  if (!friend) return;
+  if (!friend) { alert('صديق غير موجود'); return; }
+  
+  // ✅ اختبارات مناسبة لمستوى الصديق
   const friendQuizzes = quizzes.filter(q => q.grade === friend.grade);
-  if (friendQuizzes.length === 0) { alert('لا اختبارات متاحة للتحدي'); return; }
-  const quizOptions = friendQuizzes.slice(0, 10).map(q => `<option value="${q.id}">${escapeHtml(q.title)}</option>`).join('');
-  openModal(`<div class="modal-header"><h3 class="modal-title">⚔️ تحدٍ صديق: ${escapeHtml(friend.name)}</h3><button class="modal-close" onclick="openFriendsModal()">✕</button></div>
-    <div class="form-group"><label class="form-label">اختر الاختبار</label><select class="form-select" id="challengeQuizSelect">${quizOptions}</select></div>
+  if (friendQuizzes.length === 0) { 
+    alert('❌ لا توجد اختبارات متاحة لمستوى صديقك'); 
+    return; 
+  }
+  
+  const quizOptions = friendQuizzes.slice(0, 15).map(q => 
+    `<option value="${q.id}">${escapeHtml(q.title)} (${getSubjectName(q.subject)})</option>`
+  ).join('');
+  
+  openModal(`<div class="modal-header">
+    <h3 class="modal-title">⚔️ تحدي ${escapeHtml(friend.name)}</h3>
+    <button class="modal-close" onclick="openFriendsModal()">✕</button>
+  </div>
+    <div class="alert alert-info">
+      📌 سيرسل التحدي إلى <strong>${escapeHtml(friend.name)}</strong><br>
+      🎯 عند قبوله، سيحل هو التحدي وتحصلان كلاكما على النتيجة
+    </div>
+    <div class="form-group">
+      <label class="form-label">اختر الاختبار</label>
+      <select class="form-select" id="challengeQuizSelect">${quizOptions}</select>
+    </div>
     <button class="btn btn-warning btn-full" onclick="sendChallenge('${friendId}')">📤 إرسال التحدي</button>`);
 }
+
+/* ✅ إرسال التحدي فعلياً */
 async function sendChallenge(friendId) {
   const quizId = document.getElementById('challengeQuizSelect').value;
   if (!quizId) { alert('اختر اختباراً'); return; }
+  
   showLoading();
   try {
     const quizzes = await DB.get('quizzes');
     const quiz = quizzes.find(q => q.id === quizId);
+    if (!quiz) { alert('الاختبار غير موجود'); return; }
+    
+    const users = await DB.get('users');
+    const friend = users.find(u => u.id === friendId);
+    if (!friend) { alert('صديق غير موجود'); return; }
+    
+    // ✅ التحقق من عدم وجود تحدي معلق على نفس الاختبار
     const challenges = await DB.get('challenges');
-    challenges.push({
-      id: uid(), fromId: currentUser.id, toId: friendId,
-      fromName: currentUser.name, otherUserName: currentUser.name,
-      quizId, quizTitle: quiz.title,
-      status: 'pending', createdAt: Date.now()
-    });
+    const existing = challenges.find(c => 
+      c.quizId === quizId && 
+      c.status !== 'completed' && 
+      c.status !== 'declined' &&
+      ((c.fromId === currentUser.id && c.toId === friendId) || (c.fromId === friendId && c.toId === currentUser.id))
+    );
+    if (existing) {
+      alert('⚠️ يوجد تحدي معلق بالفعل على هذا الاختبار');
+      return;
+    }
+    
+    // ✅ إنشاء التحدي
+    const newChallenge = {
+      id: uid(),
+      fromId: currentUser.id,
+      fromName: currentUser.name,
+      toId: friendId,
+      toName: friend.name,
+      quizId,
+      quizTitle: quiz.title,
+      quizGrade: quiz.grade,
+      quizSubject: quiz.subject,
+      status: 'pending',
+      createdAt: Date.now(),
+      respondedAt: null,
+      completedAt: null,
+      fromScore: null,
+      toScore: null,
+      winnerId: null,
+      solveAttemptId: null
+    };
+    
+    challenges.push(newChallenge);
     await DB.set('challenges', challenges);
+    _challengesCache = challenges;
+    
+    // ✅ إشعار للمستقبل
     const notifs = await DB.get('notifications');
-    notifs.push({ id: uid(), userId: friendId, title: '⚔️ تحدٍ جديد!', body: `${currentUser.name} تحدّاك في "${quiz.title}"`, createdAt: Date.now(), read: false });
+    notifs.push({ 
+      id: uid(), 
+      userId: friendId, 
+      title: '⚔️ تحدٍ جديد!', 
+      body: `${currentUser.name} تحدّاك في "${quiz.title}"`, 
+      createdAt: Date.now(), 
+      read: false 
+    });
     await DB.set('notifications', notifs);
+    
     launchConfetti(30);
     alert('✅ تم إرسال التحدي!');
     closeModal();
     openFriendsModal();
+  } catch (e) {
+    console.error('sendChallenge error:', e);
+    alert('❌ فشل الإرسال: ' + e.message);
   } finally { hideLoading(); }
 }
+
+/* ✅ الرد على التحدي (قبول/رفض) */
 async function respondChallenge(challengeId, response) {
   showLoading();
   try {
     const challenges = await DB.get('challenges');
     const idx = challenges.findIndex(c => c.id === challengeId);
-    if (idx < 0) return;
+    if (idx < 0) { alert('التحدي غير موجود'); return; }
+    
+    const challenge = challenges[idx];
+    if (challenge.toId !== currentUser.id) { alert('غير مصرح'); return; }
+    if (challenge.status !== 'pending') { alert('التحدي ليس معلقاً'); return; }
+    
     challenges[idx].status = response;
     challenges[idx].respondedAt = Date.now();
     await DB.set('challenges', challenges);
-    const challenge = challenges[idx];
+    _challengesCache = challenges;
+    
+    // ✅ إشعار للمرسل
     const notifs = await DB.get('notifications');
-    notifs.push({ id: uid(), userId: challenge.fromId, title: response === 'accepted' ? '✅ تم قبول التحدي' : '❌ تم رفض التحدي', body: `${currentUser.name} ${response === 'accepted' ? 'قبل' : 'رفض'} تحديك`, createdAt: Date.now(), read: false });
+    notifs.push({ 
+      id: uid(), 
+      userId: challenge.fromId, 
+      title: response === 'accepted' ? '✅ تم قبول التحدي' : '❌ تم رفض التحدي', 
+      body: `${currentUser.name} ${response === 'accepted' ? 'قبل' : 'رفض'} تحديك في "${challenge.quizTitle}"`, 
+      createdAt: Date.now(), 
+      read: false 
+    });
     await DB.set('notifications', notifs);
+    
     alert(response === 'accepted' ? '✅ قبلت التحدي' : '❌ رفضت التحدي');
     refreshFriendsTabContent('challenges');
   } finally { hideLoading(); }
 }
 
-/* ============ ADMIN DASHBOARD ============ */
+/* ✅ حل التحدي - يفتح الاختبار للطالب المستقبل */
+async function solveChallenge(challengeId) {
+  const challenges = await DB.get('challenges');
+  const challenge = challenges.find(c => c.id === challengeId);
+  if (!challenge) { alert('التحدي غير موجود'); return; }
+  
+  if (challenge.toId !== currentUser.id) { alert('أنت لست المستقبل'); return; }
+  if (challenge.status !== 'accepted') { alert('التحدي ليس مقبولاً'); return; }
+  
+  const quizzes = await DB.get('quizzes');
+  const quiz = quizzes.find(q => q.id === challenge.quizId);
+  if (!quiz) { alert('الاختبار غير موجود'); return; }
+  
+  // ✅ بدء الاختبار مع علامة أنه تحدي
+  closeModal();
+  startQuizWithChallenge(challenge, quiz);
+}
+
+/* ✅ بدء اختبار التحدي */
+async function startQuizWithChallenge(challenge, quiz) {
+  showLoading();
+  try {
+    currentQuiz = quiz;
+    currentQuestionIndex = 0;
+    currentAnswers = [];
+    selectedAnswerIndex = null;
+    tfSelected = null;
+    
+    // ✅ حفظ التحدي الحالي
+    window._currentChallenge = challenge;
+    
+    showScreen('quiz');
+    loadActiveAnnouncement();
+    renderCurrentQuestion();
+    
+    // ✅ عرض إشعار
+    setTimeout(() => {
+      const quizContent = document.getElementById('quizContent');
+      if (quizContent) {
+        const banner = document.createElement('div');
+        banner.className = 'alert alert-warning';
+        banner.innerHTML = `⚔️ <strong>وضع التحدي</strong> ضد ${escapeHtml(challenge.fromName)}<br>الاختبار: ${escapeHtml(quiz.title)}`;
+        quizContent.insertBefore(banner, quizContent.firstChild);
+      }
+    }, 100);
+  } finally { hideLoading(); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ✅ Global Search
+   ═══════════════════════════════════════════════════════════ */
+function openGlobalSearch() {
+  openModal(`<div class="modal-header"><h3 class="modal-title">🔍 بحث شامل</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <input type="text" class="form-input auto-dir" id="globalSearchInput" placeholder="ابحث عن طالب، مدرس، اختبار..." dir="rtl" oninput="performGlobalSearch(this.value)" autofocus>
+    <div id="globalSearchResults" style="margin-top:16px;"></div>`);
+  setTimeout(() => document.getElementById('globalSearchInput')?.focus(), 100);
+}
+async function performGlobalSearch(query) {
+  if (!query || query.length < 2) { document.getElementById('globalSearchResults').innerHTML = ''; return; }
+  const q = query.toLowerCase();
+  const [users, quizzes] = await Promise.all([DB.get('users'), DB.get('quizzes')]);
+  const matchedUsers = users.filter(u => 
+    (u.name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q)
+  ).slice(0, 5);
+  const matchedQuizzes = quizzes.filter(qz => (qz.title || '').toLowerCase().includes(q)).slice(0, 5);
+  const isAdm = isAdmin(currentUser);
+  document.getElementById('globalSearchResults').innerHTML = `
+    ${matchedUsers.length > 0 ? `<h4 style="margin-bottom:8px;font-weight:800;">👥 المستخدمون (${matchedUsers.length})</h4>
+      ${matchedUsers.map(u => `<div class="search-result-item" onclick="closeModal(); ${isAdm && u.role !== 'admin' ? `openStudentGamificationDetails('${u.id}')` : ''}">
+        <h4 style="font-size:14px;font-weight:800;">${escapeHtml(u.name)} ${u.role === 'teacher' ? '👨‍🏫' : u.role === 'parent' ? '👨‍👩‍👦' : '👨‍🎓'}</h4>
+        <p style="font-size:12px;color:var(--text-light);">${escapeHtml(u.email)} • ${u.role} ${u.grade ? '• ' + u.grade : ''}</p>
+      </div>`).join('')}` : ''}
+    ${matchedQuizzes.length > 0 ? `<h4 style="margin:16px 0 8px;font-weight:800;">📝 الاختبارات (${matchedQuizzes.length})</h4>
+      ${matchedQuizzes.map(qz => `<div class="search-result-item" onclick="closeModal(); ${isAdm ? `viewQuizDetails('${qz.id}')` : ''}">
+        <h4 style="font-size:14px;font-weight:800;">${escapeHtml(qz.title)}</h4>
+        <p style="font-size:12px;color:var(--text-light);">${getSubjectName(qz.subject)} • ${qz.questions.length} سؤال • ${escapeHtml(qz.grade)}</p>
+      </div>`).join('')}` : ''}
+    ${matchedUsers.length === 0 && matchedQuizzes.length === 0 ? '<p style="text-align:center;padding:20px;color:var(--text-light);">لا نتائج</p>' : ''}`;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ✅ Theme Picker
+   ═══════════════════════════════════════════════════════════ */
+function openThemePicker() {
+  const currentTheme = platformSettings.theme || localStorage.getItem('edu_theme') || 'indigo';
+  openModal(`<div class="modal-header"><h3 class="modal-title">🎨 اختيار السمة</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <p style="margin-bottom:16px;color:var(--text-light);">اختر السمة المفضلة لك</p>
+    <div class="theme-grid">
+      ${Object.entries(THEMES).map(([key, t]) => `<div class="theme-option ${currentTheme === key ? 'active' : ''}" style="background:linear-gradient(135deg,${t.primary},${t.secondary});" onclick="applyTheme('${key}')">
+        <div style="font-size:32px;margin-bottom:6px;">${t.emoji}</div>
+        <div>${t.name}</div>
+        ${currentTheme === key ? '<span class="theme-check">✓</span>' : ''}
+      </div>`).join('')}
+    </div>`);
+}
+async function applyTheme(key) {
+  const t = THEMES[key];
+  if (!t) return;
+  applyThemeColors(key);
+  localStorage.setItem('edu_theme', key);
+  platformSettings.theme = key;
+  platformSettings.primaryColor = t.primary;
+  platformSettings.secondaryColor = t.secondary;
+  try { await savePlatformSettings(); } catch (e) {}
+  closeModal();
+  launchConfetti(20);
+  const header = document.querySelector('.dashboard-header');
+  if (header) header.style.background = `linear-gradient(135deg, ${t.primary}, ${t.secondary})`;
+}
+/* ═══════════════════════════════════════════════════════════
+   ✅ ADMIN DASHBOARD
+   ═══════════════════════════════════════════════════════════ */
 async function renderAdminDashboard() {
   showLoading();
   try {
     const allUsers = await DB.get('users');
     const allQuizzes = await DB.get('quizzes');
     const allAttempts = await DB.get('attempts');
+    const allChallenges = await DB.get('challenges');
     const teachers = allUsers.filter(u => u.role === 'teacher');
     const pendingTeachers = teachers.filter(t => t.approved === false);
     const students = allUsers.filter(u => u.role === 'student');
     const parents = allUsers.filter(u => u.role === 'parent');
+    const activeChallenges = allChallenges.filter(c => c.status === 'pending' || c.status === 'accepted').length;
+    const completedChallenges = allChallenges.filter(c => c.status === 'completed').length;
+    
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
       <div class="card" style="background: linear-gradient(135deg, #f59e0b, #f97316); color:#fff;">
@@ -1888,6 +2496,7 @@ async function renderAdminDashboard() {
         <div class="admin-nav-card" onclick="renderAdminStats()"><div class="admin-nav-icon">📊</div><div class="admin-nav-title">الإحصائيات</div><div class="admin-nav-desc">رسوم بيانية</div></div>
         <div class="admin-nav-card" onclick="renderAdminGamification()"><div class="admin-nav-icon">🎮</div><div class="admin-nav-title">التحفيز</div><div class="admin-nav-desc">XP + شارات</div></div>
         <div class="admin-nav-card" onclick="renderAdminAnnouncements()"><div class="admin-nav-icon">📢</div><div class="admin-nav-title">الإعلانات</div><div class="admin-nav-desc">شريط/بانر</div></div>
+        <div class="admin-nav-card" onclick="renderAdminChallenges()"><div class="admin-nav-icon">⚔️</div><div class="admin-nav-title">التحديات</div><div class="admin-nav-desc">${activeChallenges} نشط • ${completedChallenges} مكتمل</div></div>
         <div class="admin-nav-card" onclick="renderAdminSettings()"><div class="admin-nav-icon">⚙️</div><div class="admin-nav-title">إعدادات المنصة</div><div class="admin-nav-desc">الاسم + الألوان</div></div>
         <div class="admin-nav-card" onclick="renderAuditLog()"><div class="admin-nav-icon">📜</div><div class="admin-nav-title">سجل النشاط</div><div class="admin-nav-desc">آخر الأحداث</div></div>
         <div class="admin-nav-card" onclick="openAdminBroadcast()"><div class="admin-nav-icon">💬</div><div class="admin-nav-title">إشعار شامل</div><div class="admin-nav-desc">لكل المستخدمين</div></div>
@@ -1906,7 +2515,7 @@ async function renderAdminDashboard() {
       </div>
       <div class="card" style="border-right:4px solid var(--danger); background: var(--danger-light);">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-          <div><h3 style="font-size:16px; font-weight:900; color:var(--danger);">🗑 منطقة الخطر</h3></div>
+          <div><h3 style="font-size:16px; font-weight:900; color:var(--danger);">🗑 منطقة الخطر</h3><p style="font-size:12px; color:var(--text-light);">مسح الاختبارات والمحاولات والتحديات</p></div>
           <button class="btn btn-danger" onclick="wipeQuizData()">🗑 مسح</button>
         </div>
       </div>
@@ -1930,13 +2539,16 @@ async function renderAdminDashboard() {
     setTimeout(observeLazyImages, 100);
   } finally { hideLoading(); }
 }
+
 function switchUserTab(tab) { currentUserTab = tab; paginationState[tab] = 1; renderAdminDashboard(); }
+
 function renderUsersListForTab(allUsers, allAttempts, tab) {
   let filtered = [], emptyMsg = '';
   if (tab === 'students') { filtered = allUsers.filter(u => u.role === 'student'); emptyMsg = 'لا يوجد طلاب'; }
   else if (tab === 'teachers') { filtered = allUsers.filter(u => u.role === 'teacher'); emptyMsg = 'لا يوجد مدرسون'; }
   else { filtered = allUsers.filter(u => u.role === 'parent'); emptyMsg = 'لا يوجد أولياء'; }
   if (filtered.length === 0) return `<div class="empty-state"><h3>${emptyMsg}</h3></div>`;
+  
   const searchId = `search_${tab}`;
   const filterId = `filter_${tab}`;
   let filterOptions = '';
@@ -1955,9 +2567,11 @@ function renderUsersListForTab(allUsers, allAttempts, tab) {
   const paginationHtml = renderPagination(filtered.length, paged.page, tab, `changeAdminPage_${tab}`);
   return headerHtml + `<div id="usersListBody_${tab}">${renderUsersBody(paged.items, allAttempts, tab)}</div>${paginationHtml}`;
 }
+
 window.changeAdminPage_students = (p) => { paginationState.students = p; refreshAdminUsersList('students'); };
 window.changeAdminPage_teachers = (p) => { paginationState.teachers = p; refreshAdminUsersList('teachers'); };
 window.changeAdminPage_parents = (p) => { paginationState.parents = p; refreshAdminUsersList('parents'); };
+
 async function refreshAdminUsersList(tab) {
   const allUsers = await DB.get('users');
   const allAttempts = await DB.get('attempts');
@@ -1985,6 +2599,7 @@ async function refreshAdminUsersList(tab) {
   if (oldPagination) oldPagination.remove();
   if (paginationHtml) container.insertAdjacentHTML('beforeend', paginationHtml);
 }
+
 function renderUsersBody(filtered, allAttempts, tab) {
   if (filtered.length === 0) return `<div class="empty-state"><h3>لا نتائج</h3></div>`;
   return filtered.map(u => {
@@ -2024,12 +2639,15 @@ function renderUsersBody(filtered, allAttempts, tab) {
     }
   }).join('');
 }
+
 async function applyAdminFilters(tab) {
   paginationState[tab] = 1;
   refreshAdminUsersList(tab);
 }
 
-/* ============ ADMIN: QUIZZES ============ */
+/* ═══════════════════════════════════════════════════════════
+   ✅ ADMIN: QUIZZES
+   ═══════════════════════════════════════════════════════════ */
 async function renderAdminQuizzes() {
   showLoading();
   try {
@@ -2051,6 +2669,7 @@ async function renderAdminQuizzes() {
     `;
   } finally { hideLoading(); }
 }
+
 function renderAdminQuizzesList(quizzes, teachers, attempts) {
   if (quizzes.length === 0) return `<div class="card"><div class="empty-state"><div class="empty-state-icon">📝</div><h3>لا يوجد اختبارات</h3></div></div>`;
   const sorted = quizzes.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
@@ -2076,6 +2695,7 @@ function renderAdminQuizzesList(quizzes, teachers, attempts) {
   }).join('');
   return html + renderPagination(sorted.length, paged.page, 'adminQuizzes', 'changeAdminQuizzesPage');
 }
+
 window.changeAdminQuizzesPage = async (p) => {
   paginationState.adminQuizzes = p;
   const allQuizzes = await DB.get('quizzes');
@@ -2090,6 +2710,7 @@ window.changeAdminQuizzesPage = async (p) => {
   });
   document.getElementById('adminQuizzesList').innerHTML = renderAdminQuizzesList(filtered, teachers, allAttempts);
 };
+
 async function filterAdminQuizzes() {
   paginationState.adminQuizzes = 1;
   const query = document.getElementById('quizSearchInput').value.trim().toLowerCase();
@@ -2104,6 +2725,7 @@ async function filterAdminQuizzes() {
   });
   document.getElementById('adminQuizzesList').innerHTML = renderAdminQuizzesList(filtered, teachers, allAttempts);
 }
+
 async function viewQuizDetails(quizId) {
   const allQuizzes = await DB.get('quizzes');
   const quiz = allQuizzes.find(q => q.id === quizId);
@@ -2127,6 +2749,7 @@ async function viewQuizDetails(quizId) {
       </div>`;
     }).join('')}`);
 }
+
 async function adminDeleteQuiz(quizId) {
   if (!confirm('⚠️ حذف الاختبار وجميع محاولاته؟')) return;
   if (prompt('اكتب "حذف" للتأكيد:') !== 'حذف') { alert('ألغي'); return; }
@@ -2142,7 +2765,9 @@ async function adminDeleteQuiz(quizId) {
   } finally { hideLoading(); }
 }
 
-/* ============ ADMIN: STATS ============ */
+/* ═══════════════════════════════════════════════════════════
+   ✅ ADMIN: STATS
+   ═══════════════════════════════════════════════════════════ */
 async function renderAdminStats() {
   showLoading();
   try {
@@ -2202,7 +2827,9 @@ async function renderAdminStats() {
   } finally { hideLoading(); }
 }
 
-/* ============ ADMIN: GAMIFICATION ============ */
+/* ═══════════════════════════════════════════════════════════
+   ✅ ADMIN: GAMIFICATION
+   ═══════════════════════════════════════════════════════════ */
 async function renderAdminGamification() {
   showLoading();
   try {
@@ -2256,6 +2883,7 @@ async function renderAdminGamification() {
   } finally { hideLoading(); }
 }
 window.changeGamifyPage = (p) => { paginationState.students = p; renderAdminGamification(); };
+
 function openGrantXPModal(studentId) {
   openModal(`<div class="modal-header"><h3 class="modal-title">➕ منح XP</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
     <div class="form-group"><label class="form-label">عدد النقاط</label><input type="number" class="form-input" id="grantXPAmount" value="50" min="1" max="1000"></div>
@@ -2355,7 +2983,91 @@ async function resetStudentGamification(studentId) {
     renderAdminGamification();
   } finally { hideLoading(); }
 }
-/* ============ ✅ ADMIN: ANNOUNCEMENTS - مع حقول التاريخ ============ */
+
+/* ═══════════════════════════════════════════════════════════
+   ✅ ADMIN: CHALLENGES (جديد)
+   ═══════════════════════════════════════════════════════════ */
+async function renderAdminChallenges() {
+  showLoading();
+  try {
+    const challenges = await DB.get('challenges');
+    const users = await DB.get('users');
+    const container = document.getElementById('dashboardContent');
+    
+    const pending = challenges.filter(c => c.status === 'pending');
+    const accepted = challenges.filter(c => c.status === 'accepted');
+    const completed = challenges.filter(c => c.status === 'completed');
+    const declined = challenges.filter(c => c.status === 'declined');
+    
+    const sorted = challenges.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    
+    container.innerHTML = `
+      <div class="card" style="background: linear-gradient(135deg, #f43f5e, #e11d48); color:#fff;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="font-size:48px;">⚔️</span>
+          <div><h2 style="font-size:24px; font-weight:900;">إدارة التحديات</h2><p style="opacity:0.9;">${challenges.length} تحدي</p></div>
+        </div>
+      </div>
+      <button class="btn btn-outline" onclick="renderAdminDashboard()" style="margin-bottom:16px;">← العودة</button>
+      
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon warning">⏳</div><div class="stat-info"><h4>${pending.length}</h4><p>معلقة</p></div></div>
+        <div class="stat-card"><div class="stat-icon info">✅</div><div class="stat-info"><h4>${accepted.length}</h4><p>مقبولة</p></div></div>
+        <div class="stat-card"><div class="stat-icon success">🏁</div><div class="stat-info"><h4>${completed.length}</h4><p>مكتملة</p></div></div>
+        <div class="stat-card"><div class="stat-icon danger">❌</div><div class="stat-info"><h4>${declined.length}</h4><p>مرفوضة</p></div></div>
+      </div>
+      
+      <div class="section-header"><div><h2 class="section-title">⚔️ كل التحديات</h2></div></div>
+      <div class="card">
+        ${sorted.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">⚔️</div><h3>لا توجد تحديات</h3></div>` :
+          sorted.slice(0, 50).map(c => {
+            const statusLabels = { pending: '⏳ معلقة', accepted: '✅ مقبولة', completed: '🏁 مكتملة', declined: '❌ مرفوضة' };
+            const statusClasses = { pending: 'warning', accepted: 'info', completed: 'success', declined: 'danger' };
+            return `<div class="challenge-card ${c.status}">
+              <div class="challenge-header">
+                <div class="challenge-avatar">${c.status === 'completed' ? '🏁' : c.status === 'accepted' ? '✅' : c.status === 'declined' ? '❌' : '⏳'}</div>
+                <div class="challenge-info">
+                  <h4>${escapeHtml(c.fromName)} ⚔️ ${escapeHtml(c.toName)}</h4>
+                  <p>📝 ${escapeHtml(c.quizTitle)} • <span class="badge badge-${statusClasses[c.status]}">${statusLabels[c.status]}</span></p>
+                  <p style="font-size:11px;">${new Date(c.createdAt).toLocaleDateString('ar-EG')}</p>
+                </div>
+              </div>
+              ${c.status === 'completed' ? `<div class="challenge-result">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:center;">
+                  <div style="padding:8px;background:var(--primary-light);border-radius:8px;">
+                    <div style="font-size:11px;">${escapeHtml(c.fromName)}</div>
+                    <div style="font-size:18px;font-weight:900;color:var(--primary);">${c.fromScore || 0}%</div>
+                  </div>
+                  <div style="padding:8px;background:var(--info-light);border-radius:8px;">
+                    <div style="font-size:11px;">${escapeHtml(c.toName)}</div>
+                    <div style="font-size:18px;font-weight:900;color:var(--info);">${c.toScore || 0}%</div>
+                  </div>
+                </div>
+              </div>` : ''}
+              ${c.status !== 'completed' ? `<button class="btn btn-sm btn-danger" onclick="adminDeleteChallenge('${c.id}')" style="margin-top:8px;">🗑 حذف</button>` : ''}
+            </div>`;
+          }).join('')
+        }
+      </div>
+    `;
+  } finally { hideLoading(); }
+}
+
+async function adminDeleteChallenge(challengeId) {
+  if (!confirm('حذف التحدي؟')) return;
+  showLoading();
+  try {
+    const challenges = await DB.get('challenges');
+    await DB.set('challenges', challenges.filter(c => c.id !== challengeId));
+    await logActivity('حذف تحدي (أدمن)', challengeId);
+    alert('✅ تم');
+    renderAdminChallenges();
+  } finally { hideLoading(); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ✅ ADMIN: ANNOUNCEMENTS
+   ═══════════════════════════════════════════════════════════ */
 async function renderAdminAnnouncements() {
   showLoading();
   try {
@@ -2402,7 +3114,6 @@ async function renderAdminAnnouncements() {
   } finally { hideLoading(); }
 }
 
-/* ✅ إصلاح: openAnnouncementEditor يحتوي على حقول startDate و endDate */
 async function openAnnouncementEditor(id = null) {
   const announcements = await DB.get('announcements');
   const a = id ? announcements.find(x => x.id === id) : null;
@@ -2444,11 +3155,13 @@ async function openAnnouncementEditor(id = null) {
     <button class="btn btn-success btn-full" onclick="saveAnnouncement('${id || ''}')">💾 حفظ</button>`);
   window._currentAnnType = currentType;
 }
+
 function pickAnnType(type) {
   window._currentAnnType = type;
   document.getElementById('annTypeBar').classList.toggle('active', type === 'bar');
   document.getElementById('annTypeBanner').classList.toggle('active', type === 'banner');
 }
+
 async function handleAnnImageUpload(e) {
   const originalFile = e.target.files[0]; if (!originalFile) return;
   if (!originalFile.type.startsWith('image/')) { alert('صورة فقط'); e.target.value = ''; return; }
@@ -2470,13 +3183,13 @@ async function handleAnnImageUpload(e) {
   } catch (err) { alert('فشل: ' + err.message); }
   finally { hideLoading(); }
 }
+
 function removeAnnImage() {
   _tempAnnImage = null;
   document.getElementById('annImagePreview').innerHTML = '<div style="padding:20px;background:var(--bg);border-radius:10px;color:var(--text-light);">لا توجد صورة</div>';
   const fi = document.getElementById('annImageFile'); if (fi) fi.value = '';
 }
 
-/* ✅ إصلاح: saveAnnouncement يحفظ startDate و endDate */
 async function saveAnnouncement(id) {
   const emoji = document.getElementById('annEmoji').value.trim() || '📢';
   const title = document.getElementById('annTitle').value.trim();
@@ -2491,32 +3204,34 @@ async function saveAnnouncement(id) {
   const endDate = endVal ? new Date(endVal).getTime() : null;
   const type = window._currentAnnType || 'bar';
   const imageUrl = _tempAnnImage || null;
-  
+
   if (!text) { alert('أدخل نص الإعلان'); return; }
   if (imageUrl && imageUrl.length > 10 * 1024 * 1024) { alert('الصورة كبيرة'); return; }
-  
+
   showLoading();
   try {
     const announcements = await DB.get('announcements');
     if (id) {
       const idx = announcements.findIndex(a => a.id === id);
       if (idx >= 0) {
-        announcements[idx] = { 
-          ...announcements[idx], emoji, title, text, link, linkText, 
+        announcements[idx] = {
+          ...announcements[idx], emoji, title, text, link, linkText,
           bgColor, bgColorEnd, type, imageUrl, startDate, endDate,
-          updatedAt: Date.now() 
+          updatedAt: Date.now()
         };
       }
     } else {
-      announcements.push({ 
-        id: uid(), emoji, title, text, link, linkText, 
-        bgColor, bgColorEnd, type, imageUrl, 
+      announcements.push({
+        id: uid(), emoji, title, text, link, linkText,
+        bgColor, bgColorEnd, type, imageUrl,
         startDate, endDate,
-        enabled: true, createdAt: Date.now() 
+        enabled: true, createdAt: Date.now()
       });
     }
     await DB.set('announcements', announcements);
     _cachedAnnouncements = announcements;
+    localStorage.removeItem('edu_announcement_dismissed');
+    _lastAnnouncementId = null;
     await logActivity(id ? 'تعديل إعلان' : 'إنشاء إعلان', title || text.slice(0, 30));
     launchConfetti(20);
     alert('✅ تم الحفظ');
@@ -2525,6 +3240,7 @@ async function saveAnnouncement(id) {
     renderAdminAnnouncements();
   } finally { hideLoading(); }
 }
+
 async function toggleAnnouncement(id) {
   showLoading();
   try {
@@ -2539,6 +3255,7 @@ async function toggleAnnouncement(id) {
     }
   } finally { hideLoading(); }
 }
+
 async function deleteAnnouncement(id) {
   if (!confirm('حذف؟')) return;
   showLoading();
@@ -2554,7 +3271,9 @@ async function deleteAnnouncement(id) {
   } finally { hideLoading(); }
 }
 
-/* ============ ADMIN: SETTINGS ============ */
+/* ═══════════════════════════════════════════════════════════
+   ✅ ADMIN: SETTINGS
+   ═══════════════════════════════════════════════════════════ */
 async function renderAdminSettings() {
   showLoading();
   try {
@@ -2603,12 +3322,14 @@ async function renderAdminSettings() {
     `;
   } finally { hideLoading(); }
 }
+
 window.selectAdminTheme = (key) => {
   document.querySelectorAll('.theme-option').forEach(el => el.classList.remove('active'));
   const el = document.querySelector(`.theme-option[onclick*="'${key}'"]`);
   if (el) el.classList.add('active');
   document.getElementById('setTheme').value = key;
 };
+
 async function savePlatformSettingsForm() {
   platformSettings.platformName = document.getElementById('setName').value.trim() || 'منصة تعليمية';
   platformSettings.platformTagline = document.getElementById('setTagline').value.trim();
@@ -2638,7 +3359,9 @@ async function savePlatformSettingsForm() {
   } finally { hideLoading(); }
 }
 
-/* ============ ADMIN: AUDIT + BROADCAST + PENDING ============ */
+/* ═══════════════════════════════════════════════════════════
+   ✅ ADMIN: AUDIT + BROADCAST + PENDING
+   ═══════════════════════════════════════════════════════════ */
 async function renderAuditLog() {
   showLoading();
   try {
@@ -2747,13 +3470,14 @@ async function deleteUser(userId) {
 }
 async function wipeQuizData() {
   if (!isAdmin(currentUser)) { alert('غير مصرح'); return; }
-  if (!confirm('⚠️ مسح الكل؟')) return;
+  if (!confirm('⚠️ مسح الكل (اختبارات، محاولات، تحديات، إشعارات)؟')) return;
   if (prompt('اكتب "حذف":') !== 'حذف') { alert('ألغي'); return; }
   showLoading();
   try {
     await DB.set('quizzes', []);
     await DB.set('attempts', []);
     await DB.set('notifications', []);
+    await DB.set('challenges', []);
     await logActivity('مسح شامل');
     alert('✅ تم');
     renderAdminDashboard();
@@ -2767,8 +3491,9 @@ function renderPendingTeacherDashboard() {
     <p style="color:var(--text-light);">مرحباً ${escapeHtml(currentUser.name)}!</p>
   </div>`;
 }
-
-/* ============ TEACHER DASHBOARD ============ */
+/* ═══════════════════════════════════════════════════════════
+   ✅ TEACHER DASHBOARD
+   ═══════════════════════════════════════════════════════════ */
 async function renderTeacherDashboard() {
   showLoading();
   try {
@@ -2846,6 +3571,7 @@ async function renderTeacherDashboard() {
     }
   } finally { hideLoading(); }
 }
+
 function renderQuizCard(quiz) {
   const tc = {};
   quiz.questions.forEach(q => { const t = q.type || 'mcq'; tc[t] = (tc[t] || 0) + 1; });
@@ -2861,6 +3587,7 @@ function renderQuizCard(quiz) {
     </div>
   </div>`;
 }
+
 function renderStudentsList(students, allAttempts) {
   const bySchool = {};
   students.forEach(s => { const k = s.school || 'غير محدد'; if (!bySchool[k]) bySchool[k] = []; bySchool[k].push(s); });
@@ -2881,6 +3608,7 @@ function renderStudentsList(students, allAttempts) {
     ${list.length > 10 ? `<p style="text-align:center;padding:8px;color:var(--text-light);font-size:12px;">و ${list.length - 10} آخرون...</p>` : ''}
   </div>`).join('')}</div>`;
 }
+
 function renderLeaderboard(users, attempts) {
   const students = users.filter(u => u.role === 'student');
   const stats = students.map(s => {
@@ -2897,6 +3625,7 @@ function renderLeaderboard(users, attempts) {
     </div>`;
   }).join('')}</div>`;
 }
+
 function openBroadcastModal() {
   openModal(`<div class="modal-header"><h3 class="modal-title">📢 إشعار</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
     <div class="form-group">
@@ -2937,6 +3666,7 @@ async function sendBroadcast() {
     closeModal();
   } finally { hideLoading(); }
 }
+
 async function renderAttemptsList(attempts) {
   if (!attempts.length) return '<div class="card"><div class="empty-state"><h3>لا نتائج</h3></div></div>';
   const allQuizzes = await DB.get('quizzes'), allUsers = await DB.get('users');
@@ -2954,254 +3684,10 @@ async function renderAttemptsList(attempts) {
     </div>`;
   }).join('')}</div>`;
 }
-/* ============ STUDENT DASHBOARD ============ */
-async function renderStudentDashboard() {
-  showLoading();
-  try {
-    const allQuizzes = await DB.get('quizzes');
-    const myQuizzes = allQuizzes.filter(q => q.grade === currentUser.grade);
-    const allAttempts = await DB.get('attempts');
-    const myAttempts = allAttempts.filter(a => a.studentId === currentUser.id);
-    const solvedIds = new Set(myAttempts.map(a => a.quizId));
-    const availableQuizzes = myQuizzes.filter(q => !solvedIds.has(q.id));
-    const completedQuizzes = myQuizzes.filter(q => solvedIds.has(q.id));
-    const bySubject = {};
-    availableQuizzes.forEach(q => { const k = q.subject || 'other'; if (!bySubject[k]) bySubject[k] = []; bySubject[k].push(q); });
-    const orderedSubjects = SUBJECTS.filter(s => bySubject[s.id] && bySubject[s.id].length > 0).map(s => ({ ...s, quizzes: bySubject[s.id] }));
-    const lvl = getLevel(currentUser.xp || 0);
-    const next = getNextLevel(currentUser.xp || 0);
-    const xpInLevel = (currentUser.xp || 0) - lvl.minXP;
-    const xpNeeded = lvl.maxXP === Infinity ? 1 : (lvl.maxXP - lvl.minXP);
-    const xpPct = Math.min(100, (xpInLevel / xpNeeded) * 100);
-    const myBadges = currentUser.badges || [];
-    const pendingChallenges = (await DB.get('challenges')).filter(c => c.toId === currentUser.id && c.status === 'pending').length;
-    const container = document.getElementById('dashboardContent');
-    container.innerHTML = `
-      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-        <button class="btn btn-warning" onclick="openFriendsModal()">👥 الأصدقاء والتحديات ${pendingChallenges > 0 ? `<span class="badge badge-danger" style="margin-right:4px;">${pendingChallenges}</span>` : ''}</button>
-      </div>
-      <div class="xp-bar-container">
-        <div class="xp-bar-header">
-          <div class="xp-level">
-            <span class="xp-level-emoji">${lvl.emoji}</span>
-            <div class="xp-level-info"><h4>${lvl.name}</h4><p>${next ? `التالي: ${next.emoji} ${next.name}` : 'وصلت للأعلى!'}</p></div>
-          </div>
-          <div class="xp-points">${currentUser.xp || 0} XP</div>
-        </div>
-        <div class="xp-bar"><div class="xp-bar-fill" style="width:${xpPct}%;"></div></div>
-        <div class="xp-bar-info"><span>${xpInLevel} / ${xpNeeded === 1 ? '∞' : xpNeeded}</span><span>${next ? `${next.minXP - (currentUser.xp || 0)} XP` : '👑'}</span></div>
-      </div>
-      ${(currentUser.streak || 0) > 0 ? `<div class="streak-card"><span class="streak-fire">🔥</span><div class="streak-info"><h3>${currentUser.streak} يوم متتالي!</h3><p>استمر</p></div></div>` : ''}
-      <div class="stats-grid">
-        <div class="stat-card"><div class="stat-icon primary">📝</div><div class="stat-info"><h4>${availableQuizzes.length}</h4><p>متاحة</p></div></div>
-        <div class="stat-card"><div class="stat-icon success">✅</div><div class="stat-info"><h4>${completedQuizzes.length}</h4><p>حلّيتها</p></div></div>
-        <div class="stat-card"><div class="stat-icon warning">📊</div><div class="stat-info"><h4>${calculateAvg(myAttempts)}%</h4><p>متوسطك</p></div></div>
-        <div class="stat-card"><div class="stat-icon purple">🏆</div><div class="stat-info"><h4>${myBadges.length}</h4><p>شارات</p></div></div>
-      </div>
-      ${myBadges.length > 0 ? `<div class="section-header"><div><h2 class="section-title">🏅 شاراتي</h2></div></div>
-        <div class="badges-grid">${myBadges.map(b => `<div class="badge-card earned"><div class="badge-emoji">${BADGES[b].emoji}</div><div class="badge-name">${BADGES[b].name}</div></div>`).join('')}</div>` : ''}
-      ${completedQuizzes.length > 0 ? `<div class="card" style="border-right:4px solid var(--success); background: var(--success-light);">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-          <div><h3 style="font-size:18px; font-weight:900; color:var(--success);">✅ ${completedQuizzes.length} تمت الإجابة</h3></div>
-          <button class="btn btn-success" onclick="renderAnsweredScreen('all')">👁️ عرض</button>
-        </div>
-      </div>` : ''}
-      <div class="chart-container"><canvas id="studentChart"></canvas></div>
-      <div class="section-header"><div><h2 class="section-title">الاختبارات المتاحة</h2><p class="section-subtitle">${escapeHtml(currentUser.grade || '')}</p></div></div>
-      ${availableQuizzes.length === 0 ? `<div class="card" style="text-align:center; padding:40px 20px;">
-        <div style="font-size:72px; margin-bottom:16px;">🎉</div>
-        <h3 style="font-size:22px; font-weight:900;">أكملت جميع الاختبارات!</h3>
-        <button class="btn btn-success btn-lg" onclick="renderAnsweredScreen('all')" style="margin-top:16px;">👁️ عرض</button>
-      </div>` : orderedSubjects.map(subj => `<div class="subject-group">
-          <div class="subject-group-header">
-            <span class="subject-group-emoji">${subj.emoji}</span>
-            <span class="subject-group-title">${escapeHtml(subj.name)}</span>
-            <span class="subject-group-count">${subj.quizzes.length}</span>
-          </div>
-          <div class="cards-grid">${subj.quizzes.map(q => renderStudentQuizCard(q, myAttempts)).join('')}</div>
-        </div>`).join('')}
-      <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">👨‍🏫 المدرسون</h2></div></div>
-      ${await renderTeachersForStudents()}
-      ${platformSettings.leaderboardEnabled ? `<div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">🏆 لوحة الشرف</h2></div></div>${renderLeaderboard(await DB.get('users'), allAttempts)}` : ''}
-    `;
-    const ctx = document.getElementById('studentChart')?.getContext('2d');
-    if (ctx && myAttempts.length > 0) {
-      const labels = myAttempts.slice(0, 10).reverse().map(a => { const q = allQuizzes.find(x => x.id === a.quizId); return q ? q.title.slice(0, 10) : 'اختبار'; });
-      const data = myAttempts.slice(0, 10).reverse().map(a => a.total > 0 ? Math.round((a.score / a.total) * 100) : 0);
-      new Chart(ctx, { type: 'line', data: { labels, datasets: [{ label: 'درجاتك %', data, borderColor: '#4f46e5', backgroundColor: 'rgba(79,70,229,0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100 } } } });
-    }
-  } finally { hideLoading(); }
-}
-function renderStudentQuizCard(quiz, myAttempts) {
-  if (myAttempts.some(a => a.quizId === quiz.id)) return '';
-  return `<div class="subject-card" onclick="startQuiz('${quiz.id}')">
-    <div class="subject-emoji">${getSubjectEmoji(quiz.subject)}</div>
-    <div class="subject-name">${escapeHtml(quiz.title)}</div>
-    <div class="subject-meta">${getSubjectName(quiz.subject)} • ${quiz.questions.length} سؤال</div>
-    <div class="subject-footer"><span class="badge badge-primary">ابدأ</span></div>
-  </div>`;
-}
-async function renderAnsweredScreen(filterTab = 'all') {
-  showLoading();
-  try {
-    const allQuizzes = await DB.get('quizzes');
-    const allAttempts = await DB.get('attempts');
-    const myAttempts = allAttempts.filter(a => a.studentId === currentUser.id).sort((a, b) => b.createdAt - a.createdAt);
-    let filtered = myAttempts;
-    if (filterTab !== 'all') filtered = myAttempts.filter(a => { const q = allQuizzes.find(x => x.id === a.quizId); return q && q.subject === filterTab; });
-    const subjectsInAttempts = [...new Set(myAttempts.map(a => { const q = allQuizzes.find(x => x.id === a.quizId); return q?.subject; }).filter(Boolean))];
-    const container = document.getElementById('dashboardContent');
-    container.innerHTML = `
-      <div class="card" style="background: linear-gradient(135deg, var(--success), #059669); color:#fff;">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <span style="font-size:48px;">✅</span>
-          <div><h2 style="font-size:24px; font-weight:900;">ما تمت الإجابة عليه</h2><p style="opacity:0.9;">${myAttempts.length} اختبار • متوسط ${calculateAvg(myAttempts)}%</p></div>
-        </div>
-      </div>
-      <div style="display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;">
-        <button class="btn btn-outline" onclick="renderStudentDashboard()">🏠 الرئيسية</button>
-      </div>
-      <div class="answered-tabs">
-        <button class="answered-tab ${filterTab === 'all' ? 'active' : ''}" onclick="renderAnsweredScreen('all')">📚 الكل <span class="count">${myAttempts.length}</span></button>
-        ${subjectsInAttempts.map(subjId => {
-          const count = myAttempts.filter(a => { const q = allQuizzes.find(x => x.id === a.quizId); return q?.subject === subjId; }).length;
-          return `<button class="answered-tab ${filterTab === subjId ? 'active' : ''}" onclick="renderAnsweredScreen('${subjId}')">${getSubjectEmoji(subjId)} ${getSubjectName(subjId)} <span class="count">${count}</span></button>`;
-        }).join('')}
-      </div>
-      ${filtered.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا اختبارات محلولة</h3></div></div>` :
-        filtered.map(a => {
-          const quiz = allQuizzes.find(q => q.id === a.quizId);
-          if (!quiz) return '';
-          const pct = a.total > 0 ? Math.round((a.score / a.total) * 100) : 0;
-          const pending = a.needsGrading && !a.graded;
-          return `<div class="quiz-result-card">
-            <div class="quiz-result-header">
-              <div class="quiz-result-title"><h4>${escapeHtml(quiz.title)}</h4><p>${getSubjectEmoji(quiz.subject)} ${getSubjectName(quiz.subject)} • ${new Date(a.createdAt).toLocaleDateString('ar-EG')}</p></div>
-              <div class="quiz-result-score">${pct}%</div>
-            </div>
-            <div class="quiz-result-footer">
-              <span class="badge badge-primary">${a.score}/${a.total}</span>
-              ${pending ? `<span class="pending-badge"><span class="pending-dot"></span> بانتظار تصحيح</span>` : `<span class="badge badge-${pct >= 80 ? 'success' : pct >= 50 ? 'warning' : 'danger'}">${pct >= 80 ? 'ممتاز' : pct >= 50 ? 'جيد' : 'يحتاج مراجعة'}</span>`}
-            </div>
-          </div>`;
-        }).join('')}
-    `;
-  } finally { hideLoading(); }
-}
 
-/* ============ PARENT DASHBOARD ============ */
-async function renderParentDashboard() {
-  showLoading();
-  try {
-    const allUsers = await DB.get('users');
-    const allAttempts = await DB.get('attempts');
-    const children = allUsers.filter(u => u.role === 'student' && (currentUser.children || []).includes(u.id));
-    const totalAttempts = children.reduce((sum, c) => sum + allAttempts.filter(a => a.studentId === c.id).length, 0);
-    const avgAll = children.length > 0 ? Math.round(children.reduce((sum, c) => {
-      const ca = allAttempts.filter(a => a.studentId === c.id);
-      return sum + (ca.length ? calculateAvg(ca) : 0);
-    }, 0) / children.length) : 0;
-    const container = document.getElementById('dashboardContent');
-    container.innerHTML = `
-      <div class="card" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); color:#fff;">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <span style="font-size:48px;">👨‍👩‍👦</span>
-          <div><h2 style="font-size:24px; font-weight:900;">لوحة ولي الأمر</h2></div>
-        </div>
-      </div>
-      <div class="stats-grid">
-        <div class="stat-card"><div class="stat-icon primary">👨‍🎓</div><div class="stat-info"><h4>${children.length}</h4><p>أبنائي</p></div></div>
-        <div class="stat-card"><div class="stat-icon success">✅</div><div class="stat-info"><h4>${totalAttempts}</h4><p>محاولات</p></div></div>
-        <div class="stat-card"><div class="stat-icon warning">📊</div><div class="stat-info"><h4>${avgAll}%</h4><p>متوسط</p></div></div>
-      </div>
-      <div class="add-child-box">
-        <h4>➕ إضافة ابن</h4>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
-          <input type="text" class="form-input auto-dir" id="childSearchInput" placeholder="البريد أو الهاتف" style="max-width:400px;" dir="rtl">
-          <button class="btn btn-primary" onclick="searchChild()">🔍 بحث</button>
-        </div>
-      </div>
-      <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">👨‍🎓 أبنائي</h2></div></div>
-      ${children.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا أبناء</h3></div></div>` :
-        children.map(child => {
-          const ca = allAttempts.filter(a => a.studentId === child.id);
-          const cAvg = ca.length ? calculateAvg(ca) : 0;
-          const lvl = getLevel(child.xp || 0);
-          return `<div class="parent-child-card">
-            <div class="parent-child-header">
-              <div class="parent-child-avatar">${child.photoURL ? `<img data-src="${child.photoURL}" class="lazy-img" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="">` : '👨‍🎓'}</div>
-              <div class="parent-child-info"><h4>${escapeHtml(child.name)} <span class="badge badge-purple">${lvl.emoji}</span></h4><p>${escapeHtml(child.grade || '')} • ${child.xp || 0} XP</p></div>
-              <button class="btn btn-sm btn-danger" onclick="removeChild('${child.id}')">🗑</button>
-            </div>
-            <div class="parent-child-stats">
-              <div class="parent-child-stat"><h5>${ca.length}</h5><p>محلول</p></div>
-              <div class="parent-child-stat"><h5>${cAvg}%</h5><p>المتوسط</p></div>
-              <div class="parent-child-stat"><h5>${(child.badges || []).length}</h5><p>شارات</p></div>
-            </div>
-            <button class="btn btn-outline btn-full btn-sm" onclick="openChildDetails('${child.id}')">👁️ التفاصيل</button>
-          </div>`;
-        }).join('')}
-    `;
-    setTimeout(observeLazyImages, 100);
-  } finally { hideLoading(); }
-}
-async function searchChild() {
-  const query = document.getElementById('childSearchInput').value.trim().toLowerCase();
-  if (!query) { alert('أدخل البريد أو الهاتف'); return; }
-  showLoading();
-  try {
-    const users = await DB.get('users');
-    const student = users.find(u => u.role === 'student' && (u.email?.toLowerCase() === query || u.parentPhone === query));
-    if (!student) { alert('❌ لم يتم العثور'); return; }
-    if ((currentUser.children || []).includes(student.id)) { alert('⚠️ مرتبط'); return; }
-    if (!currentUser.children) currentUser.children = [];
-    currentUser.children.push(student.id);
-    const userIdx = users.findIndex(u => u.id === currentUser.id);
-    if (userIdx >= 0) { users[userIdx].children = currentUser.children; await DB.set('users', users); }
-    launchConfetti(30);
-    alert(`✅ تم ربط ${student.name}`);
-    renderParentDashboard();
-  } finally { hideLoading(); }
-}
-async function removeChild(childId) {
-  if (!confirm('إلغاء؟')) return;
-  showLoading();
-  try {
-    currentUser.children = (currentUser.children || []).filter(id => id !== childId);
-    const users = await DB.get('users');
-    const userIdx = users.findIndex(u => u.id === currentUser.id);
-    if (userIdx >= 0) { users[userIdx].children = currentUser.children; await DB.set('users', users); }
-    alert('✅');
-    renderParentDashboard();
-  } finally { hideLoading(); }
-}
-async function openChildDetails(childId) {
-  showLoading();
-  try {
-    const users = await DB.get('users');
-    const allAttempts = await DB.get('attempts');
-    const allQuizzes = await DB.get('quizzes');
-    const child = users.find(u => u.id === childId);
-    if (!child) return;
-    const ca = allAttempts.filter(a => a.studentId === childId).sort((a, b) => b.createdAt - a.createdAt);
-    const avg = ca.length ? calculateAvg(ca) : 0;
-    const lvl = getLevel(child.xp || 0);
-    openModal(`<div class="modal-header"><h3 class="modal-title">👨‍🎓 ${escapeHtml(child.name)}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-      <div class="alert alert-info">📚 ${escapeHtml(child.grade || '')}<br>${lvl.emoji} ${lvl.name} • ${child.xp || 0} XP • 🔥 ${child.streak || 0}<br>📊 المتوسط: ${avg}% • ${ca.length} اختبار</div>
-      ${ca.slice(0, 10).map(a => {
-        const quiz = allQuizzes.find(q => q.id === a.quizId);
-        if (!quiz) return '';
-        const pct = a.total > 0 ? Math.round((a.score / a.total) * 100) : 0;
-        return `<div class="history-item">
-          <div class="history-info"><h4>${escapeHtml(quiz.title)}</h4><p>${new Date(a.createdAt).toLocaleDateString('ar-EG')}</p></div>
-          <div class="history-score">${a.score}/${a.total}</div>
-          <span class="badge badge-${pct>=80?'success':pct>=50?'warning':'danger'}">${pct}%</span>
-        </div>`;
-      }).join('')}`);
-  } finally { hideLoading(); }
-}
-
-/* ============ TEACHER PROFILE + CONTENT ============ */
+/* ═══════════════════════════════════════════════════════════
+   ✅ TEACHER PROFILE + CONTENT
+   ═══════════════════════════════════════════════════════════ */
 function openTeacherProfileEdit() {
   if (currentUser.role !== 'teacher') { alert('للمدرسين فقط'); return; }
   const u = currentUser;
@@ -3404,6 +3890,7 @@ async function downloadTeacherMaterial(teacherId, index) {
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
   }
 }
+
 function renderTeacherCard(teacher, showRateButton = true) {
   const ratings = teacher.ratings || [];
   const avg = ratings.length ? (ratings.reduce((a, r) => a + r.stars, 0) / ratings.length).toFixed(1) : '0';
@@ -3464,7 +3951,9 @@ async function renderTeachersForParent() {
   return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px;">${teachers.map(t => renderTeacherCard(t, false)).join('')}</div>`;
 }
 
-/* ============ QUIZ CREATION ============ */
+/* ═══════════════════════════════════════════════════════════
+   ✅ QUIZ CREATION
+   ═══════════════════════════════════════════════════════════ */
 function openNewQuizModal() {
   editingQuizId = null;
   newQuizData = { title: '', grade: '', subject: currentUser.subject, timePerQuestion: 30, questions: [] };
@@ -3640,6 +4129,10 @@ async function deleteQuiz(quizId) {
     renderTeacherDashboard();
   } finally { hideLoading(); }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   ✅ GRADING
+   ═══════════════════════════════════════════════════════════ */
 async function openGradingCenter() {
   showLoading();
   try {
@@ -3728,6 +4221,10 @@ async function finalizeGrading(attemptId) {
     renderTeacherDashboard();
   } finally { hideLoading(); }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   ✅ EXPORT
+   ═══════════════════════════════════════════════════════════ */
 async function exportResults() {
   const quizzes = (await DB.get('quizzes')).filter(q => q.teacherId === currentUser.id);
   const allAttempts = await DB.get('attempts');
@@ -3763,22 +4260,324 @@ async function exportStudents() {
   XLSX.writeFile(wb, 'الطلاب.xlsx');
 }
 
-/* ============ TAKE QUIZ ============ */
+/* ═══════════════════════════════════════════════════════════
+   ✅ STUDENT DASHBOARD
+   ═══════════════════════════════════════════════════════════ */
+async function renderStudentDashboard() {
+  showLoading();
+  try {
+    const allQuizzes = await DB.get('quizzes');
+    const myQuizzes = allQuizzes.filter(q => q.grade === currentUser.grade);
+    const allAttempts = await DB.get('attempts');
+    const myAttempts = allAttempts.filter(a => a.studentId === currentUser.id);
+    const solvedIds = new Set(myAttempts.map(a => a.quizId));
+    const availableQuizzes = myQuizzes.filter(q => !solvedIds.has(q.id));
+    const completedQuizzes = myQuizzes.filter(q => solvedIds.has(q.id));
+    const bySubject = {};
+    availableQuizzes.forEach(q => { const k = q.subject || 'other'; if (!bySubject[k]) bySubject[k] = []; bySubject[k].push(q); });
+    const orderedSubjects = SUBJECTS.filter(s => bySubject[s.id] && bySubject[s.id].length > 0).map(s => ({ ...s, quizzes: bySubject[s.id] }));
+    const lvl = getLevel(currentUser.xp || 0);
+    const next = getNextLevel(currentUser.xp || 0);
+    const xpInLevel = (currentUser.xp || 0) - lvl.minXP;
+    const xpNeeded = lvl.maxXP === Infinity ? 1 : (lvl.maxXP - lvl.minXP);
+    const xpPct = Math.min(100, (xpInLevel / xpNeeded) * 100);
+    const myBadges = currentUser.badges || [];
+    
+    // ✅ التحديات المعلقة
+    const allChallenges = await DB.get('challenges');
+    const pendingChallenges = allChallenges.filter(c => c.toId === currentUser.id && c.status === 'pending').length;
+    const acceptedChallenges = allChallenges.filter(c => c.toId === currentUser.id && c.status === 'accepted').length;
+    const totalActiveChallenges = pendingChallenges + acceptedChallenges;
+    
+    const container = document.getElementById('dashboardContent');
+    container.innerHTML = `
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        <button class="btn btn-warning" onclick="openFriendsModal()">
+          👥 الأصدقاء والتحديات 
+          ${totalActiveChallenges > 0 ? `<span class="badge badge-danger" style="margin-right:4px;">${totalActiveChallenges}</span>` : ''}
+        </button>
+      </div>
+      <div class="xp-bar-container">
+        <div class="xp-bar-header">
+          <div class="xp-level">
+            <span class="xp-level-emoji">${lvl.emoji}</span>
+            <div class="xp-level-info"><h4>${lvl.name}</h4><p>${next ? `التالي: ${next.emoji} ${next.name}` : 'وصلت للأعلى!'}</p></div>
+          </div>
+          <div class="xp-points">${currentUser.xp || 0} XP</div>
+        </div>
+        <div class="xp-bar"><div class="xp-bar-fill" style="width:${xpPct}%;"></div></div>
+        <div class="xp-bar-info"><span>${xpInLevel} / ${xpNeeded === 1 ? '∞' : xpNeeded}</span><span>${next ? `${next.minXP - (currentUser.xp || 0)} XP` : '👑'}</span></div>
+      </div>
+      ${(currentUser.streak || 0) > 0 ? `<div class="streak-card"><span class="streak-fire">🔥</span><div class="streak-info"><h3>${currentUser.streak} يوم متتالي!</h3><p>استمر</p></div></div>` : ''}
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon primary">📝</div><div class="stat-info"><h4>${availableQuizzes.length}</h4><p>متاحة</p></div></div>
+        <div class="stat-card"><div class="stat-icon success">✅</div><div class="stat-info"><h4>${completedQuizzes.length}</h4><p>حلّيتها</p></div></div>
+        <div class="stat-card"><div class="stat-icon warning">📊</div><div class="stat-info"><h4>${calculateAvg(myAttempts)}%</h4><p>متوسطك</p></div></div>
+        <div class="stat-card"><div class="stat-icon purple">🏆</div><div class="stat-info"><h4>${myBadges.length}</h4><p>شارات</p></div></div>
+      </div>
+      ${myBadges.length > 0 ? `<div class="section-header"><div><h2 class="section-title">🏅 شاراتي</h2></div></div>
+        <div class="badges-grid">${myBadges.map(b => `<div class="badge-card earned"><div class="badge-emoji">${BADGES[b].emoji}</div><div class="badge-name">${BADGES[b].name}</div></div>`).join('')}</div>` : ''}
+      ${completedQuizzes.length > 0 ? `<div class="card" style="border-right:4px solid var(--success); background: var(--success-light);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div><h3 style="font-size:18px; font-weight:900; color:var(--success);">✅ ${completedQuizzes.length} تمت الإجابة</h3></div>
+          <button class="btn btn-success" onclick="renderAnsweredScreen('all')">👁️ عرض</button>
+        </div>
+      </div>` : ''}
+      <div class="chart-container"><canvas id="studentChart"></canvas></div>
+      <div class="section-header"><div><h2 class="section-title">الاختبارات المتاحة</h2><p class="section-subtitle">${escapeHtml(currentUser.grade || '')}</p></div></div>
+      ${availableQuizzes.length === 0 ? `<div class="card" style="text-align:center; padding:40px 20px;">
+        <div style="font-size:72px; margin-bottom:16px;">🎉</div>
+        <h3 style="font-size:22px; font-weight:900;">أكملت جميع الاختبارات!</h3>
+        <button class="btn btn-success btn-lg" onclick="renderAnsweredScreen('all')" style="margin-top:16px;">👁️ عرض</button>
+      </div>` : orderedSubjects.map(subj => `<div class="subject-group">
+          <div class="subject-group-header">
+            <span class="subject-group-emoji">${subj.emoji}</span>
+            <span class="subject-group-title">${escapeHtml(subj.name)}</span>
+            <span class="subject-group-count">${subj.quizzes.length}</span>
+          </div>
+          <div class="cards-grid">${subj.quizzes.map(q => renderStudentQuizCard(q, myAttempts)).join('')}</div>
+        </div>`).join('')}
+      <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">👨‍🏫 المدرسون</h2></div></div>
+      ${await renderTeachersForStudents()}
+      ${platformSettings.leaderboardEnabled ? `<div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">🏆 لوحة الشرف</h2></div></div>${renderLeaderboard(await DB.get('users'), allAttempts)}` : ''}
+    `;
+    const ctx = document.getElementById('studentChart')?.getContext('2d');
+    if (ctx && myAttempts.length > 0) {
+      const labels = myAttempts.slice(0, 10).reverse().map(a => { const q = allQuizzes.find(x => x.id === a.quizId); return q ? q.title.slice(0, 10) : 'اختبار'; });
+      const data = myAttempts.slice(0, 10).reverse().map(a => a.total > 0 ? Math.round((a.score / a.total) * 100) : 0);
+      new Chart(ctx, { type: 'line', data: { labels, datasets: [{ label: 'درجاتك %', data, borderColor: '#4f46e5', backgroundColor: 'rgba(79,70,229,0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100 } } } });
+    }
+  } finally { hideLoading(); }
+}
+
+function renderStudentQuizCard(quiz, myAttempts) {
+  if (myAttempts.some(a => a.quizId === quiz.id)) return '';
+  return `<div class="subject-card" onclick="startQuiz('${quiz.id}')">
+    <div class="subject-emoji">${getSubjectEmoji(quiz.subject)}</div>
+    <div class="subject-name">${escapeHtml(quiz.title)}</div>
+    <div class="subject-meta">${getSubjectName(quiz.subject)} • ${quiz.questions.length} سؤال</div>
+    <div class="subject-footer"><span class="badge badge-primary">ابدأ</span></div>
+  </div>`;
+}
+
+async function renderAnsweredScreen(filterTab = 'all') {
+  showLoading();
+  try {
+    const allQuizzes = await DB.get('quizzes');
+    const allAttempts = await DB.get('attempts');
+    const myAttempts = allAttempts.filter(a => a.studentId === currentUser.id).sort((a, b) => b.createdAt - a.createdAt);
+    let filtered = myAttempts;
+    if (filterTab !== 'all') filtered = myAttempts.filter(a => { const q = allQuizzes.find(x => x.id === a.quizId); return q && q.subject === filterTab; });
+    const subjectsInAttempts = [...new Set(myAttempts.map(a => { const q = allQuizzes.find(x => x.id === a.quizId); return q?.subject; }).filter(Boolean))];
+    const container = document.getElementById('dashboardContent');
+    container.innerHTML = `
+      <div class="card" style="background: linear-gradient(135deg, var(--success), #059669); color:#fff;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="font-size:48px;">✅</span>
+          <div><h2 style="font-size:24px; font-weight:900;">ما تمت الإجابة عليه</h2><p style="opacity:0.9;">${myAttempts.length} اختبار • متوسط ${calculateAvg(myAttempts)}%</p></div>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;">
+        <button class="btn btn-outline" onclick="renderStudentDashboard()">🏠 الرئيسية</button>
+      </div>
+      <div class="answered-tabs">
+        <button class="answered-tab ${filterTab === 'all' ? 'active' : ''}" onclick="renderAnsweredScreen('all')">📚 الكل <span class="count">${myAttempts.length}</span></button>
+        ${subjectsInAttempts.map(subjId => {
+          const count = myAttempts.filter(a => { const q = allQuizzes.find(x => x.id === a.quizId); return q?.subject === subjId; }).length;
+          return `<button class="answered-tab ${filterTab === subjId ? 'active' : ''}" onclick="renderAnsweredScreen('${subjId}')">${getSubjectEmoji(subjId)} ${getSubjectName(subjId)} <span class="count">${count}</span></button>`;
+        }).join('')}
+      </div>
+      ${filtered.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا اختبارات محلولة</h3></div></div>` :
+        filtered.map(a => {
+          const quiz = allQuizzes.find(q => q.id === a.quizId);
+          if (!quiz) return '';
+          const pct = a.total > 0 ? Math.round((a.score / a.total) * 100) : 0;
+          const pending = a.needsGrading && !a.graded;
+          return `<div class="quiz-result-card">
+            <div class="quiz-result-header">
+              <div class="quiz-result-title"><h4>${escapeHtml(quiz.title)}</h4><p>${getSubjectEmoji(quiz.subject)} ${getSubjectName(quiz.subject)} • ${new Date(a.createdAt).toLocaleDateString('ar-EG')}</p></div>
+              <div class="quiz-result-score">${pct}%</div>
+            </div>
+            <div class="quiz-result-footer">
+              <span class="badge badge-primary">${a.score}/${a.total}</span>
+              ${pending ? `<span class="pending-badge"><span class="pending-dot"></span> بانتظار تصحيح</span>` : `<span class="badge badge-${pct >= 80 ? 'success' : pct >= 50 ? 'warning' : 'danger'}">${pct >= 80 ? 'ممتاز' : pct >= 50 ? 'جيد' : 'يحتاج مراجعة'}</span>`}
+            </div>
+          </div>`;
+        }).join('')}
+    `;
+  } finally { hideLoading(); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ✅ PARENT DASHBOARD
+   ═══════════════════════════════════════════════════════════ */
+async function renderParentDashboard() {
+  showLoading();
+  try {
+    const allUsers = await DB.get('users');
+    const allAttempts = await DB.get('attempts');
+    const allChallenges = await DB.get('challenges');
+    const children = allUsers.filter(u => u.role === 'student' && (currentUser.children || []).includes(u.id));
+    const totalAttempts = children.reduce((sum, c) => sum + allAttempts.filter(a => a.studentId === c.id).length, 0);
+    const avgAll = children.length > 0 ? Math.round(children.reduce((sum, c) => {
+      const ca = allAttempts.filter(a => a.studentId === c.id);
+      return sum + (ca.length ? calculateAvg(ca) : 0);
+    }, 0) / children.length) : 0;
+    const container = document.getElementById('dashboardContent');
+    container.innerHTML = `
+      <div class="card" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); color:#fff;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="font-size:48px;">👨‍👩‍👦</span>
+          <div><h2 style="font-size:24px; font-weight:900;">لوحة ولي الأمر</h2></div>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon primary">👨‍🎓</div><div class="stat-info"><h4>${children.length}</h4><p>أبنائي</p></div></div>
+        <div class="stat-card"><div class="stat-icon success">✅</div><div class="stat-info"><h4>${totalAttempts}</h4><p>محاولات</p></div></div>
+        <div class="stat-card"><div class="stat-icon warning">📊</div><div class="stat-info"><h4>${avgAll}%</h4><p>متوسط</p></div></div>
+      </div>
+      <div class="add-child-box">
+        <h4>➕ إضافة ابن</h4>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+          <input type="text" class="form-input auto-dir" id="childSearchInput" placeholder="البريد أو الهاتف" style="max-width:400px;" dir="rtl">
+          <button class="btn btn-primary" onclick="searchChild()">🔍 بحث</button>
+        </div>
+      </div>
+      <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">👨‍🎓 أبنائي</h2></div></div>
+      ${children.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا أبناء</h3></div></div>` :
+        children.map(child => {
+          const ca = allAttempts.filter(a => a.studentId === child.id);
+          const cAvg = ca.length ? calculateAvg(ca) : 0;
+          const lvl = getLevel(child.xp || 0);
+          // ✅ التحديات الخاصة بالابن
+          const childChallenges = allChallenges.filter(c => (c.fromId === child.id || c.toId === child.id) && c.status === 'completed');
+          return `<div class="parent-child-card">
+            <div class="parent-child-header">
+              <div class="parent-child-avatar">${child.photoURL ? `<img data-src="${child.photoURL}" class="lazy-img" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="">` : '👨‍🎓'}</div>
+              <div class="parent-child-info"><h4>${escapeHtml(child.name)} <span class="badge badge-purple">${lvl.emoji}</span></h4><p>${escapeHtml(child.grade || '')} • ${child.xp || 0} XP</p></div>
+              <button class="btn btn-sm btn-danger" onclick="removeChild('${child.id}')">🗑</button>
+            </div>
+            <div class="parent-child-stats">
+              <div class="parent-child-stat"><h5>${ca.length}</h5><p>محلول</p></div>
+              <div class="parent-child-stat"><h5>${cAvg}%</h5><p>المتوسط</p></div>
+              <div class="parent-child-stat"><h5>${(child.badges || []).length}</h5><p>شارات</p></div>
+            </div>
+            ${childChallenges.length > 0 ? `<div style="padding:8px;background:var(--warning-light);border-radius:8px;margin-bottom:8px;font-size:12px;">
+              ⚔️ شارك في <strong>${childChallenges.length}</strong> تحدي مكتمل
+            </div>` : ''}
+            <button class="btn btn-outline btn-full btn-sm" onclick="openChildDetails('${child.id}')">👁️ التفاصيل</button>
+          </div>`;
+        }).join('')}
+    `;
+    setTimeout(observeLazyImages, 100);
+  } finally { hideLoading(); }
+}
+
+async function searchChild() {
+  const query = document.getElementById('childSearchInput').value.trim().toLowerCase();
+  if (!query) { alert('أدخل البريد أو الهاتف'); return; }
+  showLoading();
+  try {
+    const users = await DB.get('users');
+    const student = users.find(u => u.role === 'student' && (u.email?.toLowerCase() === query || u.parentPhone === query));
+    if (!student) { alert('❌ لم يتم العثور'); return; }
+    if ((currentUser.children || []).includes(student.id)) { alert('⚠️ مرتبط'); return; }
+    if (!currentUser.children) currentUser.children = [];
+    currentUser.children.push(student.id);
+    const userIdx = users.findIndex(u => u.id === currentUser.id);
+    if (userIdx >= 0) { users[userIdx].children = currentUser.children; await DB.set('users', users); }
+    launchConfetti(30);
+    alert(`✅ تم ربط ${student.name}`);
+    renderParentDashboard();
+  } finally { hideLoading(); }
+}
+
+async function removeChild(childId) {
+  if (!confirm('إلغاء؟')) return;
+  showLoading();
+  try {
+    currentUser.children = (currentUser.children || []).filter(id => id !== childId);
+    const users = await DB.get('users');
+    const userIdx = users.findIndex(u => u.id === currentUser.id);
+    if (userIdx >= 0) { users[userIdx].children = currentUser.children; await DB.set('users', users); }
+    alert('✅');
+    renderParentDashboard();
+  } finally { hideLoading(); }
+}
+
+async function openChildDetails(childId) {
+  showLoading();
+  try {
+    const users = await DB.get('users');
+    const allAttempts = await DB.get('attempts');
+    const allQuizzes = await DB.get('quizzes');
+    const allChallenges = await DB.get('challenges');
+    const child = users.find(u => u.id === childId);
+    if (!child) return;
+    const ca = allAttempts.filter(a => a.studentId === childId).sort((a, b) => b.createdAt - a.createdAt);
+    const childChallenges = allChallenges.filter(c => (c.fromId === childId || c.toId === childId) && c.status === 'completed')
+      .sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0));
+    const avg = ca.length ? calculateAvg(ca) : 0;
+    const lvl = getLevel(child.xp || 0);
+    openModal(`<div class="modal-header"><h3 class="modal-title">👨‍🎓 ${escapeHtml(child.name)}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+      <div class="alert alert-info">📚 ${escapeHtml(child.grade || '')}<br>${lvl.emoji} ${lvl.name} • ${child.xp || 0} XP • 🔥 ${child.streak || 0}<br>📊 المتوسط: ${avg}% • ${ca.length} اختبار</div>
+      
+      ${childChallenges.length > 0 ? `<h4 style="margin:16px 0 12px;">⚔️ التحديات (${childChallenges.length})</h4>
+        ${childChallenges.slice(0, 5).map(c => {
+          const isFrom = c.fromId === childId;
+          const myScore = isFrom ? c.fromScore : c.toScore;
+          const otherScore = isFrom ? c.toScore : c.fromScore;
+          const otherName = isFrom ? c.toName : c.fromName;
+          const result = myScore > otherScore ? '🎉 فاز' : myScore < otherScore ? '😔 خسر' : '🤝 تعادل';
+          return `<div class="challenge-result" style="margin-bottom:8px;">
+            <div><strong>${escapeHtml(c.quizTitle)}</strong> ضد ${escapeHtml(otherName)}</div>
+            <div style="display:flex;justify-content:space-between;margin-top:4px;">
+              <span>${result}</span>
+              <span>${myScore}% vs ${otherScore}%</span>
+            </div>
+          </div>`;
+        }).join('')}` : ''}
+      
+      <h4 style="margin:16px 0 12px;">📝 النتائج (${ca.length})</h4>
+      ${ca.slice(0, 10).map(a => {
+        const quiz = allQuizzes.find(q => q.id === a.quizId);
+        if (!quiz) return '';
+        const pct = a.total > 0 ? Math.round((a.score / a.total) * 100) : 0;
+        return `<div class="history-item">
+          <div class="history-info"><h4>${escapeHtml(quiz.title)}</h4><p>${new Date(a.createdAt).toLocaleDateString('ar-EG')}</p></div>
+          <div class="history-score">${a.score}/${a.total}</div>
+          <span class="badge badge-${pct>=80?'success':pct>=50?'warning':'danger'}">${pct}%</span>
+        </div>`;
+      }).join('')}`);
+  } finally { hideLoading(); }
+}
+/* ═══════════════════════════════════════════════════════════
+   ✅ TAKE QUIZ - مع دعم التحديات
+   ═══════════════════════════════════════════════════════════ */
 async function startQuiz(quizId) {
   showLoading();
   try {
     const quizzes = await DB.get('quizzes');
     const quiz = quizzes.find(q => q.id === quizId);
-    if (!quiz) return;
+    if (!quiz) { alert('الاختبار غير موجود'); return; }
     const allAttempts = await DB.get('attempts');
-    if (allAttempts.some(a => a.quizId === quizId && a.studentId === currentUser.id)) { hideLoading(); alert('حللت بالفعل'); return; }
-    currentQuiz = quiz; currentQuestionIndex = 0; currentAnswers = [];
-    selectedAnswerIndex = null; tfSelected = null;
+    if (allAttempts.some(a => a.quizId === quizId && a.studentId === currentUser.id)) { 
+      hideLoading(); 
+      alert('حللت هذا الاختبار بالفعل.'); 
+      return; 
+    }
+    currentQuiz = quiz; 
+    currentQuestionIndex = 0; 
+    currentAnswers = [];
+    selectedAnswerIndex = null; 
+    tfSelected = null;
+    window._currentChallenge = null; // ✅ ليس تحدياً
     showScreen('quiz');
     loadActiveAnnouncement();
     renderCurrentQuestion();
   } finally { hideLoading(); }
 }
+
 function renderCurrentQuestion() {
   const q = currentQuiz.questions[currentQuestionIndex];
   const ti = QUESTION_TYPES[q.type] || QUESTION_TYPES.mcq;
@@ -3794,6 +4593,7 @@ function renderCurrentQuestion() {
   else if (q.type === 'fill') answerHtml = `<input type="text" class="form-input auto-dir" id="fillInput" placeholder="إجابتك..." oninput="onFillInput()" style="font-size:16px;padding:16px;" dir="rtl">`;
   else if (q.type === 'essay') answerHtml = `<textarea class="form-textarea auto-dir" id="essayInput" placeholder="إجابتك..." style="min-height:150px;" oninput="onEssayInput()" dir="rtl"></textarea>`;
   document.getElementById('quizContent').innerHTML = `
+    ${window._currentChallenge ? `<div class="alert alert-warning" style="margin-bottom:16px;">⚔️ <strong>وضع التحدي</strong> ضد ${escapeHtml(window._currentChallenge.fromName)}</div>` : ''}
     <div class="question-type-badge qtype-${q.type}">${ti.emoji} ${ti.name}</div>
     ${q.image ? `<img src="${q.image}" class="question-image">` : ''}
     <div style="background:var(--primary-light);padding:20px;border-radius:14px;margin-bottom:20px;border-right:4px solid var(--primary);">
@@ -3806,15 +4606,21 @@ function renderCurrentQuestion() {
   startTimer();
   bindAutoDirToInputs();
 }
+
 function startTimer() {
   clearInterval(timerInterval);
   timeLeft = currentQuiz.timePerQuestion || 30;
   updateTimerUI();
   timerInterval = setInterval(() => {
-    timeLeft--; updateTimerUI();
-    if (timeLeft <= 0) { clearInterval(timerInterval); handleTimeout(); }
+    timeLeft--; 
+    updateTimerUI();
+    if (timeLeft <= 0) { 
+      clearInterval(timerInterval); 
+      handleTimeout(); 
+    }
   }, 1000);
 }
+
 function updateTimerUI() {
   const d = document.getElementById('timerDisplay'), b = document.getElementById('timerBox');
   if (!d || !b) return;
@@ -3823,22 +4629,43 @@ function updateTimerUI() {
   if (timeLeft <= 5) b.classList.add('danger');
   else if (timeLeft <= 10) b.classList.add('warning');
 }
+
 function handleTimeout() {
   if (selectedAnswerIndex === null) {
     const q = currentQuiz.questions[currentQuestionIndex];
-    if (q.type === 'fill') { const i = document.getElementById('fillInput'); currentAnswers.push(i ? i.value.trim() : ''); }
-    else if (q.type === 'essay') { const i = document.getElementById('essayInput'); currentAnswers.push(i ? i.value.trim() : ''); }
+    if (q.type === 'fill') { 
+      const i = document.getElementById('fillInput'); 
+      currentAnswers.push(i ? i.value.trim() : ''); 
+    }
+    else if (q.type === 'essay') { 
+      const i = document.getElementById('essayInput'); 
+      currentAnswers.push(i ? i.value.trim() : ''); 
+    }
     else currentAnswers.push(null);
   } else currentAnswers.push(selectedAnswerIndex);
-  selectedAnswerIndex = null; tfSelected = null;
+  selectedAnswerIndex = null; 
+  tfSelected = null;
   currentQuestionIndex++;
   if (currentQuestionIndex >= currentQuiz.questions.length) finishQuiz();
   else renderCurrentQuestion();
 }
-function selectMcqAnswer(i, btn) { selectedAnswerIndex = i; document.querySelectorAll('#quizOptions .option-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); document.getElementById('quizNextBtn').disabled = false; }
-function selectTfAnswer(v, btn) { tfSelected = v; selectedAnswerIndex = v; document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); document.getElementById('quizNextBtn').disabled = false; }
+
+function selectMcqAnswer(i, btn) { 
+  selectedAnswerIndex = i; 
+  document.querySelectorAll('#quizOptions .option-btn').forEach(b => b.classList.remove('selected')); 
+  btn.classList.add('selected'); 
+  document.getElementById('quizNextBtn').disabled = false; 
+}
+function selectTfAnswer(v, btn) { 
+  tfSelected = v; 
+  selectedAnswerIndex = v; 
+  document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected')); 
+  btn.classList.add('selected'); 
+  document.getElementById('quizNextBtn').disabled = false; 
+}
 function onFillInput() { document.getElementById('quizNextBtn').disabled = !document.getElementById('fillInput').value.trim(); }
 function onEssayInput() { document.getElementById('quizNextBtn').disabled = !document.getElementById('essayInput').value.trim(); }
+
 function nextQuizQuestion() {
   const q = currentQuiz.questions[currentQuestionIndex];
   let a;
@@ -3847,25 +4674,38 @@ function nextQuizQuestion() {
   else if (q.type === 'fill') a = document.getElementById('fillInput').value.trim();
   else if (q.type === 'essay') a = document.getElementById('essayInput').value.trim();
   currentAnswers.push(a);
-  selectedAnswerIndex = null; tfSelected = null;
+  selectedAnswerIndex = null; 
+  tfSelected = null;
   currentQuestionIndex++;
   clearInterval(timerInterval);
   if (currentQuestionIndex >= currentQuiz.questions.length) finishQuiz();
   else renderCurrentQuestion();
 }
+
 function checkAnswer(q, a) {
   if (q.type === 'mcq') return a === q.answer;
   if (q.type === 'tf') return a === q.answer;
-  if (q.type === 'fill') { if (!a || !q.answer) return false; return a.trim().toLowerCase() === q.answer.trim().toLowerCase(); }
+  if (q.type === 'fill') { 
+    if (!a || !q.answer) return false; 
+    return a.trim().toLowerCase() === q.answer.trim().toLowerCase(); 
+  }
   if (q.type === 'essay') return null;
   return false;
 }
+
+/* ✅ إنهاء الاختبار - مع تحديث التحدي إن وُجد */
 async function finishQuiz() {
   clearInterval(timerInterval);
   showLoading();
   try {
     const existing = await DB.get('attempts');
-    if (existing.some(a => a.quizId === currentQuiz.id && a.studentId === currentUser.id)) { hideLoading(); alert('حللت بالفعل'); exitQuiz(); return; }
+    if (existing.some(a => a.quizId === currentQuiz.id && a.studentId === currentUser.id && !window._currentChallenge)) { 
+      hideLoading(); 
+      alert('حللت بالفعل.'); 
+      exitQuiz(); 
+      return; 
+    }
+    
     let score = 0, autoGraded = 0, hasEssay = false;
     const results = currentQuiz.questions.map((q, i) => {
       const a = currentAnswers[i];
@@ -3875,16 +4715,84 @@ async function finishQuiz() {
       else if (c === null) hasEssay = true;
       return { questionIndex: i, answer: a, correct: c };
     });
-    const attempt = { id: uid(), quizId: currentQuiz.id, studentId: currentUser.id, score, total: currentQuiz.questions.length, autoGraded, autoScore: score, answers: currentAnswers, results, createdAt: Date.now(), needsGrading: hasEssay, graded: !hasEssay, essayGrades: {}, essayBonusPrev: 0 };
+    
+    const attemptId = uid();
+    const attempt = { 
+      id: attemptId, 
+      quizId: currentQuiz.id, 
+      studentId: currentUser.id, 
+      score, 
+      total: currentQuiz.questions.length, 
+      autoGraded, 
+      autoScore: score, 
+      answers: currentAnswers, 
+      results, 
+      createdAt: Date.now(), 
+      needsGrading: hasEssay, 
+      graded: !hasEssay, 
+      essayGrades: {}, 
+      essayBonusPrev: 0,
+      isChallenge: !!window._currentChallenge
+    };
     existing.push(attempt);
     await DB.set('attempts', existing);
+    
+    // ✅ منح XP
     const xpGain = calculateXPForAttempt(attempt);
     await awardXP(currentUser.id, xpGain, `حل اختبار: ${currentQuiz.title}`);
     await updateStreak(currentUser.id);
     const newBadges = await checkAndAwardBadges(currentUser.id);
+    
+    // ✅ إذا كان هذا تحدياً، حدّث حالة التحدي
+    let challengeResult = null;
+    if (window._currentChallenge) {
+      const challenges = await DB.get('challenges');
+      const cIdx = challenges.findIndex(c => c.id === window._currentChallenge.id);
+      if (cIdx >= 0) {
+        const pct = autoGraded > 0 ? Math.round((score / autoGraded) * 100) : 0;
+        challenges[cIdx].status = 'completed';
+        challenges[cIdx].toScore = pct;
+        challenges[cIdx].completedAt = Date.now();
+        challenges[cIdx].solveAttemptId = attemptId;
+        
+        // ✅ تحديد الفائز (fromScore يُحسب من محاولة المرسل السابقة)
+        // لكن المرسل لم يحل بعد... نحن نحل فقط للطرف الثاني
+        // fromScore = null حتى يحل هو أيضاً... أو نجعل التحدي يعتمد على من يحل أولاً
+        // الحل: الطرف الثاني يحل → toScore معروف → fromScore = نتيجة محاولته المستقلة على نفس الاختبار إن وُجدت
+        const senderAttempt = existing.find(a => a.studentId === window._currentChallenge.fromId && a.quizId === window._currentChallenge.quizId && !a.isChallenge);
+        if (senderAttempt) {
+          const senderPct = senderAttempt.total > 0 ? Math.round((senderAttempt.score / senderAttempt.total) * 100) : 0;
+          challenges[cIdx].fromScore = senderPct;
+          if (senderPct > pct) challenges[cIdx].winnerId = window._currentChallenge.fromId;
+          else if (pct > senderPct) challenges[cIdx].winnerId = currentUser.id;
+          else challenges[cIdx].winnerId = null; // تعادل
+        } else {
+          // المرسل لم يحل بعد → نضع fromScore = null، والنتيجة تُعرض لاحقاً
+          challenges[cIdx].fromScore = null;
+        }
+        
+        await DB.set('challenges', challenges);
+        _challengesCache = challenges;
+        challengeResult = challenges[cIdx];
+        
+        // ✅ إشعار للمرسل
+        const notifs = await DB.get('notifications');
+        notifs.push({ 
+          id: uid(), 
+          userId: window._currentChallenge.fromId, 
+          title: '⚔️ تم حل التحدي!', 
+          body: `${currentUser.name} حصل على ${pct}% في "${currentQuiz.title}". افتح التحديات لترى النتيجة`, 
+          createdAt: Date.now(), 
+          read: false 
+        });
+        await DB.set('notifications', notifs);
+      }
+    }
+    
     const freshUsers = await DB.get('users');
     const freshMe = freshUsers.find(u => u.id === currentUser.id);
     if (freshMe) currentUser = freshMe;
+    
     const pct = autoGraded > 0 ? Math.round((score / autoGraded) * 100) : null;
     const essayCount = currentQuiz.questions.filter(q => q.type === 'essay').length;
     let emoji, title, color;
@@ -3892,6 +4800,20 @@ async function finishQuiz() {
     else if (pct >= 80) { emoji = '🏆'; title = 'ممتاز! 🎉'; color = 'var(--success)'; launchConfetti(100); }
     else if (pct >= 50) { emoji = '👍'; title = 'جيد جداً'; color = 'var(--primary)'; }
     else { emoji = '💪'; title = 'حاول مرة أخرى'; color = 'var(--danger)'; }
+    
+    // ✅ عرض نتيجة التحدي
+    let challengeHtml = '';
+    if (challengeResult) {
+      challengeHtml = `<div class="alert alert-warning" style="text-align:right;margin-top:16px;">
+        ⚔️ <strong>نتيجة التحدي:</strong><br>
+        أنت: ${challengeResult.toScore}%<br>
+        ${escapeHtml(challengeResult.fromName)}: ${challengeResult.fromScore !== null ? challengeResult.fromScore + '%' : '(لم يحل بعد)'}
+        ${challengeResult.fromScore !== null ? 
+          (challengeResult.winnerId === currentUser.id ? '<br>🎉 <strong>فزت!</strong>' : 
+           challengeResult.winnerId ? '<br>😔 خسرت' : '<br>🤝 تعادل') : ''}
+      </div>`;
+    }
+    
     document.getElementById('quizContent').innerHTML = `
       <div style="text-align:center;padding:20px 0;">
         <div style="font-size:80px;margin-bottom:16px;">${emoji}</div>
@@ -3901,20 +4823,31 @@ async function finishQuiz() {
         <div class="alert alert-success" style="margin-top:16px;">🎉 <strong>+${xpGain} XP</strong> • ${currentUser.xp || 0} XP</div>
         ${newBadges.length > 0 ? `<div class="alert alert-warning" style="text-align:right;">🏆 ${newBadges.map(b => `${BADGES[b].emoji} ${BADGES[b].name}`).join(' • ')}</div>` : ''}
         ${essayCount > 0 ? `<div class="alert alert-warning" style="text-align:right;">📄 ${essayCount} سؤال مقالي</div>` : ''}
+        ${challengeHtml}
         <button class="btn btn-primary btn-lg" onclick="exitQuiz()" style="margin-top:20px;">🏠 العودة</button>
       </div>`;
     document.getElementById('quizProgressFill').style.width = '100%';
     document.getElementById('quizProgressText').textContent = 'تم';
+    
+    // ✅ إعادة تعيين متغير التحدي
+    window._currentChallenge = null;
   } finally { hideLoading(); }
 }
+
 function exitQuiz() {
   clearInterval(timerInterval);
-  currentQuiz = null; currentAnswers = []; currentQuestionIndex = 0;
-  selectedAnswerIndex = null; tfSelected = null;
+  currentQuiz = null; 
+  currentAnswers = []; 
+  currentQuestionIndex = 0;
+  selectedAnswerIndex = null; 
+  tfSelected = null;
+  window._currentChallenge = null;
   enterDashboard();
 }
 
-/* ============ INIT ============ */
+/* ═══════════════════════════════════════════════════════════
+   ✅ INIT + GLOBAL EXPORTS
+   ═══════════════════════════════════════════════════════════ */
 window.addEventListener('DOMContentLoaded', async () => {
   loadDarkMode();
   document.getElementById('devYear').textContent = new Date().getFullYear();
@@ -3923,14 +4856,21 @@ window.addEventListener('DOMContentLoaded', async () => {
   await initFirebase();
   await loadPlatformSettings();
   const ok = await checkSession();
+  startAnnouncementsListener();
+  startChallengesListener();
   if (!ok) { loadActiveAnnouncement(); showScreen('auth'); }
 });
 
-const _screenObserver = new MutationObserver(() => { renderAnnouncementEverywhere(); });
+const _screenObserver = new MutationObserver(() => { 
+  renderAnnouncementEverywhere(); 
+});
 document.querySelectorAll('.screen').forEach(s => _screenObserver.observe(s, { attributes: true, attributeFilter: ['class'] }));
 
-document.getElementById('modalOverlay').addEventListener('click', (e) => { if (e.target.id === 'modalOverlay') closeModal(); });
+document.getElementById('modalOverlay').addEventListener('click', (e) => { 
+  if (e.target.id === 'modalOverlay') closeModal(); 
+});
 
+// Ripple effect
 document.addEventListener('click', (e) => {
   const btn = e.target.closest('.btn');
   if (!btn) return;
@@ -3939,32 +4879,54 @@ document.addEventListener('click', (e) => {
   btn.style.setProperty('--y', ((e.clientY - rect.top) / rect.height * 100) + '%');
 });
 
+/* ✅ تصدير جميع الدوال للنطاق العام */
 const globalFns = [
+  // Auth
   switchAuthTab, pickRole, handleRegister, handleLogin, handleGoogleSignIn, handleForgotPassword, logout, toggleDarkMode,
-  openNotifications, closeModal, openNewQuizModal, continueToQuestions, showQuestionsEditor, openAddQuestionForm,
+  pickGoogleRole, completeGoogleProfile, cancelGoogleProfile, saveExistingProfile,
+  // UI
+  openNotifications, closeModal, openGlobalSearch, performGlobalSearch, openThemePicker, applyTheme,
+  // Quiz
+  openNewQuizModal, continueToQuestions, showQuestionsEditor, openAddQuestionForm,
   changeQType, pickTFAnswer, handleImageUpload, clearImage, addQuestion, removeQuestion, saveQuiz,
   openQuizManage, editQuiz, deleteQuiz, startQuiz, selectMcqAnswer, selectTfAnswer, onFillInput, onEssayInput,
-  nextQuizQuestion, exitQuiz, exportResults, exportStudents, openGradingCenter, openGradingAttempt,
-  setEssayGrade, finalizeGrading, pickGoogleRole, completeGoogleProfile, cancelGoogleProfile,
-  openPendingTeachers, approveTeacher, deleteUser, openBroadcastModal, sendBroadcast,
-  saveExistingProfile, wipeQuizData, switchUserTab, applyAdminFilters,
-  openTeacherProfileEdit, saveTeacherProfile, rateTeacher,
-  searchChild, removeChild, openChildDetails,
-  openTeacherContent, renderContentModal, addVideoLink, removeVideoLink,
-  handleMaterialUpload, removeMaterial, downloadMaterial, downloadTeacherMaterial,
-  handleAvatarUpload, removeAvatar, renderAnsweredScreen,
+  nextQuizQuestion, exitQuiz,
+  // Grading
+  openGradingCenter, openGradingAttempt, setEssayGrade, finalizeGrading,
+  // Export
+  exportResults, exportStudents,
+  // Admin
   renderAdminQuizzes, filterAdminQuizzes, viewQuizDetails, adminDeleteQuiz,
   renderAdminStats, renderAuditLog, openAdminBroadcast, sendAdminBroadcast,
   renderAdminGamification, openGrantXPModal, grantXpToStudent, openStudentGamificationDetails,
   awardBadgeManually, removeBadgeFromStudent, resetStudentGamification,
   renderAdminAnnouncements, openAnnouncementEditor, saveAnnouncement, toggleAnnouncement, deleteAnnouncement,
   renderAdminSettings, savePlatformSettingsForm, dismissAnnouncement,
+  renderAdminChallenges, adminDeleteChallenge,
   pickAnnType, handleAnnImageUpload, removeAnnImage,
-  openGlobalSearch, performGlobalSearch, openThemePicker, applyTheme,
-  openFriendsModal, switchFriendsTab, addFriend, removeFriend, challengeFriend, sendChallenge, respondChallenge,
-  refreshAdminUsersList, refreshFriendsTabContent
+  openPendingTeachers, approveTeacher, deleteUser, wipeQuizData, switchUserTab, applyAdminFilters,
+  selectAdminTheme, refreshAdminUsersList,
+  // Teacher
+  openTeacherProfileEdit, saveTeacherProfile, openTeacherContent, renderContentModal,
+  addVideoLink, removeVideoLink, handleMaterialUpload, removeMaterial, downloadMaterial, downloadTeacherMaterial,
+  handleAvatarUpload, removeAvatar, openBroadcastModal, sendBroadcast, rateTeacher,
+  // Student
+  renderAnsweredScreen, openFriendsModal, switchFriendsTab, addFriend, removeFriend,
+  challengeFriend, sendChallenge, respondChallenge, solveChallenge, refreshFriendsTabContent,
+  // Parent
+  searchChild, removeChild, openChildDetails,
+  // Listeners
+  startAnnouncementsListener, stopAnnouncementsListener,
+  startChallengesListener, stopChallengesListener,
+  startNotificationsListener, stopNotificationsListener,
+  startRealtimeAnalytics, stopRealtimeAnalytics
 ];
-globalFns.forEach(fn => { try { window[fn.name] = fn; } catch(e) {} });
+globalFns.forEach(fn => { 
+  try { window[fn.name] = fn; } catch(e) { console.warn('Could not export:', fn.name); } 
+});
+
+console.log('✅ EduPlatform Pro loaded successfully');
 </script>
 </body>
 </html>
+
