@@ -58,11 +58,7 @@
   .tab.active { background: var(--card); color: var(--primary); box-shadow: var(--shadow-sm); }
   .form-group { margin-bottom: 16px; }
   .form-label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
-  .form-input, .form-select, .form-textarea {
-    width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 12px;
-    font-family: inherit; font-size: 15px; color: var(--text); background: var(--card);
-    transition: all 0.2s; outline: none;
-  }
+  .form-input, .form-select, .form-textarea { width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 12px; font-family: inherit; font-size: 15px; color: var(--text); background: var(--card); transition: all 0.2s; outline: none; }
   .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-light); }
   .form-textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
   .role-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
@@ -74,8 +70,6 @@
   .role-option.active .role-label { color: var(--primary); }
   .btn { padding: 14px 24px; border-radius: 12px; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; position: relative; overflow: hidden; }
   .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-  .btn::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.2); transform: scale(0); border-radius: 50%; transition: transform 0.5s; }
-  .btn:active::after { transform: scale(4); transition: 0s; }
   .btn-full { width: 100%; } .btn-lg { padding: 16px 28px; font-size: 16px; } .btn-sm { padding: 10px 16px; font-size: 13px; }
   .btn-primary { background: var(--primary); color: #fff; }
   .btn-primary:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(79,70,229,0.3); }
@@ -182,7 +176,7 @@
   .qtype-option:hover { border-color: var(--primary); transform: translateY(-2px); } .qtype-option.active { border-color: var(--primary); background: var(--primary-light); }
   .qtype-option .emoji { font-size: 22px; display: block; margin-bottom: 4px; }
   .qtype-option .label { font-size: 12px; font-weight: 700; color: var(--text); } .qtype-option.active .label { color: var(--primary); }
-  .chart-container { position: relative; height: 300px; margin-bottom: 24px; }
+  .chart-container { position: relative; height: 300px; margin-bottom: 24px; background: var(--card); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); }
   .notification-badge { position: absolute; top: -4px; left: -4px; background: var(--danger); color: #fff; font-size: 10px; font-weight: 800; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0 4px; animation: bounce 1s infinite; }
   @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
   .student-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: var(--bg); border-radius: 12px; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; transition: all 0.2s; }
@@ -207,17 +201,14 @@
   .checkbox-label input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
   .link-btn { background: none; border: none; color: var(--primary); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; padding: 4px 0; transition: opacity 0.2s; }
   .link-btn:hover { opacity: 0.7; text-decoration: underline; }
-  .link-btn:disabled { opacity: 0.5; cursor: not-allowed; }
   .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: var(--text-light); font-size: 13px; font-weight: 700; }
   .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
   .dev-footer { text-align: center; padding: 24px 20px 32px; font-size: 13px; color: var(--text-light); font-weight: 600; }
   .dev-footer .dev-brand { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; background: var(--card); border: 1px solid var(--border); border-radius: 999px; box-shadow: var(--shadow-sm); transition: all 0.2s; text-decoration: none; color: var(--text); }
-  .dev-footer .dev-brand:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow); }
-  .dev-footer .dev-brand strong { color: var(--primary); font-weight: 900; letter-spacing: 0.3px; }
-  body.dark-mode .dev-footer .dev-brand strong { color: var(--primary); }
+  .dev-footer .dev-brand:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
+  .dev-footer .dev-brand strong { color: var(--primary); font-weight: 900; }
   .dev-footer .dev-copy { margin-top: 12px; font-size: 11px; opacity: 0.7; }
   .leaderboard-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--bg); border-radius: 14px; margin-bottom: 10px; transition: all 0.2s; }
-  .leaderboard-item:hover { transform: translateX(-4px); box-shadow: var(--shadow-sm); }
   .leaderboard-item.rank-1 { background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid var(--gold); }
   .leaderboard-item.rank-2 { background: linear-gradient(135deg, #f1f5f9, #e2e8f0); border: 2px solid var(--silver); }
   .leaderboard-item.rank-3 { background: linear-gradient(135deg, #fed7aa, #fdba74); border: 2px solid var(--bronze); }
@@ -226,19 +217,16 @@
   body.dark-mode .leaderboard-item.rank-3 { background: linear-gradient(135deg, #7c2d12, #9a3412); }
   .leaderboard-rank { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; background: var(--card); flex-shrink: 0; }
   .leaderboard-item.rank-1 .leaderboard-rank { background: var(--gold); color: #fff; font-size: 24px; }
-  .leaderboard-item.rank-2 .leaderboard-rank { background: var(--silver); color: #fff; font-size: 22px; }
-  .leaderboard-item.rank-3 .leaderboard-rank { background: var(--bronze); color: #fff; font-size: 22px; }
+  .leaderboard-item.rank-2 .leaderboard-rank { background: var(--silver); color: #fff; }
+  .leaderboard-item.rank-3 .leaderboard-rank { background: var(--bronze); color: #fff; }
   .leaderboard-info { flex: 1; }
   .leaderboard-info h4 { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
   .leaderboard-info p { font-size: 13px; color: var(--text-light); font-weight: 600; }
   .leaderboard-score { font-size: 24px; font-weight: 900; color: var(--primary); }
   .confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 3000; overflow: hidden; }
-  .confetti { position: absolute; width: 10px; height: 10px; background: var(--primary); animation: confettiFall 3s linear forwards; }
-  @keyframes confettiFall {
-    0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-  }
-  .admin-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; background: linear-gradient(135deg, #f59e0b, #f97316); color: #fff; border-radius: 999px; font-size: 11px; font-weight: 900; box-shadow: 0 4px 10px rgba(245,158,11,0.4); }
+  .confetti { position: absolute; width: 10px; height: 10px; animation: confettiFall 3s linear forwards; }
+  @keyframes confettiFall { 0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+  .admin-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; background: linear-gradient(135deg, #f59e0b, #f97316); color: #fff; border-radius: 999px; font-size: 11px; font-weight: 900; }
   .edit-warning { background: var(--warning-light); border: 2px solid var(--warning); color: var(--warning); padding: 14px; border-radius: 12px; margin-bottom: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
   .broadcast-option { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--bg); border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
   .broadcast-option:hover { border-color: var(--primary); }
@@ -246,7 +234,7 @@
   .user-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
   .user-tab { padding: 12px 24px; border: 2px solid var(--border); background: var(--card); border-radius: 12px; font-family: inherit; font-size: 15px; font-weight: 700; color: var(--text-light); cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
   .user-tab:hover { border-color: var(--primary); color: var(--primary); }
-  .user-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(79,70,229,0.3); }
+  .user-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
   .user-tab .count { background: rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 999px; font-size: 12px; }
   .user-tab:not(.active) .count { background: var(--bg); color: var(--text-light); }
   .subject-group { margin-bottom: 32px; }
@@ -254,13 +242,11 @@
   .subject-group-emoji { font-size: 32px; flex-shrink: 0; }
   .subject-group-title { font-size: 20px; font-weight: 900; color: var(--text); flex: 1; min-width: 120px; }
   .subject-group-count { padding: 4px 12px; background: var(--primary); color: #fff; border-radius: 999px; font-size: 13px; font-weight: 800; }
-  body.dark-mode .subject-group-header { background: linear-gradient(135deg, var(--primary-light), transparent); }
   .teacher-profile-header { display: flex; align-items: center; gap: 20px; padding: 24px; background: linear-gradient(135deg, var(--primary), #7c3aed); color: #fff; border-radius: 20px; margin-bottom: 20px; flex-wrap: wrap; }
   .teacher-profile-avatar { width: 100px; height: 100px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 48px; border: 3px solid rgba(255,255,255,0.4); overflow: hidden; flex-shrink: 0; }
   .teacher-profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
   .teacher-profile-info { flex: 1; min-width: 200px; }
   .teacher-profile-info h2 { font-size: 24px; font-weight: 900; margin-bottom: 6px; }
-  .teacher-profile-info p { opacity: 0.9; font-size: 14px; }
   .stars-display { display: inline-flex; gap: 2px; font-size: 20px; color: #f59e0b; }
   .stars-display .star-empty { color: #cbd5e1; }
   .stars-input { display: inline-flex; gap: 4px; font-size: 28px; cursor: pointer; }
@@ -275,39 +261,67 @@
   .teacher-card-info { flex: 1; }
   .teacher-card-info h4 { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
   .teacher-card-info p { font-size: 13px; color: var(--text-light); font-weight: 600; }
-  .teacher-card-bio { padding: 12px; background: var(--bg); border-radius: 10px; margin-bottom: 12px; font-size: 14px; line-height: 1.6; color: var(--text); }
+  .teacher-card-bio { padding: 12px; background: var(--bg); border-radius: 10px; margin-bottom: 12px; font-size: 14px; line-height: 1.6; }
   .teacher-card-links { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-  .teacher-link { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: var(--primary-light); color: var(--primary); border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: 700; transition: all 0.2s; }
+  .teacher-link { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: var(--primary-light); color: var(--primary); border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: 700; transition: all 0.2s; border: none; cursor: pointer; font-family: inherit; }
   .teacher-link:hover { background: var(--primary); color: #fff; transform: translateY(-2px); }
   .teacher-link.video { background: #fee2e2; color: #dc2626; }
   .teacher-link.video:hover { background: #dc2626; color: #fff; }
   .teacher-link.material { background: #dbeafe; color: #2563eb; }
   .teacher-link.material:hover { background: #2563eb; color: #fff; }
   .teacher-rating-row { display: flex; align-items: center; gap: 12px; padding-top: 12px; border-top: 1px solid var(--border); flex-wrap: wrap; }
-  .teacher-rating-row .rating-info { font-size: 13px; color: var(--text-light); font-weight: 600; }
-  .parent-child-card { background: var(--card); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px; border-right: 4px solid var(--info); transition: all 0.2s; }
-  .parent-child-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+  .parent-child-card { background: var(--card); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px; border-right: 4px solid var(--info); }
   .parent-child-header { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; flex-wrap: wrap; }
   .parent-child-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--info-light); display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; overflow: hidden; }
   .parent-child-info { flex: 1; min-width: 150px; }
   .parent-child-info h4 { font-size: 17px; font-weight: 800; margin-bottom: 4px; }
-  .parent-child-info p { font-size: 13px; color: var(--text-light); font-weight: 600; }
+  .parent-child-info p { font-size: 13px; color: var(--text-light); }
   .parent-child-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
   .parent-child-stat { text-align: center; padding: 10px; background: var(--bg); border-radius: 10px; }
   .parent-child-stat h5 { font-size: 20px; font-weight: 900; color: var(--primary); margin-bottom: 2px; }
-  .parent-child-stat p { font-size: 11px; color: var(--text-light); font-weight: 600; }
+  .parent-child-stat p { font-size: 11px; color: var(--text-light); }
   .add-child-box { background: var(--info-light); border: 2px dashed var(--info); border-radius: 16px; padding: 20px; margin-bottom: 20px; text-align: center; }
   .add-child-box h4 { font-size: 16px; font-weight: 800; color: var(--info); margin-bottom: 8px; }
-  .add-child-box p { font-size: 13px; color: var(--text-light); margin-bottom: 12px; }
+  .content-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .content-tab { padding: 10px 18px; border: 2px solid var(--border); background: var(--card); border-radius: 10px; font-family: inherit; font-size: 14px; font-weight: 700; color: var(--text-light); cursor: pointer; transition: all 0.2s; }
+  .content-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .video-link-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg); border-radius: 12px; margin-bottom: 10px; border-right: 3px solid var(--danger); flex-wrap: wrap; }
+  .video-link-item .info { flex: 1; min-width: 150px; }
+  .video-link-item .info h4 { font-size: 14px; font-weight: 800; margin-bottom: 2px; }
+  .video-link-item .info p { font-size: 12px; color: var(--text-light); word-break: break-all; }
+  .video-link-item a { color: var(--danger); text-decoration: none; font-weight: 700; font-size: 13px; padding: 6px 12px; background: #fee2e2; border-radius: 8px; }
+  .material-file-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg); border-radius: 12px; margin-bottom: 10px; border-right: 3px solid var(--info); flex-wrap: wrap; }
+  .material-file-item .icon { font-size: 28px; }
+  .material-file-item .info { flex: 1; min-width: 150px; }
+  .material-file-item .info h4 { font-size: 14px; font-weight: 800; margin-bottom: 2px; word-break: break-all; }
+  .material-file-item .info p { font-size: 12px; color: var(--text-light); }
+  .material-file-item button { padding: 6px 12px; background: var(--info-light); color: var(--info); border: none; border-radius: 8px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+  .avatar-upload-box { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 20px; background: var(--bg); border-radius: 14px; margin-bottom: 16px; }
+  .avatar-preview { width: 120px; height: 120px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 60px; overflow: hidden; border: 4px solid var(--primary); }
+  .avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
+  .answered-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .answered-tab { padding: 12px 20px; border: 2px solid var(--border); background: var(--card); border-radius: 12px; font-family: inherit; font-size: 15px; font-weight: 700; color: var(--text-light); cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+  .answered-tab.active { background: var(--success); color: #fff; border-color: var(--success); }
+  .answered-tab .count { background: rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 999px; font-size: 12px; }
+  .answered-tab:not(.active) .count { background: var(--bg); color: var(--text-light); }
+  .quiz-result-card { background: var(--card); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px; border-right: 4px solid var(--success); }
+  .quiz-result-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 12px; flex-wrap: wrap; }
+  .quiz-result-title h4 { font-size: 17px; font-weight: 800; margin-bottom: 4px; }
+  .quiz-result-title p { font-size: 13px; color: var(--text-light); }
+  .quiz-result-score { font-size: 32px; font-weight: 900; color: var(--primary); }
+  .quiz-result-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 8px; }
+  .admin-nav-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .admin-nav-card { background: var(--card); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); cursor: pointer; transition: all 0.2s; border: 2px solid transparent; text-align: center; }
+  .admin-nav-card:hover { transform: translateY(-4px); border-color: var(--primary); box-shadow: var(--shadow-lg); }
+  .admin-nav-icon { font-size: 48px; margin-bottom: 10px; }
+  .admin-nav-title { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+  .admin-nav-desc { font-size: 12px; color: var(--text-light); }
   @media (max-width: 600px) {
     .card { padding: 20px; } .auth-wrapper { margin: 20px auto; }
     .stats-grid { grid-template-columns: repeat(2, 1fr); } .stat-card { flex-direction: column; text-align: center; }
-    .section-title { font-size: 18px; } .modal { padding: 20px; } .user-info h3 { font-size: 16px; }
+    .section-title { font-size: 18px; } .modal { padding: 20px; }
     .qtype-picker { grid-template-columns: 1fr 1fr; } .chart-container { height: 220px; }
-    .leaderboard-rank { width: 40px; height: 40px; font-size: 16px; }
     .user-tab { padding: 10px 16px; font-size: 13px; }
-    .subject-group-title { font-size: 16px; }
-    .subject-group-emoji { font-size: 26px; }
   }
 </style>
 </head>
@@ -346,10 +360,7 @@
         <div class="form-group"><label class="form-label">البريد الإلكتروني</label><input type="email" class="form-input" id="loginEmail" required placeholder="you@example.com"></div>
         <div class="form-group"><label class="form-label">كلمة المرور</label><input type="password" class="form-input" id="loginPassword" required placeholder="••••••••"></div>
         <div class="auth-options">
-          <label class="checkbox-label">
-            <input type="checkbox" id="rememberMe">
-            <span>تذكرني</span>
-          </label>
+          <label class="checkbox-label"><input type="checkbox" id="rememberMe"><span>تذكرني</span></label>
           <button type="button" class="link-btn" onclick="handleForgotPassword()" id="forgotBtn">نسيت كلمة المرور؟</button>
         </div>
         <button type="submit" class="btn btn-primary btn-full btn-lg">دخول</button>
@@ -359,7 +370,6 @@
         <div class="form-group">
           <label class="form-label">الاسم الثلاثي <span style="color:var(--danger)">*</span></label>
           <input type="text" class="form-input" id="regName" required placeholder="مثال: محمد أحمد علي" minlength="5">
-          <p style="font-size:11px;color:var(--text-light);margin-top:4px;">أدخل الاسم الأول والأب والجد</p>
         </div>
         <div class="form-group"><label class="form-label">البريد الإلكتروني</label><input type="email" class="form-input" id="regEmail" required placeholder="you@example.com"></div>
         <div class="form-group"><label class="form-label">كلمة المرور</label><input type="password" class="form-input" id="regPassword" required minlength="6" placeholder="6 أحرف على الأقل"></div>
@@ -372,31 +382,28 @@
           </div>
         </div>
         <div id="studentFields">
-          <div class="form-group"><label class="form-label">المدرسة التابع لها</label><input type="text" class="form-input" id="regSchool" placeholder="اسم المدرسة"></div>
-          <div class="form-group"><label class="form-label">المرحلة الدراسية</label><select class="form-select" id="regStage"><option value="">اختر المرحلة</option><option value="ابتدائي">ابتدائي</option><option value="إعدادي">إعدادي</option><option value="ثانوي">ثانوي</option></select></div>
-          <div class="form-group"><label class="form-label">السنة الدراسية</label><select class="form-select" id="regGrade"><option value="">اختر السنة</option></select></div>
+          <div class="form-group"><label class="form-label">المدرسة</label><input type="text" class="form-input" id="regSchool" placeholder="اسم المدرسة"></div>
+          <div class="form-group"><label class="form-label">المرحلة</label><select class="form-select" id="regStage"><option value="">اختر</option><option value="ابتدائي">ابتدائي</option><option value="إعدادي">إعدادي</option><option value="ثانوي">ثانوي</option></select></div>
+          <div class="form-group"><label class="form-label">السنة</label><select class="form-select" id="regGrade"><option value="">اختر</option></select></div>
           <div style="padding:12px;background:var(--info-light);border-radius:12px;margin-bottom:16px;">
             <p style="font-size:13px;font-weight:700;color:var(--info);margin-bottom:10px;">👨‍👩‍👦 بيانات ولي الأمر</p>
-            <div class="form-group" style="margin-bottom:10px;"><label class="form-label">اسم ولي الأمر</label><input type="text" class="form-input" id="regParentName" placeholder="مثال: أحمد محمد"></div>
-            <div class="form-group" style="margin-bottom:0;"><label class="form-label">رقم هاتف ولي الأمر</label><input type="tel" class="form-input" id="regParentPhone" placeholder="مثال: 01012345678"></div>
+            <div class="form-group" style="margin-bottom:10px;"><label class="form-label">اسم ولي الأمر</label><input type="text" class="form-input" id="regParentName"></div>
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">هاتف ولي الأمر</label><input type="tel" class="form-input" id="regParentPhone"></div>
           </div>
         </div>
         <div id="teacherFields" style="display:none;">
-          <div class="form-group"><label class="form-label">المادة التي تدرّسها</label><select class="form-select" id="regSubject"><option value="">اختر المادة</option></select></div>
+          <div class="form-group"><label class="form-label">المادة</label><select class="form-select" id="regSubject"><option value="">اختر</option></select></div>
         </div>
         <div id="parentFields" style="display:none;">
-          <div class="alert alert-info">📌 يمكنك ربط أبنائك لاحقاً من لوحة التحكم عبر بريدهم أو رقم هاتفهم.</div>
+          <div class="alert alert-info">📌 يمكنك ربط أبنائك لاحقاً.</div>
         </div>
         <button type="submit" class="btn btn-primary btn-full btn-lg">إنشاء الحساب</button>
       </form>
     </div>
 
     <div class="dev-footer">
-      <a class="dev-brand" href="#" onclick="event.preventDefault();" title="مطوّر المنصة">
-        <span>💻</span>
-        <span>تطوير <strong>EMAA.Tech</strong></span>
-      </a>
-      <div class="dev-copy">© <span id="devYear"></span> EMAA.Tech — جميع الحقوق محفوظة</div>
+      <a class="dev-brand" href="#" onclick="event.preventDefault();"><span>💻</span><span>تطوير <strong>EMAA.Tech</strong></span></a>
+      <div class="dev-copy">© <span id="devYear"></span> EMAA.Tech</div>
     </div>
   </div>
 </section>
@@ -406,10 +413,7 @@
     <div class="header-content">
       <div class="header-user">
         <div class="user-avatar" id="userAvatar">👤</div>
-        <div class="user-info">
-          <h3 id="userName">المستخدم</h3>
-          <p id="userMeta">-</p>
-        </div>
+        <div class="user-info"><h3 id="userName">المستخدم</h3><p id="userMeta">-</p></div>
       </div>
       <div class="header-actions">
         <button class="btn btn-sm" onclick="toggleDarkMode()" id="darkModeBtn">🌙</button>
@@ -420,10 +424,7 @@
   </div>
   <div class="container" id="dashboardContent"></div>
   <div class="dev-footer">
-    <a class="dev-brand" href="#" onclick="event.preventDefault();" title="مطوّر المنصة">
-      <span>💻</span>
-      <span>تطوير <strong>EMAA.Tech</strong></span>
-    </a>
+    <a class="dev-brand" href="#" onclick="event.preventDefault();"><span>💻</span><span>تطوير <strong>EMAA.Tech</strong></span></a>
   </div>
 </section>
 
@@ -455,12 +456,13 @@ const DEFAULT_FIREBASE_CONFIG = {
 };
 
 const ADMIN_EMAIL = "admin@emaa.tech";
-
-let fbApp = null, fbDB = null, fbAuth = null, firebaseEnabled = false, firebaseAuthEnabled = false;
+let fbApp = null, fbDB = null, fbAuth = null, fbStorage = null;
+let firebaseEnabled = false, firebaseAuthEnabled = false, firebaseStorageEnabled = false;
 let FB = {};
 let pendingGoogleUser = null;
 let notifUnsubscribe = null;
 let isProcessingRedirect = false;
+let _tempAvatar = null;
 
 function loadFirebaseConfig() {
   try {
@@ -468,7 +470,6 @@ function loadFirebaseConfig() {
     return c ? JSON.parse(c) : DEFAULT_FIREBASE_CONFIG;
   } catch { return DEFAULT_FIREBASE_CONFIG; }
 }
-function saveFirebaseConfig(c) { localStorage.setItem('edu_firebase_config', JSON.stringify(c)); }
 
 async function initFirebase() {
   const config = loadFirebaseConfig();
@@ -478,12 +479,19 @@ async function initFirebase() {
   try {
     const appMod = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
     const dbMod = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
-    FB = { ...appMod, ...dbMod };
+    const storageMod = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js");
+    FB = { ...appMod, ...dbMod, ...storageMod };
     fbApp = appMod.initializeApp(config);
-    fbDB = {
-      db: dbMod.getDatabase(fbApp), ref: dbMod.ref, set: dbMod.set, get: dbMod.get, onValue: dbMod.onValue
+    fbDB = { db: dbMod.getDatabase(fbApp), ref: dbMod.ref, set: dbMod.set, get: dbMod.get, onValue: dbMod.onValue };
+    fbStorage = {
+      storage: storageMod.getStorage(fbApp),
+      ref: storageMod.ref,
+      uploadBytes: storageMod.uploadBytes,
+      getDownloadURL: storageMod.getDownloadURL,
+      deleteObject: storageMod.deleteObject
     };
     firebaseEnabled = true;
+    firebaseStorageEnabled = true;
     try {
       const authMod = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
       FB = { ...FB, ...authMod };
@@ -503,9 +511,9 @@ async function initFirebase() {
         getRedirectResult: authMod.getRedirectResult
       };
       firebaseAuthEnabled = true;
-      console.log('✅ Firebase + Auth متصل');
+      console.log('✅ Firebase + Auth + Storage متصل');
     } catch (e) { firebaseAuthEnabled = false; }
-  } catch (err) { firebaseEnabled = false; firebaseAuthEnabled = false; }
+  } catch (err) { firebaseEnabled = false; firebaseAuthEnabled = false; firebaseStorageEnabled = false; }
 }
 
 const DB = {
@@ -533,7 +541,7 @@ const DB = {
           try { localStorage.setItem('edu_' + key, JSON.stringify(arr)); } catch {}
           return arr;
         }
-      } catch (e) { console.warn('FB get error:', e); }
+      } catch (e) {}
     }
     return this._toArray(localData);
   },
@@ -541,18 +549,17 @@ const DB = {
     const arr = Array.isArray(value) ? value : this._toArray(value);
     try { localStorage.setItem('edu_' + key, JSON.stringify(arr)); } catch {}
     if (firebaseEnabled && fbDB) {
-      let lastErr = null;
       for (let attempt = 1; attempt <= 3; attempt++) {
         try {
           const asObject = {};
           arr.forEach((item, idx) => {
             if (!item) return;
-            const itemId = item.id || ('idx_' + idx + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6));
+            const itemId = item.id || ('idx_' + idx + '_' + Date.now());
             asObject[itemId] = item;
           });
           await fbDB.set(fbDB.ref(fbDB.db, key), asObject);
           return true;
-        } catch (e) { lastErr = e; await new Promise(r => setTimeout(r, 500 * attempt)); }
+        } catch (e) { await new Promise(r => setTimeout(r, 500 * attempt)); }
       }
       return false;
     }
@@ -568,24 +575,23 @@ const DB = {
 
 async function ensureUserProfile(fbUser, existingProfile) {
   if (existingProfile) return existingProfile;
-  const fallbackProfile = {
+  const fallback = {
     id: fbUser.uid, email: fbUser.email,
     name: fbUser.displayName || (fbUser.email || '').split('@')[0] || 'مستخدم',
-    role: 'student',
-    provider: fbUser.providerData && fbUser.providerData[0] ? fbUser.providerData[0].providerId : 'email',
-    photoURL: fbUser.photoURL || null, createdAt: Date.now(), needsProfileCompletion: true
+    role: 'student', provider: 'email', photoURL: fbUser.photoURL || null,
+    createdAt: Date.now(), needsProfileCompletion: true
   };
   if (fbUser.email && fbUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-    fallbackProfile.role = 'admin'; fallbackProfile.approved = true; fallbackProfile.needsProfileCompletion = false;
+    fallback.role = 'admin'; fallback.approved = true; fallback.needsProfileCompletion = false;
   }
   try {
     const users = await DB.get('users');
-    const alreadyExists = users.find(u => u.id === fbUser.uid || u.email === fbUser.email);
-    if (alreadyExists) return alreadyExists;
-    users.push(fallbackProfile);
+    const exists = users.find(u => u.id === fbUser.uid || u.email === fbUser.email);
+    if (exists) return exists;
+    users.push(fallback);
     await DB.set('users', users);
-  } catch (e) { console.warn('ensureUserProfile save error:', e); }
-  return fallbackProfile;
+  } catch (e) {}
+  return fallback;
 }
 
 function showLoading() { document.getElementById('loadingOverlay').classList.add('active'); }
@@ -611,19 +617,18 @@ function launchConfetti(count = 80) {
 
 async function hashPassword(password) {
   const salt = crypto.getRandomValues(new Uint8Array(16));
-  const keyMaterial = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), { name: 'PBKDF2' }, false, ['deriveBits']);
-  const derivedBits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' }, keyMaterial, 256);
-  return `pbkdf2_sha256$100000$${safeBtoa(salt)}$${safeBtoa(new Uint8Array(derivedBits))}`;
+  const km = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), { name: 'PBKDF2' }, false, ['deriveBits']);
+  const db = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' }, km, 256);
+  return `pbkdf2_sha256$100000$${safeBtoa(salt)}$${safeBtoa(new Uint8Array(db))}`;
 }
-async function verifyPassword(storedHash, password) {
+async function verifyPassword(h, p) {
   try {
-    const parts = storedHash.split('$');
-    if (parts.length !== 4 || parts[0] !== 'pbkdf2_sha256') return false;
-    const iterations = parseInt(parts[1]);
+    const parts = h.split('$');
+    if (parts.length !== 4) return false;
     const salt = safeAtob(parts[2]);
-    const keyMaterial = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), { name: 'PBKDF2' }, false, ['deriveBits']);
-    const derivedBits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations, hash: 'SHA-256' }, keyMaterial, 256);
-    return safeBtoa(new Uint8Array(derivedBits)) === parts[3];
+    const km = await crypto.subtle.importKey('raw', new TextEncoder().encode(p), { name: 'PBKDF2' }, false, ['deriveBits']);
+    const db = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations: parseInt(parts[1]), hash: 'SHA-256' }, km, 256);
+    return safeBtoa(new Uint8Array(db)) === parts[3];
   } catch { return false; }
 }
 function safeBtoa(bytes) {
@@ -671,21 +676,16 @@ function getSubjectName(id) { const s = SUBJECTS.find(x=>x.id===id); return s?s.
 function showAlert(msg, type='error') { const b = document.getElementById('authAlert'); if (!b) return; b.innerHTML = `<div class="alert alert-${type}">${escapeHtml(msg)}</div>`; setTimeout(()=>{b.innerHTML='';},5000); }
 function showScreen(name) { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(name+'Screen').classList.add('active'); window.scrollTo(0,0); }
 function calculateAvg(attempts) { if(!attempts.length) return 0; return Math.round(attempts.reduce((a,x)=>a+(x.score/x.total)*100,0)/attempts.length); }
-function isMobileDevice() {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-         (navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && /Macintosh/.test(navigator.userAgent));
-}
+function isMobileDevice() { return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && /Macintosh/.test(navigator.userAgent)); }
 function isAdmin(user) { return user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase(); }
 
 const SESSION_KEY = 'edu_session';
-const REMEMBER_KEY = 'edu_remember';
-
-function saveSession(userId, remember) {
-  if (remember) { localStorage.setItem(SESSION_KEY, userId); localStorage.setItem(REMEMBER_KEY, '1'); sessionStorage.removeItem(SESSION_KEY); }
-  else { sessionStorage.setItem(SESSION_KEY, userId); localStorage.removeItem(SESSION_KEY); localStorage.removeItem(REMEMBER_KEY); }
+function saveSession(id, rem) {
+  if (rem) { localStorage.setItem(SESSION_KEY, id); sessionStorage.removeItem(SESSION_KEY); }
+  else { sessionStorage.setItem(SESSION_KEY, id); localStorage.removeItem(SESSION_KEY); }
 }
 function getSessionUserId() { return sessionStorage.getItem(SESSION_KEY) || localStorage.getItem(SESSION_KEY); }
-function clearSession() { localStorage.removeItem(SESSION_KEY); localStorage.removeItem(REMEMBER_KEY); sessionStorage.removeItem(SESSION_KEY); }
+function clearSession() { localStorage.removeItem(SESSION_KEY); sessionStorage.removeItem(SESSION_KEY); }
 
 function toggleDarkMode() { document.body.classList.toggle('dark-mode'); const d = document.body.classList.contains('dark-mode'); localStorage.setItem('edu_dark_mode', d?'1':'0'); document.getElementById('darkModeBtn').textContent = d?'☀️':'🌙'; }
 function loadDarkMode() { if(localStorage.getItem('edu_dark_mode')==='1'){ document.body.classList.add('dark-mode'); document.getElementById('darkModeBtn').textContent='☀️'; } }
@@ -701,25 +701,19 @@ function switchAuthTab(tab) {
 function pickRole(role) {
   selectedRole = role;
   document.querySelectorAll('.role-option').forEach(o => o.classList.remove('active'));
-  const activeEl = document.querySelector(`.role-option[data-role="${role}"]`);
-  if (activeEl) activeEl.classList.add('active');
-  const studentFields = document.getElementById('studentFields');
-  const teacherFields = document.getElementById('teacherFields');
-  const parentFields = document.getElementById('parentFields');
+  const el = document.querySelector(`.role-option[data-role="${role}"]`);
+  if (el) el.classList.add('active');
+  document.getElementById('studentFields').style.display = role === 'student' ? 'block' : 'none';
+  document.getElementById('teacherFields').style.display = role === 'teacher' ? 'block' : 'none';
+  document.getElementById('parentFields').style.display = role === 'parent' ? 'block' : 'none';
   const schoolInput = document.getElementById('regSchool');
-  if (studentFields) studentFields.style.display = role === 'student' ? 'block' : 'none';
-  if (teacherFields) teacherFields.style.display = role === 'teacher' ? 'block' : 'none';
-  if (parentFields) parentFields.style.display = role === 'parent' ? 'block' : 'none';
   if (schoolInput) schoolInput.required = (role === 'student');
-  if (role === 'teacher' && schoolInput) schoolInput.value = '';
   if (role === 'teacher') {
-    document.getElementById('regSubject').innerHTML = '<option value="">اختر المادة</option>' +
-      SUBJECTS.map(s => `<option value="${s.id}">${s.emoji} ${s.name}</option>`).join('');
+    document.getElementById('regSubject').innerHTML = '<option value="">اختر المادة</option>' + SUBJECTS.map(s => `<option value="${s.id}">${s.emoji} ${s.name}</option>`).join('');
   }
 }
 document.getElementById('regStage').addEventListener('change', function() {
-  document.getElementById('regGrade').innerHTML='<option value="">اختر السنة</option>'+
-    (STAGES[this.value]||[]).map(g=>`<option value="${g}">${g}</option>`).join('');
+  document.getElementById('regGrade').innerHTML='<option value="">اختر السنة</option>'+(STAGES[this.value]||[]).map(g=>`<option value="${g}">${g}</option>`).join('');
 });
 
 
@@ -734,10 +728,7 @@ async function handleRegister(e) {
   if (!selectedRole) { showAlert('اختر دورك'); return; }
 
   const nameParts = name.split(/\s+/).filter(p => p.length > 0);
-  if (nameParts.length < 3) {
-    showAlert('يجب إدخال الاسم الثلاثي (الاسم الأول والأب والجد)');
-    return;
-  }
+  if (nameParts.length < 3) { showAlert('يجب إدخال الاسم الثلاثي'); return; }
 
   const profile = { name, email, role: selectedRole, createdAt: Date.now(), provider: 'email' };
 
@@ -749,27 +740,18 @@ async function handleRegister(e) {
     const parentPhone = document.getElementById('regParentPhone').value.trim();
     if (!school) { showAlert('أدخل اسم المدرسة'); return; }
     if (!stage || !grade) { showAlert('اختر المرحلة والسنة'); return; }
-    profile.school = school;
-    profile.stage = stage; profile.grade = grade;
-    profile.parentName = parentName;
-    profile.parentPhone = parentPhone;
+    profile.school = school; profile.stage = stage; profile.grade = grade;
+    profile.parentName = parentName; profile.parentPhone = parentPhone;
   } else if (selectedRole === 'teacher') {
     const subject = document.getElementById('regSubject').value;
     if (!subject) { showAlert('اختر المادة'); return; }
-    profile.subject = subject;
-    profile.approved = false;
-    profile.bio = '';
-    profile.videoLink = '';
-    profile.materialLink = '';
-    profile.ratings = [];
+    profile.subject = subject; profile.approved = false;
+    profile.bio = ''; profile.videoLinks = []; profile.materialFiles = []; profile.ratings = [];
   } else if (selectedRole === 'parent') {
     profile.children = [];
   }
 
-  if (email === ADMIN_EMAIL.toLowerCase()) {
-    profile.role = 'admin';
-    profile.approved = true;
-  }
+  if (email === ADMIN_EMAIL.toLowerCase()) { profile.role = 'admin'; profile.approved = true; }
 
   showLoading();
   try {
@@ -777,39 +759,30 @@ async function handleRegister(e) {
       try {
         const cred = await fbAuth.createUserWithEmailAndPassword(fbAuth.auth, email, password);
         profile.id = cred.user.uid;
-        const freshUsers = await DB.get('users');
-        if (freshUsers.find(u => u.email === email || u.id === profile.id)) {
-          showAlert('هذا البريد مسجل بالفعل'); return;
-        }
-        freshUsers.push(profile);
-        const saved = await DB.set('users', freshUsers);
-        if (!saved) showAlert('تم إنشاء الحساب لكن تعذر حفظ الملف الشخصي.', 'warning');
+        const users = await DB.get('users');
+        if (users.find(u => u.email === email || u.id === profile.id)) { showAlert('هذا البريد مسجل بالفعل'); return; }
+        users.push(profile);
+        await DB.set('users', users);
         currentUser = profile;
         saveSession(profile.id, true);
         showAlert('تم إنشاء الحساب!', 'success');
         launchConfetti(50);
         setTimeout(() => enterDashboard(), 500);
       } catch (err) {
-        const msgs = {
-          'auth/email-already-in-use': 'البريد مسجل بالفعل',
-          'auth/weak-password': 'كلمة المرور ضعيفة',
-          'auth/invalid-email': 'البريد غير صالح',
-          'auth/operation-not-allowed': 'تسجيل البريد غير مفعّل في Firebase Console'
-        };
+        const msgs = { 'auth/email-already-in-use': 'البريد مسجل بالفعل', 'auth/weak-password': 'كلمة المرور ضعيفة', 'auth/invalid-email': 'البريد غير صالح' };
         showAlert(msgs[err.code] || err.message);
       }
       return;
     }
-
     const users = await DB.get('users');
-    if (users.find(u => u.email === email)) { showAlert('هذا البريد مسجل بالفعل'); return; }
+    if (users.find(u => u.email === email)) { showAlert('هذا البريد مسجل'); return; }
     profile.id = uid();
     profile.passwordHash = await hashPassword(password);
     users.push(profile);
     await DB.set('users', users);
     currentUser = profile;
     saveSession(profile.id, true);
-    showAlert('تم إنشاء الحساب (محلي)!', 'success');
+    showAlert('تم إنشاء الحساب!', 'success');
     launchConfetti(50);
     setTimeout(() => enterDashboard(), 500);
   } finally { hideLoading(); }
@@ -824,42 +797,33 @@ async function handleLogin(e) {
   try {
     if (firebaseAuthEnabled) {
       try {
-        if (fbAuth.setPersistence) {
-          try { await fbAuth.setPersistence(fbAuth.auth, remember ? fbAuth.browserLocalPersistence : fbAuth.browserSessionPersistence); } catch (e) {}
-        }
+        if (fbAuth.setPersistence) { try { await fbAuth.setPersistence(fbAuth.auth, remember ? fbAuth.browserLocalPersistence : fbAuth.browserSessionPersistence); } catch (e) {} }
         const cred = await fbAuth.signInWithEmailAndPassword(fbAuth.auth, email, password);
         const users = await DB.get('users');
-        let user = users.find(u => u.id === cred.user.uid) ||
-                   users.find(u => u.email && cred.user.email && u.email.toLowerCase() === cred.user.email.toLowerCase());
+        let user = users.find(u => u.id === cred.user.uid) || users.find(u => u.email && cred.user.email && u.email.toLowerCase() === cred.user.email.toLowerCase());
         if (!user) user = await ensureUserProfile(cred.user, null);
         if (email === ADMIN_EMAIL.toLowerCase() && user.role !== 'admin') {
           user.role = 'admin'; user.approved = true;
           const idx = users.findIndex(u => u.id === user.id);
-          if (idx >= 0) { users[idx] = user; } else { users.push(user); }
+          if (idx >= 0) users[idx] = user; else users.push(user);
           await DB.set('users', users);
         }
         currentUser = user;
         saveSession(user.id, remember);
         enterDashboard();
       } catch (err) {
-        const msgs = {
-          'auth/user-not-found': 'لا يوجد حساب بهذا البريد',
-          'auth/wrong-password': 'كلمة المرور غير صحيحة',
-          'auth/invalid-credential': 'بيانات الدخول غير صحيحة',
-          'auth/too-many-requests': 'محاولات كثيرة، حاول لاحقاً',
-          'auth/network-request-failed': 'تعذر الاتصال بالشبكة'
-        };
-        showAlert(msgs[err.code] || 'البريد أو كلمة المرور غير صحيحة');
+        const msgs = { 'auth/user-not-found': 'لا يوجد حساب', 'auth/wrong-password': 'كلمة المرور خاطئة', 'auth/invalid-credential': 'بيانات غير صحيحة' };
+        showAlert(msgs[err.code] || 'البريد أو كلمة المرور خاطئة');
       }
       return;
     }
     const users = await DB.get('users');
     let user = users.find(u => u.email === email);
-    if (!user) { showAlert('البريد أو كلمة المرور غير صحيحة'); return; }
+    if (!user) { showAlert('البريد أو كلمة المرور خاطئة'); return; }
     let valid = false;
-    if (user.passwordHash) { valid = await verifyPassword(user.passwordHash, password); }
-    else if (user.password) { valid = (user.password === password); }
-    if (!valid) { showAlert('البريد أو كلمة المرور غير صحيحة'); return; }
+    if (user.passwordHash) valid = await verifyPassword(user.passwordHash, password);
+    else if (user.password) valid = (user.password === password);
+    if (!valid) { showAlert('البريد أو كلمة المرور خاطئة'); return; }
     if (email === ADMIN_EMAIL.toLowerCase() && user.role !== 'admin') {
       user.role = 'admin'; user.approved = true;
       const idx = users.findIndex(u => u.id === user.id);
@@ -872,65 +836,40 @@ async function handleLogin(e) {
 }
 
 async function handleGoogleSignIn() {
-  if (!firebaseAuthEnabled) {
-    showAlert('تسجيل الدخول بـ Google غير متاح في الوضع المحلي.', 'warning'); return;
-  }
+  if (!firebaseAuthEnabled) { showAlert('غير متاح', 'warning'); return; }
   const btn = document.getElementById('googleBtn');
-  const originalHTML = btn.innerHTML;
+  const orig = btn.innerHTML;
   btn.disabled = true;
   try {
     const provider = new fbAuth.GoogleAuthProvider();
     provider.addScope('email'); provider.addScope('profile');
     if (isMobileDevice()) {
-      btn.innerHTML = '<span>جارٍ التحويل إلى Google...</span>';
-      try {
-        sessionStorage.setItem('edu_google_redirect', '1');
-        await fbAuth.signInWithRedirect(fbAuth.auth, provider);
-      } catch (err) {
-        const msgs = {
-          'auth/operation-not-allowed': 'تسجيل الدخول بـ Google غير مفعّل في Firebase Console',
-          'auth/unauthorized-domain': 'هذا النطاق غير مصرح به في Firebase',
-          'auth/network-request-failed': 'تعذر الاتصال بالشبكة'
-        };
-        showAlert(msgs[err.code] || 'تعذر التحويل: ' + (err.message || 'خطأ'));
-        sessionStorage.removeItem('edu_google_redirect');
-      }
+      btn.innerHTML = '<span>جارٍ التحويل...</span>';
+      sessionStorage.setItem('edu_google_redirect', '1');
+      await fbAuth.signInWithRedirect(fbAuth.auth, provider);
       return;
     }
-    btn.innerHTML = '<span>جارٍ الاتصال بـ Google...</span>';
-    try {
-      const result = await fbAuth.signInWithPopup(fbAuth.auth, provider);
-      await processGoogleUser(result.user);
-    } catch (err) {
-      const msgs = {
-        'auth/popup-closed-by-user': 'تم إغلاق نافذة Google قبل الإكمال',
-        'auth/popup-blocked': 'المتصفح منع النافذة المنبثقة',
-        'auth/cancelled-popup-request': 'تم إلغاء الطلب',
-        'auth/operation-not-allowed': 'تسجيل الدخول بـ Google غير مفعّل',
-        'auth/unauthorized-domain': 'هذا النطاق غير مصرح به',
-        'auth/network-request-failed': 'تعذر الاتصال بالشبكة'
-      };
-      showAlert(msgs[err.code] || 'تعذر تسجيل الدخول: ' + (err.message || 'خطأ'));
-    }
-  } finally { btn.disabled = false; btn.innerHTML = originalHTML; }
+    btn.innerHTML = '<span>جارٍ الاتصال...</span>';
+    const result = await fbAuth.signInWithPopup(fbAuth.auth, provider);
+    await processGoogleUser(result.user);
+  } catch (err) {
+    showAlert('تعذر تسجيل الدخول: ' + (err.message || 'خطأ'));
+  } finally { btn.disabled = false; btn.innerHTML = orig; }
 }
 
-async function processGoogleUser(googleUser) {
-  if (!googleUser || !googleUser.email) { showAlert('تعذر الحصول على بيانات Google.'); return; }
-  console.log('✅ Google Sign-In نجح:', { uid: googleUser.uid, email: googleUser.email, displayName: googleUser.displayName, photoURL: googleUser.photoURL });
+async function processGoogleUser(g) {
+  if (!g || !g.email) { showAlert('تعذر الحصول على البيانات'); return; }
   const users = await DB.get('users');
-  let existing = users.find(u => u.id === googleUser.uid || (u.email && googleUser.email && u.email.toLowerCase() === googleUser.email.toLowerCase()));
-  if (googleUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-    if (existing) {
-      existing.role = 'admin'; existing.approved = true;
-      const idx = users.findIndex(u => u.id === existing.id);
-      if (idx >= 0) { users[idx] = existing; await DB.set('users', users); }
-    }
+  let existing = users.find(u => u.id === g.uid || (u.email && g.email && u.email.toLowerCase() === g.email.toLowerCase()));
+  if (g.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() && existing) {
+    existing.role = 'admin'; existing.approved = true;
+    const idx = users.findIndex(u => u.id === existing.id);
+    if (idx >= 0) { users[idx] = existing; await DB.set('users', users); }
   }
   if (existing) {
-    const nameParts = (existing.name || '').split(/\s+/).filter(p => p.length > 0);
-    if (nameParts.length < 3 && !isAdmin(existing)) {
-      pendingGoogleUser = { id: existing.id, email: existing.email, name: existing.name, photoURL: existing.photoURL, provider: 'google', isExisting: true };
+    const np = (existing.name || '').split(/\s+/).filter(p => p.length > 0);
+    if (np.length < 3 && !isAdmin(existing)) {
+      pendingGoogleUser = { id: existing.id, email: existing.email, name: existing.name, photoURL: existing.photoURL, isExisting: true };
       openProfileCompletionModal(true);
       return;
     }
@@ -939,7 +878,7 @@ async function processGoogleUser(googleUser) {
     showAlert(`مرحباً ${existing.name}!`, 'success');
     setTimeout(() => enterDashboard(), 400);
   } else {
-    pendingGoogleUser = { id: googleUser.uid, email: googleUser.email, name: googleUser.displayName || '', photoURL: googleUser.photoURL || null, provider: 'google', isExisting: false };
+    pendingGoogleUser = { id: g.uid, email: g.email, name: g.displayName || '', photoURL: g.photoURL || null, isExisting: false };
     openProfileCompletionModal(false);
   }
 }
@@ -953,23 +892,18 @@ async function handleGoogleRedirectResult() {
     const result = await fbAuth.getRedirectResult(fbAuth.auth);
     sessionStorage.removeItem('edu_google_redirect');
     if (result && result.user) await processGoogleUser(result.user);
-  } catch (err) {
-    sessionStorage.removeItem('edu_google_redirect');
-    showAlert('تعذر إكمال تسجيل الدخول: ' + (err.message || 'خطأ'));
-  } finally { hideLoading(); isProcessingRedirect = false; }
+  } catch (err) { sessionStorage.removeItem('edu_google_redirect'); }
+  finally { hideLoading(); isProcessingRedirect = false; }
 }
 
 let googleSelectedRole = null;
 
 function openProfileCompletionModal(isExisting = false) {
   googleSelectedRole = null;
-  const isNameThreePart = pendingGoogleUser?.name && pendingGoogleUser.name.split(/\s+/).filter(p => p.length > 0).length >= 3;
-  openModal(`<div class="modal-header"><h3 class="modal-title">👋 مرحباً ${escapeHtml(pendingGoogleUser?.name || '')}</h3></div>
-    <div class="alert alert-info">تم تسجيل الدخول بـ Google بنجاح. أكمل بياناتك لإنشاء حسابك.</div>
-    ${!isNameThreePart ? `
-      <div class="form-group"><label class="form-label">الاسم الثلاثي <span style="color:var(--danger)">*</span></label>
-      <input type="text" class="form-input" id="gFullName" value="${escapeHtml(pendingGoogleUser?.name || '')}" placeholder="مثال: محمد أحمد علي"></div>
-    ` : `<input type="hidden" id="gFullName" value="${escapeHtml(pendingGoogleUser?.name || '')}">`}
+  const isName3 = pendingGoogleUser?.name && pendingGoogleUser.name.split(/\s+/).filter(p => p.length > 0).length >= 3;
+  openModal(`<div class="modal-header"><h3 class="modal-title">👋 ${escapeHtml(pendingGoogleUser?.name || '')}</h3></div>
+    <div class="alert alert-info">تم تسجيل الدخول بـ Google. أكمل بياناتك.</div>
+    ${!isName3 ? `<div class="form-group"><label class="form-label">الاسم الثلاثي</label><input type="text" class="form-input" id="gFullName" value="${escapeHtml(pendingGoogleUser?.name || '')}" placeholder="محمد أحمد علي"></div>` : `<input type="hidden" id="gFullName" value="${escapeHtml(pendingGoogleUser?.name || '')}">`}
     <div class="form-group">
       <label class="form-label">أنا...</label>
       <div class="role-picker" style="grid-template-columns: repeat(3, 1fr);">
@@ -979,33 +913,30 @@ function openProfileCompletionModal(isExisting = false) {
       </div>
     </div>
     <div id="gStudentFields" style="display:none;">
-      <div class="form-group"><label class="form-label">المدرسة التابع لها</label><input type="text" class="form-input" id="gSchool" placeholder="اسم المدرسة"></div>
-      <div class="form-group"><label class="form-label">المرحلة الدراسية</label><select class="form-select" id="gStage"><option value="">اختر المرحلة</option><option value="ابتدائي">ابتدائي</option><option value="إعدادي">إعدادي</option><option value="ثانوي">ثانوي</option></select></div>
-      <div class="form-group"><label class="form-label">السنة الدراسية</label><select class="form-select" id="gGrade"><option value="">اختر السنة</option></select></div>
+      <div class="form-group"><label class="form-label">المدرسة</label><input type="text" class="form-input" id="gSchool"></div>
+      <div class="form-group"><label class="form-label">المرحلة</label><select class="form-select" id="gStage"><option value="">اختر</option><option value="ابتدائي">ابتدائي</option><option value="إعدادي">إعدادي</option><option value="ثانوي">ثانوي</option></select></div>
+      <div class="form-group"><label class="form-label">السنة</label><select class="form-select" id="gGrade"><option value="">اختر</option></select></div>
       <div style="padding:12px;background:var(--info-light);border-radius:12px;margin-bottom:16px;">
         <p style="font-size:13px;font-weight:700;color:var(--info);margin-bottom:10px;">👨‍👩‍👦 بيانات ولي الأمر</p>
-        <div class="form-group" style="margin-bottom:10px;"><label class="form-label">اسم ولي الأمر</label><input type="text" class="form-input" id="gParentName" placeholder="مثال: أحمد محمد"></div>
-        <div class="form-group" style="margin-bottom:0;"><label class="form-label">رقم هاتف ولي الأمر</label><input type="tel" class="form-input" id="gParentPhone" placeholder="مثال: 01012345678"></div>
+        <div class="form-group" style="margin-bottom:10px;"><label class="form-label">اسم ولي الأمر</label><input type="text" class="form-input" id="gParentName"></div>
+        <div class="form-group" style="margin-bottom:0;"><label class="form-label">هاتف ولي الأمر</label><input type="tel" class="form-input" id="gParentPhone"></div>
       </div>
     </div>
     <div id="gTeacherFields" style="display:none;">
-      <div class="form-group"><label class="form-label">المادة التي تدرّسها</label><select class="form-select" id="gSubject"><option value="">اختر المادة</option></select></div>
+      <div class="form-group"><label class="form-label">المادة</label><select class="form-select" id="gSubject"><option value="">اختر</option></select></div>
     </div>
     <div id="gParentFields" style="display:none;">
-      <div class="alert alert-info">📌 يمكنك ربط أبنائك لاحقاً من لوحة التحكم.</div>
+      <div class="alert alert-info">📌 يمكنك ربط أبنائك لاحقاً.</div>
     </div>
     <div style="display:flex;gap:8px;margin-top:16px;">
       ${!isExisting ? `<button class="btn btn-ghost" onclick="cancelGoogleProfile()" style="flex:1;">إلغاء</button>` : ''}
-      <button class="btn btn-success" onclick="completeGoogleProfile()" style="flex:2;">✅ إكمال الحساب</button>
+      <button class="btn btn-success" onclick="completeGoogleProfile()" style="flex:2;">✅ إكمال</button>
     </div>`);
   setTimeout(() => {
-    const stageEl = document.getElementById('gStage');
-    if (stageEl) {
-      stageEl.addEventListener('change', function() {
-        document.getElementById('gGrade').innerHTML = '<option value="">اختر السنة</option>' +
-          (STAGES[this.value] || []).map(g => `<option value="${g}">${g}</option>`).join('');
-      });
-    }
+    const s = document.getElementById('gStage');
+    if (s) s.addEventListener('change', function() {
+      document.getElementById('gGrade').innerHTML = '<option value="">اختر السنة</option>' + (STAGES[this.value] || []).map(g => `<option value="${g}">${g}</option>`).join('');
+    });
   }, 50);
 }
 
@@ -1018,8 +949,7 @@ function pickGoogleRole(role) {
   document.getElementById('gTeacherFields').style.display = role === 'teacher' ? 'block' : 'none';
   document.getElementById('gParentFields').style.display = role === 'parent' ? 'block' : 'none';
   if (role === 'teacher') {
-    document.getElementById('gSubject').innerHTML = '<option value="">اختر المادة</option>' +
-      SUBJECTS.map(s => `<option value="${s.id}">${s.emoji} ${s.name}</option>`).join('');
+    document.getElementById('gSubject').innerHTML = '<option value="">اختر المادة</option>' + SUBJECTS.map(s => `<option value="${s.id}">${s.emoji} ${s.name}</option>`).join('');
   }
 }
 
@@ -1033,35 +963,25 @@ async function completeGoogleProfile() {
   if (!pendingGoogleUser) return;
   if (!googleSelectedRole) { alert('اختر دورك'); return; }
   const fullName = document.getElementById('gFullName').value.trim();
-  const nameParts = fullName.split(/\s+/).filter(p => p.length > 0);
-  if (nameParts.length < 3) { alert('يجب إدخال الاسم الثلاثي'); return; }
+  const np = fullName.split(/\s+/).filter(p => p.length > 0);
+  if (np.length < 3) { alert('يجب إدخال الاسم الثلاثي'); return; }
 
-  const profile = {
-    id: pendingGoogleUser.id, email: pendingGoogleUser.email, name: fullName,
-    role: googleSelectedRole, provider: 'google',
-    photoURL: pendingGoogleUser.photoURL, createdAt: Date.now()
-  };
-
-  if (pendingGoogleUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-    profile.role = 'admin'; profile.approved = true;
-  }
+  const profile = { id: pendingGoogleUser.id, email: pendingGoogleUser.email, name: fullName, role: googleSelectedRole, provider: 'google', photoURL: pendingGoogleUser.photoURL, createdAt: Date.now() };
+  if (pendingGoogleUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) { profile.role = 'admin'; profile.approved = true; }
 
   if (googleSelectedRole === 'student' && profile.role !== 'admin') {
     const school = document.getElementById('gSchool').value.trim();
     const stage = document.getElementById('gStage').value;
     const grade = document.getElementById('gGrade').value;
-    const parentName = document.getElementById('gParentName').value.trim();
-    const parentPhone = document.getElementById('gParentPhone').value.trim();
-    if (!school) { alert('أدخل اسم المدرسة'); return; }
-    if (!stage || !grade) { alert('اختر المرحلة والسنة'); return; }
+    if (!school || !stage || !grade) { alert('أكمل البيانات'); return; }
     profile.school = school; profile.stage = stage; profile.grade = grade;
-    profile.parentName = parentName; profile.parentPhone = parentPhone;
+    profile.parentName = document.getElementById('gParentName').value.trim();
+    profile.parentPhone = document.getElementById('gParentPhone').value.trim();
   } else if (googleSelectedRole === 'teacher' && profile.role !== 'admin') {
     const subject = document.getElementById('gSubject').value;
     if (!subject) { alert('اختر المادة'); return; }
     profile.subject = subject; profile.approved = false;
-    profile.bio = ''; profile.videoLink = ''; profile.materialLink = '';
-    profile.ratings = [];
+    profile.bio = ''; profile.videoLinks = []; profile.materialFiles = []; profile.ratings = [];
   } else if (googleSelectedRole === 'parent') {
     profile.children = [];
   }
@@ -1069,20 +989,13 @@ async function completeGoogleProfile() {
   showLoading();
   try {
     const users = await DB.get('users');
-    const existingIdx = users.findIndex(u => u.id === profile.id || u.email === profile.email);
-    if (existingIdx >= 0) {
-      users[existingIdx] = { ...users[existingIdx], ...profile, needsProfileCompletion: false };
-      await DB.set('users', users);
-      currentUser = users[existingIdx];
-    } else {
-      users.push(profile);
-      await DB.set('users', users);
-      currentUser = profile;
-    }
+    const idx = users.findIndex(u => u.id === profile.id || u.email === profile.email);
+    if (idx >= 0) { users[idx] = { ...users[idx], ...profile, needsProfileCompletion: false }; await DB.set('users', users); currentUser = users[idx]; }
+    else { users.push(profile); await DB.set('users', users); currentUser = profile; }
     saveSession(currentUser.id, true);
     pendingGoogleUser = null; googleSelectedRole = null;
     closeModal();
-    showAlert('تم حفظ بياناتك بنجاح!', 'success');
+    showAlert('تم حفظ البيانات!', 'success');
     launchConfetti(50);
     setTimeout(() => enterDashboard(), 400);
   } finally { hideLoading(); }
@@ -1090,8 +1003,8 @@ async function completeGoogleProfile() {
 
 function openProfileCompletionForExisting() {
   googleSelectedRole = null;
-  openModal(`<div class="modal-header"><h3 class="modal-title">👋 مرحباً ${escapeHtml(currentUser.name)}</h3></div>
-    <div class="alert alert-warning">لم نجد ملفك الشخصي الكامل. يرجى استكمال بياناتك.</div>
+  openModal(`<div class="modal-header"><h3 class="modal-title">👋 ${escapeHtml(currentUser.name)}</h3></div>
+    <div class="alert alert-warning">يرجى استكمال بياناتك.</div>
     <div class="form-group"><label class="form-label">الاسم الثلاثي</label><input type="text" class="form-input" id="gFullName" value="${escapeHtml(currentUser.name || '')}"></div>
     <div class="form-group">
       <label class="form-label">أنا...</label>
@@ -1109,15 +1022,12 @@ function openProfileCompletionForExisting() {
     <div id="gTeacherFields" style="display:none;">
       <div class="form-group"><label class="form-label">المادة</label><select class="form-select" id="gSubject"><option value="">اختر</option></select></div>
     </div>
-    <div id="gParentFields" style="display:none;">
-      <div class="alert alert-info">يمكنك ربط أبنائك من لوحة التحكم.</div>
-    </div>
-    <button class="btn btn-success btn-full" onclick="saveExistingProfile()" style="margin-top:16px;">✅ حفظ البيانات</button>`);
+    <div id="gParentFields" style="display:none;"><div class="alert alert-info">يمكنك ربط أبنائك لاحقاً.</div></div>
+    <button class="btn btn-success btn-full" onclick="saveExistingProfile()" style="margin-top:16px;">✅ حفظ</button>`);
   setTimeout(() => {
-    const stageEl = document.getElementById('gStage');
-    if (stageEl) stageEl.addEventListener('change', function() {
-      document.getElementById('gGrade').innerHTML = '<option value="">اختر السنة</option>' +
-        (STAGES[this.value] || []).map(g => `<option value="${g}">${g}</option>`).join('');
+    const s = document.getElementById('gStage');
+    if (s) s.addEventListener('change', function() {
+      document.getElementById('gGrade').innerHTML = '<option value="">اختر السنة</option>' + (STAGES[this.value] || []).map(g => `<option value="${g}">${g}</option>`).join('');
     });
   }, 50);
 }
@@ -1125,21 +1035,21 @@ function openProfileCompletionForExisting() {
 async function saveExistingProfile() {
   if (!googleSelectedRole) { alert('اختر دورك'); return; }
   const fullName = document.getElementById('gFullName').value.trim();
-  const nameParts = fullName.split(/\s+/).filter(p => p.length > 0);
-  if (nameParts.length < 3) { alert('الاسم الثلاثي مطلوب'); return; }
+  const np = fullName.split(/\s+/).filter(p => p.length > 0);
+  if (np.length < 3) { alert('الاسم الثلاثي مطلوب'); return; }
   const updates = { name: fullName, role: googleSelectedRole, needsProfileCompletion: false };
 
   if (googleSelectedRole === 'student') {
     const school = document.getElementById('gSchool').value.trim();
     const stage = document.getElementById('gStage').value;
     const grade = document.getElementById('gGrade').value;
-    if (!school || !stage || !grade) { alert('أكمل جميع الحقول'); return; }
+    if (!school || !stage || !grade) { alert('أكمل الحقول'); return; }
     updates.school = school; updates.stage = stage; updates.grade = grade;
   } else if (googleSelectedRole === 'teacher') {
     const subject = document.getElementById('gSubject').value;
     if (!subject) { alert('اختر المادة'); return; }
     updates.subject = subject; updates.approved = false;
-  } else if (googleSelectedRole === 'parent') {
+  } else {
     updates.children = currentUser.children || [];
   }
 
@@ -1159,22 +1069,18 @@ async function saveExistingProfile() {
 }
 
 async function handleForgotPassword() {
-  const emailInput = document.getElementById('loginEmail');
-  let email = emailInput.value.trim().toLowerCase();
-  if (!email) { showAlert('أدخل بريدك الإلكتروني أولاً', 'warning'); emailInput.focus(); return; }
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) { showAlert('البريد الإلكتروني غير صالح', 'error'); return; }
-  if (!firebaseAuthEnabled) { showAlert('الاستعادة غير متاحة في الوضع المحلي', 'warning'); return; }
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  if (!email) { showAlert('أدخل بريدك أولاً', 'warning'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showAlert('البريد غير صالح'); return; }
+  if (!firebaseAuthEnabled) { showAlert('غير متاح', 'warning'); return; }
   const btn = document.getElementById('forgotBtn');
-  const originalText = btn.textContent;
+  const orig = btn.textContent;
   btn.disabled = true; btn.textContent = 'جارٍ الإرسال...';
   try {
     await fbAuth.sendPasswordResetEmail(fbAuth.auth, email);
-    showAlert(`✅ تم إرسال رابط إعادة التعيين إلى ${email}`, 'success');
-  } catch (err) {
-    const msgs = { 'auth/user-not-found': 'لا يوجد حساب', 'auth/invalid-email': 'البريد غير صالح', 'auth/too-many-requests': 'محاولات كثيرة' };
-    showAlert(msgs[err.code] || 'تعذر إرسال البريد');
-  } finally { btn.disabled = false; btn.textContent = originalText; }
+    showAlert(`✅ تم الإرسال إلى ${email}`, 'success');
+  } catch (err) { showAlert('تعذر الإرسال'); }
+  finally { btn.disabled = false; btn.textContent = orig; }
 }
 
 async function logout() {
@@ -1185,7 +1091,6 @@ async function logout() {
   showScreen('auth');
   document.getElementById('loginForm').reset();
   document.getElementById('registerForm').reset();
-  document.getElementById('rememberMe').checked = false;
 }
 
 async function checkSession() {
@@ -1193,35 +1098,32 @@ async function checkSession() {
   if (isProcessingRedirect) return false;
   if (firebaseAuthEnabled && fbAuth) {
     return new Promise((resolve) => {
-      let resolved = false;
+      let done = false;
       const unsub = fbAuth.onAuthStateChanged(fbAuth.auth, async (user) => {
-        if (resolved) return;
-        resolved = true; unsub();
+        if (done) return;
+        done = true; unsub();
         if (user) {
           try {
             const users = await DB.get('users');
-            let profile = users.find(u => u.id === user.uid) ||
-                          users.find(u => u.email && user.email && u.email.toLowerCase() === user.email.toLowerCase());
-            if (!profile) {
-              profile = await ensureUserProfile(user, null);
-              if (!profile) { resolve(false); return; }
-            }
-            if (user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() && profile.role !== 'admin') {
-              profile.role = 'admin'; profile.approved = true;
-              const idx = users.findIndex(u => u.id === profile.id);
-              if (idx >= 0) { users[idx] = profile; } else { users.push(profile); }
+            let p = users.find(u => u.id === user.uid) || users.find(u => u.email && user.email && u.email.toLowerCase() === user.email.toLowerCase());
+            if (!p) p = await ensureUserProfile(user, null);
+            if (!p) { resolve(false); return; }
+            if (user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() && p.role !== 'admin') {
+              p.role = 'admin'; p.approved = true;
+              const i = users.findIndex(u => u.id === p.id);
+              if (i >= 0) users[i] = p; else users.push(p);
               await DB.set('users', users);
             }
-            currentUser = profile;
-            saveSession(profile.id, true);
+            currentUser = p;
+            saveSession(p.id, true);
             enterDashboard();
             resolve(true);
             return;
-          } catch (e) { console.error('checkSession error:', e); }
+          } catch (e) {}
         }
         resolve(false);
       });
-      setTimeout(() => { if (!resolved) { resolved = true; resolve(false); } }, 8000);
+      setTimeout(() => { if (!done) { done = true; resolve(false); } }, 8000);
     });
   }
   const id = getSessionUserId();
@@ -1244,75 +1146,334 @@ function enterDashboard() {
   else if (currentUser.role === 'teacher') {
     if (currentUser.approved === false) renderPendingTeacherDashboard();
     else renderTeacherDashboard();
-  } else if (currentUser.role === 'parent') {
-    renderParentDashboard();
-  } else renderStudentDashboard();
+  } else if (currentUser.role === 'parent') renderParentDashboard();
+  else renderStudentDashboard();
 }
 
 function updateHeader() {
-  const avatarEl = document.getElementById('userAvatar');
-  if (currentUser.photoURL) {
-    avatarEl.innerHTML = `<img src="${currentUser.photoURL}" alt="avatar" referrerpolicy="no-referrer">`;
-  } else {
-    avatarEl.textContent = isAdmin(currentUser) ? '👑' : (currentUser.role==='teacher'?'👨‍🏫':currentUser.role==='parent'?'👨‍👩‍👦':'👨‍🎓');
-  }
+  const av = document.getElementById('userAvatar');
+  if (currentUser.photoURL) av.innerHTML = `<img src="${currentUser.photoURL}" alt="avatar" referrerpolicy="no-referrer">`;
+  else av.textContent = isAdmin(currentUser) ? '👑' : (currentUser.role === 'teacher' ? '👨‍🏫' : currentUser.role === 'parent' ? '👨‍👩‍👦' : '👨‍🎓');
   document.getElementById('userName').textContent = currentUser.name;
   let meta = '';
   if (isAdmin(currentUser)) meta = '👑 مدير المنصة';
   else if (currentUser.role === 'teacher') meta = `مدرس • ${getSubjectName(currentUser.subject)}${currentUser.approved === false ? ' • ⏳ بانتظار الاعتماد' : ''}`;
-  else if (currentUser.role === 'parent') meta = `👨‍👩‍👦 ولي أمر • ${(currentUser.children || []).length} أبناء مرتبطون`;
+  else if (currentUser.role === 'parent') meta = `👨‍👩‍👦 ولي أمر • ${(currentUser.children || []).length} أبناء`;
   else meta = `طالب • ${currentUser.grade || ''}${currentUser.school ? ' • ' + currentUser.school : ''}`;
   document.getElementById('userMeta').textContent = meta;
 }
 
 /* ============================================================
-   ============ Teacher Profile ============
+   ============ Audit Log ============
+   ============================================================ */
+async function logActivity(action, details = '') {
+  try {
+    const logs = await DB.get('auditLog');
+    logs.push({
+      id: uid(),
+      userId: currentUser?.id || 'unknown',
+      userName: currentUser?.name || 'غير معروف',
+      userRole: currentUser?.role || 'unknown',
+      action,
+      details,
+      timestamp: Date.now()
+    });
+    if (logs.length > 500) logs.splice(0, logs.length - 500);
+    await DB.set('auditLog', logs);
+  } catch (e) {}
+}
+
+/* ============================================================
+   ============ Teacher Profile (Avatar Upload) ============
    ============================================================ */
 function openTeacherProfileEdit() {
-  if (currentUser.role !== 'teacher') { alert('هذا الخيار للمدرسين فقط'); return; }
+  if (currentUser.role !== 'teacher') { alert('للمدرسين فقط'); return; }
   const u = currentUser;
-  openModal(`<div class="modal-header"><h3 class="modal-title">✏️ الملف الشخصي للمعلم</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-    <div class="alert alert-info">ستظهر هذه البيانات للطلاب في بطاقتك.</div>
-    <div class="form-group"><label class="form-label">نبذة عنك</label><textarea class="form-textarea" id="tBio" placeholder="مثال: مدرس رياضيات بخبرة 10 سنوات..." maxlength="300">${escapeHtml(u.bio || '')}</textarea></div>
-    <div class="form-group"><label class="form-label">🔗 رابط فيديو الكورس</label><input type="url" class="form-input" id="tVideoLink" placeholder="https://youtube.com/..." value="${escapeHtml(u.videoLink || '')}"></div>
-    <div class="form-group"><label class="form-label">📄 رابط الملازم</label><input type="url" class="form-input" id="tMaterialLink" placeholder="https://drive.google.com/..." value="${escapeHtml(u.materialLink || '')}"></div>
-    <div class="form-group"><label class="form-label">🖼️ رابط صورة شخصية (اختياري)</label><input type="url" class="form-input" id="tPhotoURL" placeholder="https://..." value="${escapeHtml(u.photoURL || '')}"></div>
+  _tempAvatar = u.photoURL || null;
+  window._tempAvatarPath = null;
+  openModal(`<div class="modal-header"><h3 class="modal-title">✏️ الملف الشخصي</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="alert alert-info">ستظهر هذه البيانات للطلاب.</div>
+    <div class="avatar-upload-box">
+      <div class="avatar-preview" id="avatarPreview">${u.photoURL ? `<img src="${u.photoURL}" referrerpolicy="no-referrer">` : '👨‍🏫'}</div>
+      <input type="file" accept="image/*" id="avatarFile" onchange="handleAvatarUpload(event)" style="display:none;">
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary btn-sm" onclick="document.getElementById('avatarFile').click()">📷 اختيار صورة</button>
+        ${u.photoURL ? `<button class="btn btn-danger btn-sm" onclick="removeAvatar()">🗑 إزالة</button>` : ''}
+      </div>
+      <p style="font-size:11px;color:var(--text-light);">الحد الأقصى: 5MB</p>
+    </div>
+    <div class="form-group"><label class="form-label">نبذة عنك</label><textarea class="form-textarea" id="tBio" maxlength="300" placeholder="مثال: مدرس رياضيات بخبرة 10 سنوات...">${escapeHtml(u.bio || '')}</textarea></div>
     <button class="btn btn-success btn-full" onclick="saveTeacherProfile()">💾 حفظ</button>`);
+}
+
+async function handleAvatarUpload(e) {
+  const f = e.target.files[0]; if (!f) return;
+  if (f.size > 5 * 1024 * 1024) { alert('الصورة كبيرة (الحد 5MB)'); e.target.value = ''; return; }
+  if (!f.type.startsWith('image/')) { alert('اختر صورة فقط'); e.target.value = ''; return; }
+
+  if (!firebaseStorageEnabled) {
+    // fallback لـ base64 لو Storage غير مفعّل
+    if (f.size > 500 * 1024) { alert('Storage غير مفعّل، الحد 500KB'); e.target.value = ''; return; }
+    const r = new FileReader();
+    r.onload = (ev) => {
+      _tempAvatar = ev.target.result;
+      document.getElementById('avatarPreview').innerHTML = `<img src="${ev.target.result}">`;
+    };
+    r.readAsDataURL(f);
+    return;
+  }
+
+  showLoading();
+  try {
+    const path = `avatars/${currentUser.id}_${Date.now()}.jpg`;
+    const storageRef = fbStorage.ref(fbStorage.storage, path);
+    await fbStorage.uploadBytes(storageRef, f);
+    const downloadURL = await fbStorage.getDownloadURL(storageRef);
+    _tempAvatar = downloadURL;
+    window._tempAvatarPath = path;
+    document.getElementById('avatarPreview').innerHTML = `<img src="${downloadURL}">`;
+    alert('✅ تم رفع الصورة. اضغط "حفظ" للتأكيد.');
+  } catch (err) { alert('فشل الرفع: ' + err.message); }
+  finally { hideLoading(); }
+}
+
+function removeAvatar() {
+  _tempAvatar = null;
+  window._tempAvatarPath = null;
+  document.getElementById('avatarPreview').innerHTML = '👨‍🏫';
+  const fi = document.getElementById('avatarFile'); if (fi) fi.value = '';
 }
 
 async function saveTeacherProfile() {
   const bio = document.getElementById('tBio').value.trim();
-  const videoLink = document.getElementById('tVideoLink').value.trim();
-  const materialLink = document.getElementById('tMaterialLink').value.trim();
-  const photoURL = document.getElementById('tPhotoURL').value.trim();
   showLoading();
   try {
     const users = await DB.get('users');
     const idx = users.findIndex(u => u.id === currentUser.id);
     if (idx >= 0) {
       users[idx].bio = bio;
-      users[idx].videoLink = videoLink;
-      users[idx].materialLink = materialLink;
-      if (photoURL) users[idx].photoURL = photoURL;
+      users[idx].photoURL = _tempAvatar || null;
       await DB.set('users', users);
       currentUser = users[idx];
       updateHeader();
       closeModal();
       launchConfetti(20);
-      alert('✅ تم حفظ الملف الشخصي');
+      alert('✅ تم الحفظ');
     }
   } finally { hideLoading(); }
 }
 
+/* ============================================================
+   ============ Teacher Content (Videos + Materials via Storage) ============
+   ============================================================ */
+function openTeacherContent() {
+  if (currentUser.role !== 'teacher') { alert('للمدرسين فقط'); return; }
+  renderContentModal('videos');
+}
+
+function renderContentModal(activeTab = 'videos') {
+  const u = currentUser;
+  const videos = u.videoLinks || [];
+  const materials = u.materialFiles || [];
+
+  const videosHtml = videos.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">🎥</div><h3>لا توجد فيديوهات</h3></div>` :
+    videos.map((v, i) => `
+      <div class="video-link-item">
+        <div class="info">
+          <h4>${escapeHtml(v.title || 'فيديو ' + (i + 1))}</h4>
+          <p>${escapeHtml(v.url)}</p>
+        </div>
+        <a href="${escapeHtml(v.url)}" target="_blank" rel="noopener">▶️ مشاهدة</a>
+        <button class="icon-btn icon-btn-danger" onclick="removeVideoLink(${i})">🗑</button>
+      </div>
+    `).join('');
+
+  const materialsHtml = materials.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">📄</div><h3>لا توجد ملازم</h3></div>` :
+    materials.map((m, i) => `
+      <div class="material-file-item">
+        <span class="icon">📄</span>
+        <div class="info">
+          <h4>${escapeHtml(m.name)}</h4>
+          <p>${(m.size / 1024).toFixed(1)} KB • ${new Date(m.uploadedAt).toLocaleDateString('ar-EG')}</p>
+        </div>
+        <button onclick="downloadMaterial(${i})">⬇️ تحميل</button>
+        <button class="icon-btn icon-btn-danger" onclick="removeMaterial(${i})">🗑</button>
+      </div>
+    `).join('');
+
+  openModal(`<div class="modal-header"><h3 class="modal-title">📚 محتوى المادة</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="content-tabs">
+      <button class="content-tab ${activeTab === 'videos' ? 'active' : ''}" onclick="renderContentModal('videos')">🎥 فيديوهات (${videos.length})</button>
+      <button class="content-tab ${activeTab === 'materials' ? 'active' : ''}" onclick="renderContentModal('materials')">📄 الملازم (${materials.length})</button>
+    </div>
+    ${activeTab === 'videos' ? `
+      <div class="form-group">
+        <label class="form-label">➕ إضافة فيديو</label>
+        <input type="text" class="form-input" id="newVideoTitle" placeholder="عنوان الفيديو (اختياري)" style="margin-bottom:8px;">
+        <input type="url" class="form-input" id="newVideoUrl" placeholder="https://youtube.com/watch?v=...">
+        <button class="btn btn-primary btn-full" onclick="addVideoLink()" style="margin-top:8px;">➕ إضافة</button>
+      </div>
+      <h4 style="font-size:15px;font-weight:800;margin:16px 0 10px;">📋 الفيديوهات (${videos.length})</h4>
+      ${videosHtml}
+    ` : `
+      <div class="form-group">
+        <label class="form-label">➕ رفع ملزمة (PDF / Word / صور)</label>
+        <input type="file" class="form-input" id="newMaterialFile" accept=".pdf,.doc,.docx,image/*,.ppt,.pptx" onchange="handleMaterialUpload(event)">
+        <p style="font-size:11px;color:var(--text-light);margin-top:6px;">${firebaseStorageEnabled ? 'الحد: 20MB' : 'Storage غير مفعّل — الحد 500KB'}</p>
+      </div>
+      <h4 style="font-size:15px;font-weight:800;margin:16px 0 10px;">📋 الملازم (${materials.length})</h4>
+      ${materialsHtml}
+    `}`);
+}
+
+async function addVideoLink() {
+  const title = document.getElementById('newVideoTitle').value.trim();
+  const url = document.getElementById('newVideoUrl').value.trim();
+  if (!url) { alert('أدخل الرابط'); return; }
+  try { new URL(url); } catch { alert('رابط غير صالح'); return; }
+  showLoading();
+  try {
+    const users = await DB.get('users');
+    const idx = users.findIndex(u => u.id === currentUser.id);
+    if (idx >= 0) {
+      if (!users[idx].videoLinks) users[idx].videoLinks = [];
+      users[idx].videoLinks.push({ title: title || `فيديو ${users[idx].videoLinks.length + 1}`, url, addedAt: Date.now() });
+      await DB.set('users', users);
+      currentUser = users[idx];
+      await logActivity('إضافة فيديو', title || url);
+      launchConfetti(10);
+      alert('✅ تم');
+      renderContentModal('videos');
+    }
+  } finally { hideLoading(); }
+}
+
+async function removeVideoLink(index) {
+  if (!confirm('حذف هذا الفيديو؟')) return;
+  showLoading();
+  try {
+    const users = await DB.get('users');
+    const idx = users.findIndex(u => u.id === currentUser.id);
+    if (idx >= 0 && users[idx].videoLinks) {
+      const v = users[idx].videoLinks[index];
+      users[idx].videoLinks.splice(index, 1);
+      await DB.set('users', users);
+      currentUser = users[idx];
+      await logActivity('حذف فيديو', v.title || '');
+      renderContentModal('videos');
+    }
+  } finally { hideLoading(); }
+}
+
+async function handleMaterialUpload(e) {
+  const f = e.target.files[0]; if (!f) return;
+
+  if (firebaseStorageEnabled) {
+    if (f.size > 20 * 1024 * 1024) { alert('الملف كبير (الحد 20MB)'); e.target.value = ''; return; }
+    showLoading();
+    try {
+      const path = `materials/${currentUser.id}/${Date.now()}_${f.name}`;
+      const storageRef = fbStorage.ref(fbStorage.storage, path);
+      await fbStorage.uploadBytes(storageRef, f);
+      const downloadURL = await fbStorage.getDownloadURL(storageRef);
+      const users = await DB.get('users');
+      const idx = users.findIndex(u => u.id === currentUser.id);
+      if (idx >= 0) {
+        if (!users[idx].materialFiles) users[idx].materialFiles = [];
+        users[idx].materialFiles.push({ name: f.name, size: f.size, type: f.type, url: downloadURL, storagePath: path, uploadedAt: Date.now() });
+        await DB.set('users', users);
+        currentUser = users[idx];
+        await logActivity('رفع ملزمة', f.name);
+        launchConfetti(10);
+        alert(`✅ تم رفع "${f.name}"`);
+        renderContentModal('materials');
+      }
+    } catch (err) { alert('فشل الرفع: ' + err.message); }
+    finally { hideLoading(); }
+    return;
+  }
+
+  // fallback base64
+  if (f.size > 500 * 1024) { alert('Storage غير مفعّل، الحد 500KB'); e.target.value = ''; return; }
+  showLoading();
+  try {
+    const base64 = await new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = (ev) => res(ev.target.result);
+      r.onerror = rej;
+      r.readAsDataURL(f);
+    });
+    const users = await DB.get('users');
+    const idx = users.findIndex(u => u.id === currentUser.id);
+    if (idx >= 0) {
+      if (!users[idx].materialFiles) users[idx].materialFiles = [];
+      users[idx].materialFiles.push({ name: f.name, size: f.size, type: f.type, data: base64, uploadedAt: Date.now() });
+      await DB.set('users', users);
+      currentUser = users[idx];
+      alert(`✅ تم رفع "${f.name}"`);
+      renderContentModal('materials');
+    }
+  } finally { hideLoading(); }
+}
+
+async function removeMaterial(index) {
+  if (!confirm('حذف هذه الملزمة؟')) return;
+  showLoading();
+  try {
+    const users = await DB.get('users');
+    const idx = users.findIndex(u => u.id === currentUser.id);
+    if (idx >= 0 && users[idx].materialFiles) {
+      const m = users[idx].materialFiles[index];
+      if (m.storagePath && firebaseStorageEnabled) {
+        try { await fbStorage.deleteObject(fbStorage.ref(fbStorage.storage, m.storagePath)); } catch (e) {}
+      }
+      users[idx].materialFiles.splice(index, 1);
+      await DB.set('users', users);
+      currentUser = users[idx];
+      await logActivity('حذف ملزمة', m.name);
+      renderContentModal('materials');
+    }
+  } finally { hideLoading(); }
+}
+
+function downloadMaterial(index) {
+  const m = (currentUser.materialFiles || [])[index];
+  if (!m) return;
+  if (m.url) window.open(m.url, '_blank');
+  else if (m.data) {
+    const a = document.createElement('a');
+    a.href = m.data; a.download = m.name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }
+}
+
+async function downloadTeacherMaterial(teacherId, index) {
+  const users = await DB.get('users');
+  const t = users.find(u => u.id === teacherId);
+  if (!t || !t.materialFiles || !t.materialFiles[index]) return;
+  const m = t.materialFiles[index];
+  if (m.url) window.open(m.url, '_blank');
+  else if (m.data) {
+    const a = document.createElement('a');
+    a.href = m.data; a.download = m.name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }
+}
+
+/* ============================================================
+   ============ Teacher Card ============
+   ============================================================ */
 function renderTeacherCard(teacher, showRateButton = true) {
   const ratings = teacher.ratings || [];
   const avg = ratings.length ? (ratings.reduce((a, r) => a + r.stars, 0) / ratings.length).toFixed(1) : '0';
   const fullStars = Math.round(parseFloat(avg));
   const myRating = ratings.find(r => r.studentId === currentUser?.id);
+  const videos = teacher.videoLinks || [];
+  const materials = teacher.materialFiles || [];
 
   return `<div class="teacher-card">
     <div class="teacher-card-header">
-      <div class="teacher-card-avatar">${teacher.photoURL ? `<img src="${teacher.photoURL}" alt="${escapeHtml(teacher.name)}" referrerpolicy="no-referrer">` : '👨‍🏫'}</div>
+      <div class="teacher-card-avatar">${teacher.photoURL ? `<img src="${teacher.photoURL}" referrerpolicy="no-referrer">` : '👨‍🏫'}</div>
       <div class="teacher-card-info">
         <h4>${escapeHtml(teacher.name)}</h4>
         <p>${getSubjectName(teacher.subject)} • ${teacher.approved ? '✅ معتمد' : '⏳ معلق'}</p>
@@ -1323,15 +1484,17 @@ function renderTeacherCard(teacher, showRateButton = true) {
       </div>
     </div>
     ${teacher.bio ? `<div class="teacher-card-bio">${escapeHtml(teacher.bio)}</div>` : ''}
-    <div class="teacher-card-links">
-      ${teacher.videoLink ? `<a href="${escapeHtml(teacher.videoLink)}" target="_blank" rel="noopener" class="teacher-link video">🎥 فيديو الكورس</a>` : ''}
-      ${teacher.materialLink ? `<a href="${escapeHtml(teacher.materialLink)}" target="_blank" rel="noopener" class="teacher-link material">📄 الملازم</a>` : ''}
-    </div>
+    ${videos.length > 0 || materials.length > 0 ? `
+      <div class="teacher-card-links">
+        ${videos.map(v => `<a href="${escapeHtml(v.url)}" target="_blank" rel="noopener" class="teacher-link video">🎥 ${escapeHtml(v.title || 'فيديو')}</a>`).join('')}
+        ${materials.map((m, i) => `<button class="teacher-link material" onclick="downloadTeacherMaterial('${teacher.id}', ${i})">📄 ${escapeHtml(m.name)}</button>`).join('')}
+      </div>
+    ` : ''}
     ${showRateButton && currentUser && currentUser.role === 'student' ? `
       <div class="teacher-rating-row">
-        <span class="rating-info">قيّم هذا المعلم:${myRating ? ` (تقييمك: ${myRating.stars}★)` : ''}</span>
-        <div class="stars-input" data-teacher-id="${teacher.id}">
-          ${[1,2,3,4,5].map(i => `<span class="star ${myRating && i <= myRating.stars ? 'active' : ''}" data-value="${i}" onclick="rateTeacher('${teacher.id}', ${i})">★</span>`).join('')}
+        <span style="font-size:13px;color:var(--text-light);">قيّم:${myRating ? ` (تقييمك: ${myRating.stars}★)` : ''}</span>
+        <div class="stars-input">
+          ${[1,2,3,4,5].map(i => `<span class="star ${myRating && i <= myRating.stars ? 'active' : ''}" onclick="rateTeacher('${teacher.id}', ${i})">★</span>`).join('')}
         </div>
       </div>
     ` : ''}
@@ -1339,18 +1502,18 @@ function renderTeacherCard(teacher, showRateButton = true) {
 }
 
 async function rateTeacher(teacherId, stars) {
-  if (!currentUser || currentUser.role !== 'student') { alert('التقييم متاح للطلاب فقط'); return; }
+  if (!currentUser || currentUser.role !== 'student') { alert('للطلاب فقط'); return; }
   showLoading();
   try {
     const users = await DB.get('users');
-    const teacherIdx = users.findIndex(u => u.id === teacherId);
-    if (teacherIdx < 0) return;
-    if (!users[teacherIdx].ratings) users[teacherIdx].ratings = [];
-    users[teacherIdx].ratings = users[teacherIdx].ratings.filter(r => r.studentId !== currentUser.id);
-    users[teacherIdx].ratings.push({ studentId: currentUser.id, stars, at: Date.now() });
+    const idx = users.findIndex(u => u.id === teacherId);
+    if (idx < 0) return;
+    if (!users[idx].ratings) users[idx].ratings = [];
+    users[idx].ratings = users[idx].ratings.filter(r => r.studentId !== currentUser.id);
+    users[idx].ratings.push({ studentId: currentUser.id, stars, at: Date.now() });
     await DB.set('users', users);
     launchConfetti(10);
-    alert(`✅ تم تقييم المعلم بـ ${stars} نجوم`);
+    alert(`✅ تم التقييم بـ ${stars} نجوم`);
     if (currentUser.role === 'student') renderStudentDashboard();
   } finally { hideLoading(); }
 }
@@ -1358,185 +1521,23 @@ async function rateTeacher(teacherId, stars) {
 async function renderTeachersForStudents() {
   const users = await DB.get('users');
   const teachers = users.filter(u => u.role === 'teacher' && u.approved !== false);
-  if (teachers.length === 0) return `<div class="card"><div class="empty-state"><h3>لا يوجد مدرسون بعد</h3></div></div>`;
+  if (teachers.length === 0) return `<div class="card"><div class="empty-state"><h3>لا يوجد مدرسون</h3></div></div>`;
   return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px;">
     ${teachers.map(t => renderTeacherCard(t, true)).join('')}
   </div>`;
 }
 
-/* ============================================================
-   ============ Parent Dashboard ============
-   ============================================================ */
-async function renderParentDashboard() {
-  showLoading();
-  try {
-    const allUsers = await DB.get('users');
-    const allAttempts = await DB.get('attempts');
-    const allQuizzes = await DB.get('quizzes');
-
-    const children = allUsers.filter(u => u.role === 'student' && (currentUser.children || []).includes(u.id));
-    const totalAttempts = children.reduce((sum, child) => sum + allAttempts.filter(a => a.studentId === child.id).length, 0);
-    const avgAllChildren = children.length > 0
-      ? Math.round(children.reduce((sum, child) => {
-          const cAttempts = allAttempts.filter(a => a.studentId === child.id);
-          return sum + (cAttempts.length ? calculateAvg(cAttempts) : 0);
-        }, 0) / children.length)
-      : 0;
-
-    const container = document.getElementById('dashboardContent');
-    container.innerHTML = `
-      <div class="card" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); color:#fff;">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <span style="font-size:48px;">👨‍👩‍👦</span>
-          <div><h2 style="font-size:24px; font-weight:900;">لوحة ولي الأمر</h2><p style="opacity:0.9;">متابعة أبنائك والمدرسين</p></div>
-        </div>
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-card"><div class="stat-icon primary">👨‍🎓</div><div class="stat-info"><h4>${children.length}</h4><p>أبنائي</p></div></div>
-        <div class="stat-card"><div class="stat-icon success">✅</div><div class="stat-info"><h4>${totalAttempts}</h4><p>إجمالي المحاولات</p></div></div>
-        <div class="stat-card"><div class="stat-icon warning">📊</div><div class="stat-info"><h4>${avgAllChildren}%</h4><p>متوسط الأبناء</p></div></div>
-      </div>
-
-      <div class="add-child-box">
-        <h4>➕ إضافة ابن/ابنة</h4>
-        <p>أدخل بريد الطالب أو رقم هاتف ولي الأمر المرتبط بحسابه</p>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
-          <input type="text" class="form-input" id="childSearchInput" placeholder="البريد الإلكتروني أو رقم الهاتف" style="max-width:400px;">
-          <button class="btn btn-primary" onclick="searchChild()">🔍 بحث وإضافة</button>
-        </div>
-      </div>
-
-      <div class="section-header" style="margin-top:32px;">
-        <div><h2 class="section-title">👨‍🎓 أبنائي</h2><p class="section-subtitle">${children.length} طالب مرتبط</p></div>
-      </div>
-
-      ${children.length === 0 ? `
-        <div class="card"><div class="empty-state"><div class="empty-state-icon">👨‍👩‍👦</div><h3>لا يوجد أبناء مرتبطون</h3><p style="margin-top:8px;">استخدم البحث أعلاه لإضافة ابنك</p></div></div>
-      ` : children.map(child => {
-        const cAttempts = allAttempts.filter(a => a.studentId === child.id);
-        const cAvg = cAttempts.length ? calculateAvg(cAttempts) : 0;
-        return `<div class="parent-child-card">
-          <div class="parent-child-header">
-            <div class="parent-child-avatar">${child.photoURL ? `<img src="${child.photoURL}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : '👨‍🎓'}</div>
-            <div class="parent-child-info">
-              <h4>${escapeHtml(child.name)}</h4>
-              <p>${escapeHtml(child.grade || '')} • ${escapeHtml(child.school || '')} • ${escapeHtml(child.email)}</p>
-            </div>
-            <button class="btn btn-sm btn-danger" onclick="removeChild('${child.id}')">🗑 إلغاء الربط</button>
-          </div>
-          <div class="parent-child-stats">
-            <div class="parent-child-stat"><h5>${cAttempts.length}</h5><p>اختبار محلول</p></div>
-            <div class="parent-child-stat"><h5>${cAvg}%</h5><p>المتوسط</p></div>
-            <div class="parent-child-stat"><h5>${cAttempts.filter(a => (a.score / a.total) >= 0.8).length}</h5><p>اختبارات ممتازة</p></div>
-          </div>
-          <button class="btn btn-outline btn-full btn-sm" onclick="openChildDetails('${child.id}')">👁️ عرض التفاصيل الكاملة</button>
-        </div>`;
-      }).join('')}
-
-      <div class="section-header" style="margin-top:32px;">
-        <div><h2 class="section-title">👨‍🏫 المدرسون</h2><p class="section-subtitle">تعرّف على المدرسين</p></div>
-      </div>
-      ${await renderTeachersForParent()}
-    `;
-  } finally { hideLoading(); }
-}
-
-async function searchChild() {
-  const query = document.getElementById('childSearchInput').value.trim().toLowerCase();
-  if (!query) { alert('أدخل البريد أو رقم الهاتف'); return; }
-  showLoading();
-  try {
-    const users = await DB.get('users');
-    const student = users.find(u =>
-      u.role === 'student' &&
-      (u.email?.toLowerCase() === query || u.parentPhone === query)
-    );
-    if (!student) { alert('❌ لم يتم العثور على طالب بهذا البريد أو رقم الهاتف'); return; }
-    if ((currentUser.children || []).includes(student.id)) { alert('⚠️ هذا الطالب مرتبط بحسابك بالفعل'); return; }
-    if (!currentUser.children) currentUser.children = [];
-    currentUser.children.push(student.id);
-    const userIdx = users.findIndex(u => u.id === currentUser.id);
-    if (userIdx >= 0) { users[userIdx].children = currentUser.children; await DB.set('users', users); }
-    launchConfetti(30);
-    alert(`✅ تم ربط ${student.name} بحسابك`);
-    renderParentDashboard();
-  } finally { hideLoading(); }
-}
-
-async function removeChild(childId) {
-  if (!confirm('إلغاء ربط هذا الطالب بحسابك؟')) return;
-  showLoading();
-  try {
-    currentUser.children = (currentUser.children || []).filter(id => id !== childId);
-    const users = await DB.get('users');
-    const userIdx = users.findIndex(u => u.id === currentUser.id);
-    if (userIdx >= 0) { users[userIdx].children = currentUser.children; await DB.set('users', users); }
-    alert('✅ تم إلغاء الربط');
-    renderParentDashboard();
-  } finally { hideLoading(); }
-}
-
-async function openChildDetails(childId) {
-  showLoading();
-  try {
-    const users = await DB.get('users');
-    const allAttempts = await DB.get('attempts');
-    const allQuizzes = await DB.get('quizzes');
-    const child = users.find(u => u.id === childId);
-    if (!child) return;
-    const childAttempts = allAttempts.filter(a => a.studentId === childId).sort((a, b) => b.createdAt - a.createdAt);
-    const avg = childAttempts.length ? calculateAvg(childAttempts) : 0;
-
-    openModal(`<div class="modal-header"><h3 class="modal-title">👨‍🎓 ${escapeHtml(child.name)}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-      <div class="alert alert-info">
-        📚 ${escapeHtml(child.grade || '')} • ${escapeHtml(child.school || '')}<br>
-        📧 ${escapeHtml(child.email)}<br>
-        📊 المتوسط: <strong>${avg}%</strong> • ${childAttempts.length} اختبار محلول
-      </div>
-
-      <h4 style="font-size:16px;font-weight:800;margin:20px 0 12px;">📝 سجل النتائج</h4>
-      ${childAttempts.length === 0 ? `<div class="empty-state"><h3>لا نتائج بعد</h3></div>` : childAttempts.map(a => {
-        const quiz = allQuizzes.find(q => q.id === a.quizId);
-        if (!quiz) return '';
-        const pct = Math.round((a.score / a.total) * 100);
-        const pending = a.needsGrading && !a.graded;
-        return `<div class="history-item">
-          <div class="history-info">
-            <h4>${escapeHtml(quiz.title)}</h4>
-            <p>${getSubjectName(quiz.subject)} • ${new Date(a.createdAt).toLocaleDateString('ar-EG')}</p>
-          </div>
-          ${pending ? `<span class="pending-badge"><span class="pending-dot"></span> بانتظار التصحيح</span>` : ''}
-          <div class="history-score">${a.score}/${a.total}</div>
-          <span class="badge badge-${pct>=80?'success':pct>=50?'warning':'danger'}">${pct}%</span>
-        </div>`;
-      }).join('')}
-
-      <h4 style="font-size:16px;font-weight:800;margin:20px 0 12px;">👨‍🏫 المدرسون المرتبطون</h4>
-      ${renderChildTeachers(child, allQuizzes, users)}
-    `);
-  } finally { hideLoading(); }
-}
-
-function renderChildTeachers(child, allQuizzes, users) {
-  const childGradeQuizzes = allQuizzes.filter(q => q.grade === child.grade);
-  const teacherIds = [...new Set(childGradeQuizzes.map(q => q.teacherId))];
-  const teachers = users.filter(u => teacherIds.includes(u.id));
-  if (teachers.length === 0) return `<div class="empty-state"><h3>لا يوجد مدرسون مرتبطون</h3></div>`;
-  return teachers.map(t => renderTeacherCard(t, false)).join('');
-}
-
 async function renderTeachersForParent() {
   const users = await DB.get('users');
   const teachers = users.filter(u => u.role === 'teacher' && u.approved !== false);
-  if (teachers.length === 0) return `<div class="card"><div class="empty-state"><h3>لا يوجد مدرسون بعد</h3></div></div>`;
+  if (teachers.length === 0) return `<div class="card"><div class="empty-state"><h3>لا يوجد مدرسون</h3></div></div>`;
   return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px;">
     ${teachers.map(t => renderTeacherCard(t, false)).join('')}
   </div>`;
 }
 
 /* ============================================================
-   ============ Admin Dashboard ============
+   ============ Admin Dashboard (مع الميزات الخمس) ============
    ============================================================ */
 async function renderAdminDashboard() {
   showLoading();
@@ -1548,6 +1549,7 @@ async function renderAdminDashboard() {
     const pendingTeachers = teachers.filter(t => t.approved === false);
     const students = allUsers.filter(u => u.role === 'student');
     const parents = allUsers.filter(u => u.role === 'parent');
+
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
       <div class="card" style="background: linear-gradient(135deg, #f59e0b, #f97316); color:#fff;">
@@ -1556,41 +1558,67 @@ async function renderAdminDashboard() {
           <div><h2 style="font-size:24px; font-weight:900;">لوحة الأدمن</h2><p style="opacity:0.9;">إدارة كاملة للمنصة</p></div>
         </div>
       </div>
+
+      <div class="admin-nav-grid">
+        <div class="admin-nav-card" onclick="renderAdminQuizzes()">
+          <div class="admin-nav-icon">📝</div>
+          <div class="admin-nav-title">إدارة الاختبارات</div>
+          <div class="admin-nav-desc">${allQuizzes.length} اختبار</div>
+        </div>
+        <div class="admin-nav-card" onclick="renderAdminStats()">
+          <div class="admin-nav-icon">📊</div>
+          <div class="admin-nav-title">الإحصائيات</div>
+          <div class="admin-nav-desc">رسوم بيانية</div>
+        </div>
+        <div class="admin-nav-card" onclick="renderAuditLog()">
+          <div class="admin-nav-icon">📜</div>
+          <div class="admin-nav-title">سجل النشاط</div>
+          <div class="admin-nav-desc">آخر الأحداث</div>
+        </div>
+        <div class="admin-nav-card" onclick="openAdminBroadcast()">
+          <div class="admin-nav-icon">📢</div>
+          <div class="admin-nav-title">إشعار شامل</div>
+          <div class="admin-nav-desc">لكل المستخدمين</div>
+        </div>
+      </div>
+
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-icon primary">👥</div><div class="stat-info"><h4>${allUsers.length}</h4><p>إجمالي المستخدمين</p></div></div>
+        <div class="stat-card"><div class="stat-icon primary">👥</div><div class="stat-info"><h4>${allUsers.length}</h4><p>المستخدمون</p></div></div>
         <div class="stat-card"><div class="stat-icon success">👨‍🎓</div><div class="stat-info"><h4>${students.length}</h4><p>طلاب</p></div></div>
         <div class="stat-card"><div class="stat-icon info">👨‍🏫</div><div class="stat-info"><h4>${teachers.length}</h4><p>مدرسون</p></div></div>
         <div class="stat-card"><div class="stat-icon warning">👨‍👩‍👦</div><div class="stat-info"><h4>${parents.length}</h4><p>أولياء أمور</p></div></div>
       </div>
+
       <div class="stats-grid">
         <div class="stat-card"><div class="stat-icon primary">📝</div><div class="stat-info"><h4>${allQuizzes.length}</h4><p>اختبارات</p></div></div>
         <div class="stat-card"><div class="stat-icon success">✅</div><div class="stat-info"><h4>${allAttempts.length}</h4><p>محاولات</p></div></div>
-        <div class="stat-card"><div class="stat-icon warning">📊</div><div class="stat-info"><h4>${calculateAvg(allAttempts)}%</h4><p>المتوسط العام</p></div></div>
+        <div class="stat-card"><div class="stat-icon warning">📊</div><div class="stat-info"><h4>${calculateAvg(allAttempts)}%</h4><p>المتوسط</p></div></div>
+        <div class="stat-card"><div class="stat-icon danger">⏳</div><div class="stat-info"><h4>${pendingTeachers.length}</h4><p>بانتظار الاعتماد</p></div></div>
       </div>
+
       <div class="card" style="border-right:4px solid var(--danger); background: var(--danger-light);">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-          <div>
-            <h3 style="font-size:16px; font-weight:900; color:var(--danger); margin-bottom:4px;">🗑 منطقة الخطر</h3>
-            <p style="font-size:13px; color:var(--text-light); font-weight:600;">مسح جميع الاختبارات والمحاولات (لا يؤثر على حسابات المستخدمين)</p>
-          </div>
-          <button class="btn btn-danger" onclick="wipeQuizData()">🗑 مسح جميع الاختبارات والمحاولات</button>
+          <div><h3 style="font-size:16px; font-weight:900; color:var(--danger);">🗑 منطقة الخطر</h3><p style="font-size:13px; color:var(--text-light);">مسح الاختبارات والمحاولات</p></div>
+          <button class="btn btn-danger" onclick="wipeQuizData()">🗑 مسح</button>
         </div>
       </div>
+
       ${pendingTeachers.length > 0 ? `
         <div class="card" style="border-right:4px solid var(--warning); background: var(--warning-light);">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-            <div><h3 style="font-size:18px; font-weight:900; color:var(--warning); margin-bottom:4px;">⏳ ${pendingTeachers.length} مدرس بانتظار الاعتماد</h3></div>
+            <div><h3 style="font-size:18px; font-weight:900; color:var(--warning);">⏳ ${pendingTeachers.length} مدرس بانتظار الاعتماد</h3></div>
             <button class="btn btn-primary" onclick="openPendingTeachers()">👀 مراجعة</button>
           </div>
         </div>
       ` : ''}
+
       <div class="section-header" style="margin-top:32px;">
-        <div><h2 class="section-title">إدارة المستخدمين</h2><p class="section-subtitle">جميع المستخدمين المسجلين (${allUsers.length})</p></div>
+        <div><h2 class="section-title">إدارة المستخدمين</h2><p class="section-subtitle">${allUsers.length} مستخدم</p></div>
       </div>
       <div class="user-tabs">
         <button class="user-tab ${currentUserTab === 'students' ? 'active' : ''}" onclick="switchUserTab('students')">👨‍🎓 الطلاب <span class="count">${students.length}</span></button>
         <button class="user-tab ${currentUserTab === 'teachers' ? 'active' : ''}" onclick="switchUserTab('teachers')">👨‍🏫 المدرسون <span class="count">${teachers.length}</span></button>
-        <button class="user-tab ${currentUserTab === 'parents' ? 'active' : ''}" onclick="switchUserTab('parents')">👨‍👩‍👦 أولياء الأمور <span class="count">${parents.length}</span></button>
+        <button class="user-tab ${currentUserTab === 'parents' ? 'active' : ''}" onclick="switchUserTab('parents')">👨‍👩‍👦 أولياء <span class="count">${parents.length}</span></button>
       </div>
       <div class="card" id="usersListContainer">${renderUsersListForTab(allUsers, allAttempts, currentUserTab)}</div>
     `;
@@ -1602,11 +1630,36 @@ function switchUserTab(tab) { currentUserTab = tab; renderAdminDashboard(); }
 function renderUsersListForTab(allUsers, allAttempts, tab) {
   let filtered = [];
   let emptyMsg = '';
-  if (tab === 'students') { filtered = allUsers.filter(u => u.role === 'student'); emptyMsg = 'لا يوجد طلاب مسجلون'; }
-  else if (tab === 'teachers') { filtered = allUsers.filter(u => u.role === 'teacher'); emptyMsg = 'لا يوجد مدرسون مسجلون'; }
-  else { filtered = allUsers.filter(u => u.role === 'parent'); emptyMsg = 'لا يوجد أولياء أمور مسجلون'; }
-  if (filtered.length === 0) return `<div class="empty-state"><div class="empty-state-icon">${tab === 'students' ? '👨‍🎓' : tab === 'teachers' ? '👨‍🏫' : '👨‍👩‍👦'}</div><h3>${emptyMsg}</h3></div>`;
+  if (tab === 'students') { filtered = allUsers.filter(u => u.role === 'student'); emptyMsg = 'لا يوجد طلاب'; }
+  else if (tab === 'teachers') { filtered = allUsers.filter(u => u.role === 'teacher'); emptyMsg = 'لا يوجد مدرسون'; }
+  else { filtered = allUsers.filter(u => u.role === 'parent'); emptyMsg = 'لا يوجد أولياء'; }
+
+  if (filtered.length === 0) return `<div class="empty-state"><h3>${emptyMsg}</h3></div>`;
+
+  const searchId = `search_${tab}`;
+  const filterId = `filter_${tab}`;
+  let filterOptions = '';
+  if (tab === 'students') {
+    const grades = [...new Set(filtered.map(u => u.grade).filter(Boolean))];
+    filterOptions = `<option value="">كل السنوات</option>${grades.map(g => `<option value="${g}">${g}</option>`).join('')}`;
+  } else if (tab === 'teachers') {
+    filterOptions = `<option value="">كل الحالات</option><option value="approved">✅ معتمد</option><option value="pending">⏳ معلق</option>`;
+  }
+
   filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+  const headerHtml = `
+    <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+      <input type="text" class="form-input" id="${searchId}" placeholder="🔍 بحث بالاسم أو البريد..." style="flex:1; min-width:200px;" oninput="applyAdminFilters('${tab}')">
+      <select class="form-select" id="${filterId}" style="max-width:200px;" onchange="applyAdminFilters('${tab}')">${filterOptions}</select>
+    </div>
+  `;
+
+  return headerHtml + `<div id="usersListBody_${tab}">${renderUsersBody(filtered, allAttempts, tab)}</div>`;
+}
+
+function renderUsersBody(filtered, allAttempts, tab) {
+  if (filtered.length === 0) return `<div class="empty-state"><h3>لا نتائج</h3></div>`;
   return filtered.map(u => {
     if (tab === 'students') {
       const sAttempts = allAttempts.filter(a => a.studentId === u.id);
@@ -1615,11 +1668,11 @@ function renderUsersListForTab(allUsers, allAttempts, tab) {
         <div class="student-info">
           <h4>${escapeHtml(u.name)} ${u.provider === 'google' ? '🔵' : ''}</h4>
           <p>${escapeHtml(u.email)} • ${escapeHtml(u.grade || '')} • ${escapeHtml(u.school || '')} • ${sAttempts.length} محاولة • متوسط ${avg}%</p>
-          ${u.parentName ? `<p style="font-size:11px;">👨‍👩‍👦 ولي الأمر: ${escapeHtml(u.parentName)}${u.parentPhone ? ' • ' + escapeHtml(u.parentPhone) : ''}</p>` : ''}
+          ${u.parentName ? `<p style="font-size:11px;">👨‍👩‍👦 ${escapeHtml(u.parentName)}${u.parentPhone ? ' • ' + escapeHtml(u.parentPhone) : ''}</p>` : ''}
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
           <span class="badge badge-${avg>=80?'success':avg>=50?'warning':'danger'}">${avg}%</span>
-          <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')">🗑 حذف</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')">🗑</button>
         </div>
       </div>`;
     } else if (tab === 'teachers') {
@@ -1627,41 +1680,348 @@ function renderUsersListForTab(allUsers, allAttempts, tab) {
       const avgR = ratings.length ? (ratings.reduce((a, r) => a + r.stars, 0) / ratings.length).toFixed(1) : '0';
       return `<div class="student-row">
         <div class="student-info">
-          <h4>${escapeHtml(u.name)} ${isAdmin(u) ? '<span class="admin-badge">👑 أدمن</span>' : ''} ${u.approved === false ? '<span class="badge badge-warning">⏳ معلق</span>' : ''}</h4>
+          <h4>${escapeHtml(u.name)} ${isAdmin(u) ? '<span class="admin-badge">👑</span>' : ''} ${u.approved === false ? '<span class="badge badge-warning">⏳ معلق</span>' : ''}</h4>
           <p>${escapeHtml(u.email)} • ${getSubjectName(u.subject)} • ⭐ ${avgR} (${ratings.length})</p>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
           ${u.approved === false ? `<button class="btn btn-sm btn-success" onclick="approveTeacher('${u.id}')">✅ اعتماد</button>` : ''}
-          ${!isAdmin(u) ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')">🗑 حذف</button>` : ''}
+          ${!isAdmin(u) ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')">🗑</button>` : ''}
         </div>
       </div>`;
     } else {
       return `<div class="student-row">
-        <div class="student-info">
-          <h4>${escapeHtml(u.name)}</h4>
-          <p>${escapeHtml(u.email)} • ${(u.children || []).length} أبناء مرتبطون</p>
-        </div>
-        <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')">🗑 حذف</button>
+        <div class="student-info"><h4>${escapeHtml(u.name)}</h4><p>${escapeHtml(u.email)} • ${(u.children || []).length} أبناء</p></div>
+        <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')">🗑</button>
       </div>`;
     }
   }).join('');
 }
 
+async function applyAdminFilters(tab) {
+  const searchId = `search_${tab}`;
+  const filterId = `filter_${tab}`;
+  const query = (document.getElementById(searchId)?.value || '').trim().toLowerCase();
+  const filterVal = document.getElementById(filterId)?.value || '';
+
+  const allUsers = await DB.get('users');
+  const allAttempts = await DB.get('attempts');
+
+  let filtered = [];
+  if (tab === 'students') filtered = allUsers.filter(u => u.role === 'student');
+  else if (tab === 'teachers') filtered = allUsers.filter(u => u.role === 'teacher');
+  else filtered = allUsers.filter(u => u.role === 'parent');
+
+  if (query) {
+    filtered = filtered.filter(u =>
+      (u.name || '').toLowerCase().includes(query) ||
+      (u.email || '').toLowerCase().includes(query)
+    );
+  }
+
+  if (filterVal) {
+    if (tab === 'students') filtered = filtered.filter(u => u.grade === filterVal);
+    else if (tab === 'teachers') {
+      if (filterVal === 'approved') filtered = filtered.filter(u => u.approved !== false);
+      if (filterVal === 'pending') filtered = filtered.filter(u => u.approved === false);
+    }
+  }
+
+  filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  const body = document.getElementById(`usersListBody_${tab}`);
+  if (body) body.innerHTML = renderUsersBody(filtered, allAttempts, tab);
+}
+
+/* ============================================================
+   ============ Admin: Quiz Management ============
+   ============================================================ */
+async function renderAdminQuizzes() {
+  showLoading();
+  try {
+    const allQuizzes = await DB.get('quizzes');
+    const allUsers = await DB.get('users');
+    const allAttempts = await DB.get('attempts');
+    const teachers = allUsers.filter(u => u.role === 'teacher');
+
+    const container = document.getElementById('dashboardContent');
+    container.innerHTML = `
+      <div class="card" style="background: linear-gradient(135deg, #6366f1, #4f46e5); color:#fff;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="font-size:48px;">📝</span>
+          <div><h2 style="font-size:24px; font-weight:900;">إدارة الاختبارات</h2><p style="opacity:0.9;">${allQuizzes.length} اختبار</p></div>
+        </div>
+      </div>
+      <button class="btn btn-outline" onclick="renderAdminDashboard()" style="margin-bottom:16px;">← العودة</button>
+      <div class="form-group">
+        <input type="text" class="form-input" id="quizSearchInput" placeholder="🔍 ابحث بعنوان الاختبار أو اسم المدرس..." oninput="filterAdminQuizzes()">
+      </div>
+      <div id="adminQuizzesList">${renderAdminQuizzesList(allQuizzes, teachers, allAttempts)}</div>
+    `;
+  } finally { hideLoading(); }
+}
+
+function renderAdminQuizzesList(quizzes, teachers, attempts) {
+  if (quizzes.length === 0) return `<div class="card"><div class="empty-state"><div class="empty-state-icon">📝</div><h3>لا يوجد اختبارات</h3></div></div>`;
+  return quizzes.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).map(quiz => {
+    const teacher = teachers.find(t => t.id === quiz.teacherId);
+    const qa = attempts.filter(a => a.quizId === quiz.id);
+    const avg = qa.length ? calculateAvg(qa) : 0;
+    return `<div class="card" style="border-right:4px solid var(--primary);">
+      <h3 style="font-size:18px; font-weight:800; margin-bottom:8px;">${getSubjectEmoji(quiz.subject)} ${escapeHtml(quiz.title)}</h3>
+      <p style="font-size:13px; color:var(--text-light); margin-bottom:12px;">${getSubjectName(quiz.subject)} • ${escapeHtml(quiz.grade)} • المدرس: ${escapeHtml(teacher?.name || 'محذوف')}</p>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+        <span class="badge badge-primary">${quiz.questions.length} سؤال</span>
+        <span class="badge badge-info">⏱️ ${quiz.timePerQuestion || 30}ث</span>
+        <span class="badge badge-success">${qa.length} محاولة</span>
+        <span class="badge badge-${avg >= 80 ? 'success' : avg >= 50 ? 'warning' : 'danger'}">متوسط ${avg}%</span>
+        <span class="badge badge-warning">📅 ${new Date(quiz.createdAt).toLocaleDateString('ar-EG')}</span>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn btn-sm btn-outline" onclick="viewQuizDetails('${quiz.id}')">👁️ عرض</button>
+        <button class="btn btn-sm btn-danger" onclick="adminDeleteQuiz('${quiz.id}')">🗑 حذف</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function filterAdminQuizzes() {
+  const query = document.getElementById('quizSearchInput').value.trim().toLowerCase();
+  const allQuizzes = await DB.get('quizzes');
+  const allUsers = await DB.get('users');
+  const allAttempts = await DB.get('attempts');
+  const teachers = allUsers.filter(u => u.role === 'teacher');
+
+  let filtered = allQuizzes;
+  if (query) {
+    filtered = allQuizzes.filter(q => {
+      const t = teachers.find(x => x.id === q.teacherId);
+      return q.title.toLowerCase().includes(query) || (t?.name || '').toLowerCase().includes(query);
+    });
+  }
+  document.getElementById('adminQuizzesList').innerHTML = renderAdminQuizzesList(filtered, teachers, allAttempts);
+}
+
+async function viewQuizDetails(quizId) {
+  const allQuizzes = await DB.get('quizzes');
+  const quiz = allQuizzes.find(q => q.id === quizId);
+  if (!quiz) return;
+  const allUsers = await DB.get('users');
+  const teacher = allUsers.find(t => t.id === quiz.teacherId);
+  const allAttempts = await DB.get('attempts');
+  const qa = allAttempts.filter(a => a.quizId === quizId);
+
+  openModal(`<div class="modal-header"><h3 class="modal-title">${escapeHtml(quiz.title)}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="alert alert-info">
+      ${getSubjectEmoji(quiz.subject)} ${getSubjectName(quiz.subject)} • ${escapeHtml(quiz.grade)}<br>
+      المدرس: ${escapeHtml(teacher?.name || 'محذوف')}<br>
+      ${quiz.questions.length} سؤال • ${qa.length} محاولة
+    </div>
+    <h4 style="margin:16px 0 12px;">📋 الأسئلة</h4>
+    ${quiz.questions.map((q, i) => {
+      const ti = QUESTION_TYPES[q.type] || QUESTION_TYPES.mcq;
+      return `<div class="question-item">
+        <div class="question-item-header">
+          <span style="font-weight:900;color:var(--primary);">س${i + 1}</span>
+          <span class="question-type-badge qtype-${q.type}">${ti.emoji} ${ti.name}</span>
+        </div>
+        <div class="question-item-text">${escapeHtml(q.text)}</div>
+      </div>`;
+    }).join('')}`);
+}
+
+async function adminDeleteQuiz(quizId) {
+  if (!confirm('⚠️ حذف الاختبار وجميع محاولاته؟')) return;
+  if (prompt('اكتب "حذف" للتأكيد:') !== 'حذف') { alert('ألغي'); return; }
+  showLoading();
+  try {
+    const quizzes = await DB.get('quizzes');
+    const quiz = quizzes.find(q => q.id === quizId);
+    await DB.set('quizzes', quizzes.filter(q => q.id !== quizId));
+    const attempts = await DB.get('attempts');
+    await DB.set('attempts', attempts.filter(a => a.quizId !== quizId));
+    await logActivity('حذف اختبار (أدمن)', quiz?.title || quizId);
+    alert('✅ تم الحذف');
+    renderAdminQuizzes();
+  } finally { hideLoading(); }
+}
+
+/* ============================================================
+   ============ Admin: Advanced Stats ============
+   ============================================================ */
+async function renderAdminStats() {
+  showLoading();
+  try {
+    const allUsers = await DB.get('users');
+    const allAttempts = await DB.get('attempts');
+
+    const container = document.getElementById('dashboardContent');
+    container.innerHTML = `
+      <div class="card" style="background: linear-gradient(135deg, #10b981, #059669); color:#fff;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="font-size:48px;">📊</span>
+          <div><h2 style="font-size:24px; font-weight:900;">الإحصائيات المتقدمة</h2><p style="opacity:0.9;">تحليل شامل</p></div>
+        </div>
+      </div>
+      <button class="btn btn-outline" onclick="renderAdminDashboard()" style="margin-bottom:16px;">← العودة</button>
+      <div class="chart-container" style="height:340px;"><canvas id="usersGrowthChart"></canvas></div>
+      <div class="chart-container" style="height:340px;"><canvas id="attemptsChart"></canvas></div>
+      <div class="chart-container" style="height:340px;"><canvas id="gradeDistChart"></canvas></div>
+      <div class="chart-container" style="height:340px;"><canvas id="topTeachersChart"></canvas></div>
+    `;
+
+    const labels7 = [];
+    const users7 = [];
+    const attempts7 = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      date.setHours(0, 0, 0, 0);
+      const next = new Date(date); next.setDate(next.getDate() + 1);
+      labels7.push(date.toLocaleDateString('ar-EG', { weekday: 'short', day: 'numeric' }));
+      users7.push(allUsers.filter(u => u.createdAt >= date.getTime() && u.createdAt < next.getTime()).length);
+      attempts7.push(allAttempts.filter(a => a.createdAt >= date.getTime() && a.createdAt < next.getTime()).length);
+    }
+
+    const c1 = document.getElementById('usersGrowthChart')?.getContext('2d');
+    if (c1) new Chart(c1, {
+      type: 'line',
+      data: { labels: labels7, datasets: [{ label: 'مستخدمون جدد', data: users7, borderColor: '#4f46e5', backgroundColor: 'rgba(79,70,229,0.15)', fill: true, tension: 0.4 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'نمو المستخدمين (7 أيام)', font: { size: 16, weight: 'bold' } } } }
+    });
+
+    const c2 = document.getElementById('attemptsChart')?.getContext('2d');
+    if (c2) new Chart(c2, {
+      type: 'bar',
+      data: { labels: labels7, datasets: [{ label: 'محاولات', data: attempts7, backgroundColor: 'rgba(16,185,129,0.7)', borderRadius: 8 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'المحاولات اليومية', font: { size: 16, weight: 'bold' } } } }
+    });
+
+    const dist = { 'ممتاز (90+)': 0, 'جيد جداً (80-89)': 0, 'جيد (70-79)': 0, 'مقبول (50-69)': 0, 'ضعيف (<50)': 0 };
+    allAttempts.forEach(a => {
+      const pct = Math.round((a.score / a.total) * 100);
+      if (pct >= 90) dist['ممتاز (90+)']++;
+      else if (pct >= 80) dist['جيد جداً (80-89)']++;
+      else if (pct >= 70) dist['جيد (70-79)']++;
+      else if (pct >= 50) dist['مقبول (50-69)']++;
+      else dist['ضعيف (<50)']++;
+    });
+
+    const c3 = document.getElementById('gradeDistChart')?.getContext('2d');
+    if (c3) new Chart(c3, {
+      type: 'doughnut',
+      data: { labels: Object.keys(dist), datasets: [{ data: Object.values(dist), backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#64748b'] }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'توزيع الدرجات', font: { size: 16, weight: 'bold' } } } }
+    });
+
+    const teachers = allUsers.filter(u => u.role === 'teacher');
+    const topT = teachers.map(t => {
+      const r = t.ratings || [];
+      return { name: t.name, avg: r.length ? parseFloat((r.reduce((a, x) => a + x.stars, 0) / r.length).toFixed(1)) : 0, count: r.length };
+    }).sort((a, b) => b.avg - a.avg).slice(0, 5);
+
+    const c4 = document.getElementById('topTeachersChart')?.getContext('2d');
+    if (c4) new Chart(c4, {
+      type: 'bar',
+      data: { labels: topT.map(t => t.name.length > 15 ? t.name.slice(0, 15) + '...' : t.name), datasets: [{ label: 'متوسط التقييم', data: topT.map(t => t.avg), backgroundColor: 'rgba(245,158,11,0.7)', borderRadius: 8 }] },
+      options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { title: { display: true, text: 'أفضل 5 مدرسين', font: { size: 16, weight: 'bold' } }, legend: { display: false } }, scales: { x: { beginAtZero: true, max: 5 } } }
+    });
+  } finally { hideLoading(); }
+}
+
+/* ============================================================
+   ============ Admin: Audit Log ============
+   ============================================================ */
+async function renderAuditLog() {
+  showLoading();
+  try {
+    const logs = await DB.get('auditLog');
+    logs.sort((a, b) => b.timestamp - a.timestamp);
+
+    const container = document.getElementById('dashboardContent');
+    container.innerHTML = `
+      <div class="card" style="background: linear-gradient(135deg, #475569, #334155); color:#fff;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="font-size:48px;">📜</span>
+          <div><h2 style="font-size:24px; font-weight:900;">سجل النشاط</h2><p style="opacity:0.9;">${logs.length} حدث مسجل</p></div>
+        </div>
+      </div>
+      <button class="btn btn-outline" onclick="renderAdminDashboard()" style="margin-bottom:16px;">← العودة</button>
+      <div class="card">
+        ${logs.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">📜</div><h3>لا يوجد نشاط بعد</h3></div>` :
+          logs.slice(0, 100).map(log => `
+            <div class="history-item">
+              <div class="history-info">
+                <h4>${escapeHtml(log.userName)} <span class="badge badge-${log.userRole === 'admin' ? 'warning' : log.userRole === 'teacher' ? 'info' : log.userRole === 'parent' ? 'primary' : 'success'}">${log.userRole}</span></h4>
+                <p><strong>${escapeHtml(log.action)}</strong>${log.details ? ' • ' + escapeHtml(log.details) : ''}</p>
+                <p style="font-size:11px;">${new Date(log.timestamp).toLocaleString('ar-EG')}</p>
+              </div>
+            </div>
+          `).join('')}
+      </div>
+    `;
+  } finally { hideLoading(); }
+}
+
+/* ============================================================
+   ============ Admin: Broadcast to All ============
+   ============================================================ */
+function openAdminBroadcast() {
+  openModal(`<div class="modal-header"><h3 class="modal-title">📢 إشعار شامل</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="alert alert-info">سيُرسل لجميع المستخدمين المسجلين.</div>
+    <div class="form-group">
+      <label class="form-label">الفئة المستهدفة</label>
+      <select class="form-select" id="adminBroadcastTarget">
+        <option value="all">جميع المستخدمين</option>
+        <option value="student">الطلاب فقط</option>
+        <option value="teacher">المدرسون فقط</option>
+        <option value="parent">أولياء الأمور فقط</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">العنوان</label><input type="text" class="form-input" id="adminBroadcastTitle" maxlength="80" placeholder="عنوان الإشعار"></div>
+    <div class="form-group"><label class="form-label">الرسالة</label><textarea class="form-textarea" id="adminBroadcastBody" maxlength="300" placeholder="نص الرسالة..."></textarea></div>
+    <button class="btn btn-primary btn-full" onclick="sendAdminBroadcast()">📤 إرسال</button>`);
+}
+
+async function sendAdminBroadcast() {
+  const target = document.getElementById('adminBroadcastTarget').value;
+  const title = document.getElementById('adminBroadcastTitle').value.trim();
+  const body = document.getElementById('adminBroadcastBody').value.trim();
+  if (!title || !body) { alert('أكمل البيانات'); return; }
+
+  showLoading();
+  try {
+    const users = await DB.get('users');
+    let recipients = users;
+    if (target !== 'all') recipients = users.filter(u => u.role === target);
+    if (recipients.length === 0) { alert('لا يوجد مستلمون'); return; }
+
+    const notifs = await DB.get('notifications');
+    recipients.forEach(r => notifs.push({ id: uid(), userId: r.id, title: `📢 ${title}`, body, createdAt: Date.now(), read: false }));
+    await DB.set('notifications', notifs);
+    await logActivity('إشعار شامل', `${title} → ${target} (${recipients.length})`);
+    launchConfetti(30);
+    alert(`✅ أُرسل إلى ${recipients.length} مستخدم`);
+    closeModal();
+  } finally { hideLoading(); }
+}
+
+/* ============================================================
+   ============ Pending Teachers + Delete + Wipe ============
+   ============================================================ */
 async function openPendingTeachers() {
   const users = await DB.get('users');
   const pending = users.filter(u => u.role === 'teacher' && u.approved === false);
   if (pending.length === 0) {
-    openModal(`<div class="modal-header"><h3 class="modal-title">⏳ المدرسون المعلقون</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-      <div class="empty-state"><div class="empty-state-icon">🎉</div><h3>لا يوجد مدرسون معلقون</h3></div>`);
+    openModal(`<div class="modal-header"><h3 class="modal-title">⏳ المعلقون</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+      <div class="empty-state"><h3>لا يوجد معلقون</h3></div>`);
     return;
   }
-  openModal(`<div class="modal-header"><h3 class="modal-title">⏳ المدرسون المعلقون (${pending.length})</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+  openModal(`<div class="modal-header"><h3 class="modal-title">⏳ المعلقون (${pending.length})</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
     ${pending.map(t => `
       <div class="history-item">
-        <div class="history-info"><h4>${escapeHtml(t.name)}</h4><p>${escapeHtml(t.email)} • ${getSubjectName(t.subject)} • ${new Date(t.createdAt).toLocaleDateString('ar-EG')}</p></div>
+        <div class="history-info"><h4>${escapeHtml(t.name)}</h4><p>${escapeHtml(t.email)} • ${getSubjectName(t.subject)}</p></div>
         <div style="display:flex;gap:6px;">
-          <button class="btn btn-sm btn-success" onclick="approveTeacher('${t.id}')">✅ اعتماد</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteUser('${t.id}')">❌ رفض</button>
+          <button class="btn btn-sm btn-success" onclick="approveTeacher('${t.id}')">✅</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteUser('${t.id}')">❌</button>
         </div>
       </div>
     `).join('')}`);
@@ -1676,10 +2036,11 @@ async function approveTeacher(userId) {
       users[idx].approved = true;
       await DB.set('users', users);
       const notifs = await DB.get('notifications');
-      notifs.push({ id: uid(), userId, title: '✅ تم اعتماد حسابك', body: 'مرحباً بك! تم اعتماد حسابك كمدرس.', createdAt: Date.now(), read: false });
+      notifs.push({ id: uid(), userId, title: '✅ تم اعتماد حسابك', body: 'تم اعتماد حسابك كمدرس.', createdAt: Date.now(), read: false });
       await DB.set('notifications', notifs);
+      await logActivity('اعتماد مدرس', users[idx].name);
       launchConfetti(30);
-      alert('تم اعتماد المدرس بنجاح');
+      alert('تم الاعتماد');
       closeModal();
       renderAdminDashboard();
     }
@@ -1687,26 +2048,25 @@ async function approveTeacher(userId) {
 }
 
 async function deleteUser(userId) {
-  if (!confirm('حذف هذا المستخدم نهائياً؟')) return;
+  if (!confirm('حذف المستخدم نهائياً؟')) return;
   showLoading();
   try {
     const users = await DB.get('users');
     const user = users.find(u => u.id === userId);
-    if (isAdmin(user)) { alert('لا يمكن حذف حساب الأدمن'); return; }
+    if (isAdmin(user)) { alert('لا يمكن حذف الأدمن'); return; }
     await DB.set('users', users.filter(u => u.id !== userId));
     const attempts = await DB.get('attempts');
     await DB.set('attempts', attempts.filter(a => a.studentId !== userId));
-    alert('تم حذف المستخدم');
+    await logActivity('حذف مستخدم', user?.name || userId);
+    alert('تم الحذف');
     renderAdminDashboard();
   } finally { hideLoading(); }
 }
 
 async function wipeQuizData() {
   if (!isAdmin(currentUser)) { alert('غير مصرح'); return; }
-  const confirmed = confirm('⚠️ سيتم حذف: جميع الاختبارات، المحاولات، الإشعارات.\nلن تُحذف حسابات المستخدمين.\n\nهل أنت متأكد؟');
-  if (!confirmed) return;
-  const doubleConfirm = prompt('اكتب كلمة "حذف" للتأكيد النهائي:');
-  if (doubleConfirm !== 'حذف') { alert('تم الإلغاء'); return; }
+  if (!confirm('⚠️ سيتم حذف: الاختبارات، المحاولات، الإشعارات.\nلن تُحذف الحسابات.\n\nمتابعة؟')) return;
+  if (prompt('اكتب "حذف" للتأكيد:') !== 'حذف') { alert('ألغي'); return; }
   showLoading();
   try {
     await DB.set('quizzes', []);
@@ -1717,9 +2077,10 @@ async function wipeQuizData() {
         await fbDB.set(fbDB.ref(fbDB.db, 'quizzes'), null);
         await fbDB.set(fbDB.ref(fbDB.db, 'attempts'), null);
         await fbDB.set(fbDB.ref(fbDB.db, 'notifications'), null);
-      } catch (e) { console.warn(e); }
+      } catch (e) {}
     }
-    alert('✅ تم مسح جميع الاختبارات والمحاولات');
+    await logActivity('مسح شامل', 'الاختبارات والمحاولات');
+    alert('✅ تم المسح');
     renderAdminDashboard();
   } finally { hideLoading(); }
 }
@@ -1730,11 +2091,8 @@ function renderPendingTeacherDashboard() {
     <div class="card" style="text-align:center; padding:60px 20px;">
       <div style="font-size:80px; margin-bottom:16px;">⏳</div>
       <h2 style="font-size:24px; font-weight:900; margin-bottom:12px;">حسابك بانتظار الاعتماد</h2>
-      <p style="font-size:15px; color:var(--text-light); line-height:1.8; max-width:500px; margin:0 auto 24px;">
-        مرحباً ${escapeHtml(currentUser.name)}!<br>سيتم مراجعة طلبك من قبل الإدارة قريباً.
-      </p>
-    </div>
-  `;
+      <p style="color:var(--text-light);">مرحباً ${escapeHtml(currentUser.name)}! سيتم مراجعة طلبك قريباً.</p>
+    </div>`;
 }
 
 /* ============================================================
@@ -1754,14 +2112,8 @@ async function renderTeacherDashboard() {
     const myAvgRating = myRatings.length ? (myRatings.reduce((a, r) => a + r.stars, 0) / myRatings.length).toFixed(1) : '0';
 
     const bySubject = {};
-    quizzes.forEach(q => {
-      const key = q.subject || 'other';
-      if (!bySubject[key]) bySubject[key] = [];
-      bySubject[key].push(q);
-    });
-    const orderedSubjects = SUBJECTS
-      .filter(s => bySubject[s.id] && bySubject[s.id].length > 0)
-      .map(s => ({ ...s, quizzes: bySubject[s.id] }));
+    quizzes.forEach(q => { const k = q.subject || 'other'; if (!bySubject[k]) bySubject[k] = []; bySubject[k].push(q); });
+    const orderedSubjects = SUBJECTS.filter(s => bySubject[s.id] && bySubject[s.id].length > 0).map(s => ({ ...s, quizzes: bySubject[s.id] }));
 
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
@@ -1769,75 +2121,69 @@ async function renderTeacherDashboard() {
         <div class="teacher-profile-avatar">${currentUser.photoURL ? `<img src="${currentUser.photoURL}" referrerpolicy="no-referrer">` : '👨‍🏫'}</div>
         <div class="teacher-profile-info">
           <h2>${escapeHtml(currentUser.name)}</h2>
-          <p>${getSubjectName(currentUser.subject)} • ⭐ ${myAvgRating} (${myRatings.length} تقييم)</p>
+          <p style="opacity:0.9;font-size:14px;">${getSubjectName(currentUser.subject)} • ⭐ ${myAvgRating} (${myRatings.length})</p>
         </div>
-        <button class="btn" style="background:rgba(255,255,255,0.2);color:#fff;" onclick="openTeacherProfileEdit()">✏️ تعديل الملف الشخصي</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn" style="background:rgba(255,255,255,0.2);color:#fff;" onclick="openTeacherProfileEdit()">✏️ الملف الشخصي</button>
+          <button class="btn" style="background:rgba(255,255,255,0.2);color:#fff;" onclick="openTeacherContent()">📚 محتوى المادة</button>
+        </div>
       </div>
-
       <div class="stats-grid">
         <div class="stat-card"><div class="stat-icon primary">📝</div><div class="stat-info"><h4>${quizzes.length}</h4><p>اختباراتي</p></div></div>
         <div class="stat-card"><div class="stat-icon success">✅</div><div class="stat-info"><h4>${attempts.length}</h4><p>محاولات</p></div></div>
         <div class="stat-card"><div class="stat-icon warning">📊</div><div class="stat-info"><h4>${calculateAvg(attempts)}%</h4><p>متوسط</p></div></div>
         <div class="stat-card"><div class="stat-icon info">👥</div><div class="stat-info"><h4>${students.length}</h4><p>طلاب</p></div></div>
       </div>
-
       ${pendingGrading.length > 0 ? `
         <div class="card" style="border-right:4px solid var(--warning); background: var(--warning-light);">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-            <div><h3 style="font-size:18px; font-weight:900; color:var(--warning);">⏳ لديك ${pendingGrading.length} محاولة بحاجة للتصحيح</h3></div>
-            <button class="btn btn-primary" onclick="openGradingCenter()">✏️ ابدأ التصحيح</button>
+            <div><h3 style="font-size:18px; font-weight:900; color:var(--warning);">⏳ ${pendingGrading.length} محاولة للتصحيح</h3></div>
+            <button class="btn btn-primary" onclick="openGradingCenter()">✏️ تصحيح</button>
           </div>
         </div>
       ` : ''}
-
       <div class="chart-container"><canvas id="teacherChart"></canvas></div>
-
       <div class="section-header">
-        <div><h2 class="section-title">اختباراتي</h2><p class="section-subtitle">مجمّعة حسب المادة</p></div>
+        <div><h2 class="section-title">اختباراتي</h2><p class="section-subtitle">حسب المادة</p></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn btn-outline btn-sm" onclick="renderTeacherDashboard()">🔄 تحديث</button>
-          <button class="btn btn-outline btn-sm" onclick="openBroadcastModal()">📢 إشعار جماعي</button>
-          <button class="btn btn-outline btn-sm" onclick="exportResults()">📥 تصدير النتائج</button>
+          <button class="btn btn-outline btn-sm" onclick="openBroadcastModal()">📢 إشعار</button>
+          <button class="btn btn-outline btn-sm" onclick="exportResults()">📥 تصدير</button>
           <button class="btn btn-primary" onclick="openNewQuizModal()">➕ اختبار جديد</button>
         </div>
       </div>
-
-      ${quizzes.length === 0 ? `<div class="card"><div class="empty-state"><div class="empty-state-icon">📚</div><h3>لا توجد اختبارات</h3></div></div>` : orderedSubjects.map(subj => `
-        <div class="subject-group">
-          <div class="subject-group-header">
-            <span class="subject-group-emoji">${subj.emoji}</span>
-            <span class="subject-group-title">${escapeHtml(subj.name)}</span>
-            <span class="subject-group-count">${subj.quizzes.length} اختبار</span>
+      ${quizzes.length === 0 ? `<div class="card"><div class="empty-state"><div class="empty-state-icon">📚</div><h3>لا اختبارات</h3></div></div>` :
+        orderedSubjects.map(subj => `
+          <div class="subject-group">
+            <div class="subject-group-header">
+              <span class="subject-group-emoji">${subj.emoji}</span>
+              <span class="subject-group-title">${escapeHtml(subj.name)}</span>
+              <span class="subject-group-count">${subj.quizzes.length}</span>
+            </div>
+            <div class="cards-grid">${subj.quizzes.map(renderQuizCard).join('')}</div>
           </div>
-          <div class="cards-grid">${subj.quizzes.map(renderQuizCard).join('')}</div>
-        </div>
-      `).join('')}
-
+        `).join('')}
       <div class="section-header" style="margin-top:32px;">
-        <div><h2 class="section-title">إدارة الطلاب</h2><p class="section-subtitle">${students.length} طالب مسجل</p></div>
-        <button class="btn btn-outline btn-sm" onclick="exportStudents()">📥 تصدير الطلاب</button>
+        <div><h2 class="section-title">الطلاب</h2><p class="section-subtitle">${students.length} مسجل</p></div>
+        <button class="btn btn-outline btn-sm" onclick="exportStudents()">📥 تصدير</button>
       </div>
-      ${students.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا يوجد طلاب</h3></div></div>` : renderStudentsList(students, allAttempts)}
-
-      <div class="section-header" style="margin-top:32px;">
-        <div><h2 class="section-title">🏆 لوحة الشرف</h2></div>
-      </div>
-      ${renderLeaderboard(allUsers, allAttempts, 'all')}
-
+      ${students.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا طلاب</h3></div></div>` : renderStudentsList(students, allAttempts)}
+      <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">🏆 لوحة الشرف</h2></div></div>
+      ${renderLeaderboard(allUsers, allAttempts)}
       <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">آخر النتائج</h2></div></div>
       ${attempts.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا نتائج</h3></div></div>` : await renderAttemptsList(attempts.sort((a,b) => b.createdAt - a.createdAt).slice(0, 20))}
     `;
 
     const ctx = document.getElementById('teacherChart')?.getContext('2d');
     if (ctx && quizzes.length > 0) {
-      const quizNames = quizzes.map(q => q.title.length > 15 ? q.title.slice(0, 15) + '...' : q.title);
-      const avgScores = quizzes.map(q => {
+      const names = quizzes.map(q => q.title.length > 15 ? q.title.slice(0, 15) + '...' : q.title);
+      const avgs = quizzes.map(q => {
         const at = attempts.filter(a => a.quizId === q.id);
         return at.length ? Math.round(at.reduce((s, a) => s + (a.score / a.total) * 100, 0) / at.length) : 0;
       });
       new Chart(ctx, {
         type: 'bar',
-        data: { labels: quizNames, datasets: [{ label: 'متوسط %', data: avgScores, backgroundColor: 'rgba(79,70,229,0.7)', borderRadius: 8 }] },
+        data: { labels: names, datasets: [{ label: 'متوسط %', data: avgs, backgroundColor: 'rgba(79,70,229,0.7)', borderRadius: 8 }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100 } } }
       });
     }
@@ -1845,9 +2191,9 @@ async function renderTeacherDashboard() {
 }
 
 function renderQuizCard(quiz) {
-  const typeCount = {};
-  quiz.questions.forEach(q => { const t = q.type || 'mcq'; typeCount[t] = (typeCount[t] || 0) + 1; });
-  const typeLabels = Object.entries(typeCount).map(([t, c]) => {
+  const tc = {};
+  quiz.questions.forEach(q => { const t = q.type || 'mcq'; tc[t] = (tc[t] || 0) + 1; });
+  const typeLabels = Object.entries(tc).map(([t, c]) => {
     const i = QUESTION_TYPES[t] || QUESTION_TYPES.mcq;
     return `<span class="badge qtype-${t}">${i.emoji} ${c}</span>`;
   }).join(' ');
@@ -1865,11 +2211,7 @@ function renderQuizCard(quiz) {
 
 function renderStudentsList(students, allAttempts) {
   const bySchool = {};
-  students.forEach(s => {
-    const key = s.school || 'غير محدد';
-    if (!bySchool[key]) bySchool[key] = [];
-    bySchool[key].push(s);
-  });
+  students.forEach(s => { const k = s.school || 'غير محدد'; if (!bySchool[k]) bySchool[k] = []; bySchool[k].push(s); });
   return `<div class="card">${Object.entries(bySchool).map(([school, list]) => `
     <div style="margin-bottom:16px;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
@@ -1880,10 +2222,7 @@ function renderStudentsList(students, allAttempts) {
         const sAttempts = allAttempts.filter(a => a.studentId === s.id);
         const avg = sAttempts.length ? calculateAvg(sAttempts) : 0;
         return `<div class="student-row">
-          <div class="student-info">
-            <h4>${escapeHtml(s.name)} ${s.provider === 'google' ? '🔵' : ''}</h4>
-            <p>${escapeHtml(s.grade || '')} • ${escapeHtml(s.stage || '')} • ${sAttempts.length} محاولة</p>
-          </div>
+          <div class="student-info"><h4>${escapeHtml(s.name)} ${s.provider === 'google' ? '🔵' : ''}</h4><p>${escapeHtml(s.grade || '')} • ${sAttempts.length} محاولة</p></div>
           <span class="badge badge-${avg>=80?'success':avg>=50?'warning':'danger'}">${avg}%</span>
         </div>`;
       }).join('')}
@@ -1891,18 +2230,14 @@ function renderStudentsList(students, allAttempts) {
   `).join('')}</div>`;
 }
 
-function renderLeaderboard(users, attempts, mode) {
+function renderLeaderboard(users, attempts) {
   const students = users.filter(u => u.role === 'student');
   const stats = students.map(s => {
-    const sAttempts = attempts.filter(a => a.studentId === s.id);
-    const avg = sAttempts.length ? calculateAvg(sAttempts) : 0;
-    return { ...s, avg, attemptCount: sAttempts.length };
-  }).filter(s => s.attemptCount > 0);
-
-  stats.sort((a, b) => b.avg - a.avg);
-  const top = stats.slice(0, 20);
-  if (top.length === 0) return `<div class="card"><div class="empty-state"><h3>لا يوجد طلاب لديهم محاولات بعد</h3></div></div>`;
-  return `<div class="card">${top.map((s, i) => `
+    const sa = attempts.filter(a => a.studentId === s.id);
+    return { ...s, avg: sa.length ? calculateAvg(sa) : 0, attemptCount: sa.length };
+  }).filter(s => s.attemptCount > 0).sort((a, b) => b.avg - a.avg).slice(0, 20);
+  if (stats.length === 0) return `<div class="card"><div class="empty-state"><h3>لا يوجد بيانات</h3></div></div>`;
+  return `<div class="card">${stats.map((s, i) => `
     <div class="leaderboard-item ${i < 3 ? 'rank-' + (i+1) : ''}">
       <div class="leaderboard-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i+1}</div>
       <div class="leaderboard-info"><h4>${escapeHtml(s.name)} ${s.provider === 'google' ? '🔵' : ''}</h4><p>${escapeHtml(s.grade || '')} • ${escapeHtml(s.school || '')} • ${s.attemptCount} محاولة</p></div>
@@ -1912,7 +2247,7 @@ function renderLeaderboard(users, attempts, mode) {
 }
 
 /* ============================================================
-   ============ Broadcast / Attempts / Student Dashboard ============
+   ============ Broadcast (Teacher) ============
    ============================================================ */
 function openBroadcastModal() {
   openModal(`<div class="modal-header"><h3 class="modal-title">📢 إشعار جماعي</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
@@ -1929,7 +2264,7 @@ function openBroadcastModal() {
         <select class="form-select" id="bGradeValue"><option value="">اختر السنة</option>${Object.entries(STAGES).map(([s, gs]) => gs.map(g => `<option value="${g}">${g}</option>`).join('')).join('')}</select>
       </div>
     </div>
-    <div class="form-group"><label class="form-label">العنوان</label><input type="text" class="form-input" id="bTitle" placeholder="عنوان الإشعار" maxlength="80"></div>
+    <div class="form-group"><label class="form-label">العنوان</label><input type="text" class="form-input" id="bTitle" maxlength="80"></div>
     <div class="form-group"><label class="form-label">الرسالة</label><textarea class="form-textarea" id="bBody" maxlength="300"></textarea></div>
     <button class="btn btn-primary btn-full" onclick="sendBroadcast()">📤 إرسال</button>`);
 }
@@ -1939,25 +2274,27 @@ async function sendBroadcast() {
   const grade = document.getElementById('bGradeValue').value;
   const title = document.getElementById('bTitle').value.trim();
   const body = document.getElementById('bBody').value.trim();
-  if (!title || !body) { alert('أدخل العنوان والرسالة'); return; }
+  if (!title || !body) { alert('أكمل البيانات'); return; }
   if (target === 'grade' && !grade) { alert('اختر السنة'); return; }
   showLoading();
   try {
     const users = await DB.get('users');
     let recipients = users.filter(u => u.role === 'student');
     if (target === 'grade') recipients = recipients.filter(u => u.grade === grade);
-    if (recipients.length === 0) { alert('لا يوجد طلاب مطابقون'); return; }
+    if (recipients.length === 0) { alert('لا يوجد طلاب'); return; }
     const notifs = await DB.get('notifications');
-    recipients.forEach(r => {
-      notifs.push({ id: uid(), userId: r.id, title: `📢 ${title}`, body, createdAt: Date.now(), read: false });
-    });
+    recipients.forEach(r => notifs.push({ id: uid(), userId: r.id, title: `📢 ${title}`, body, createdAt: Date.now(), read: false }));
     await DB.set('notifications', notifs);
+    await logActivity('إشعار للمدرسين', title);
     launchConfetti(30);
-    alert(`✅ تم إرسال الإشعار إلى ${recipients.length} طالب`);
+    alert(`✅ أُرسل إلى ${recipients.length} طالب`);
     closeModal();
   } finally { hideLoading(); }
 }
 
+/* ============================================================
+   ============ Attempts List ============
+   ============================================================ */
 async function renderAttemptsList(attempts) {
   if (!attempts.length) return '<div class="card"><div class="empty-state"><h3>لا نتائج</h3></div></div>';
   const allQuizzes = await DB.get('quizzes'), allUsers = await DB.get('users');
@@ -1969,13 +2306,16 @@ async function renderAttemptsList(attempts) {
     const pending = a.needsGrading && !a.graded;
     return `<div class="history-item">
       <div class="history-info"><h4>${escapeHtml(student.name)}</h4><p>${escapeHtml(quiz.title)} • ${new Date(a.createdAt).toLocaleDateString('ar-EG')}</p></div>
-      ${pending ? `<span class="pending-badge"><span class="pending-dot"></span> بانتظار التصحيح</span>` : ''}
+      ${pending ? `<span class="pending-badge"><span class="pending-dot"></span> للتصحيح</span>` : ''}
       <div class="history-score">${a.score}/${a.total}</div>
       <span class="badge badge-${pct>=80?'success':pct>=50?'warning':'danger'}">${pct}%</span>
     </div>`;
   }).join('')}</div>`;
 }
 
+/* ============================================================
+   ============ Student Dashboard ============
+   ============================================================ */
 async function renderStudentDashboard() {
   showLoading();
   try {
@@ -1983,60 +2323,58 @@ async function renderStudentDashboard() {
     const myQuizzes = allQuizzes.filter(q => q.grade === currentUser.grade);
     const allAttempts = await DB.get('attempts');
     const myAttempts = allAttempts.filter(a => a.studentId === currentUser.id);
-    const solvedQuizIds = new Set(myAttempts.map(a => a.quizId));
-    const availableQuizzes = myQuizzes.filter(q => !solvedQuizIds.has(q.id));
-    const completedQuizzes = myQuizzes.filter(q => solvedQuizIds.has(q.id));
+    const solvedIds = new Set(myAttempts.map(a => a.quizId));
+    const availableQuizzes = myQuizzes.filter(q => !solvedIds.has(q.id));
+    const completedQuizzes = myQuizzes.filter(q => solvedIds.has(q.id));
 
     const bySubject = {};
-    myQuizzes.forEach(q => {
-      const key = q.subject || 'other';
-      if (!bySubject[key]) bySubject[key] = [];
-      bySubject[key].push(q);
-    });
-    const orderedSubjects = SUBJECTS
-      .filter(s => bySubject[s.id] && bySubject[s.id].length > 0)
-      .map(s => ({ ...s, quizzes: bySubject[s.id] }));
+    availableQuizzes.forEach(q => { const k = q.subject || 'other'; if (!bySubject[k]) bySubject[k] = []; bySubject[k].push(q); });
+    const orderedSubjects = SUBJECTS.filter(s => bySubject[s.id] && bySubject[s.id].length > 0).map(s => ({ ...s, quizzes: bySubject[s.id] }));
 
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-icon primary">📝</div><div class="stat-info"><h4>${availableQuizzes.length}</h4><p>اختبارات متاحة</p></div></div>
+        <div class="stat-card"><div class="stat-icon primary">📝</div><div class="stat-info"><h4>${availableQuizzes.length}</h4><p>متاحة</p></div></div>
         <div class="stat-card"><div class="stat-icon success">✅</div><div class="stat-info"><h4>${completedQuizzes.length}</h4><p>حلّيتها</p></div></div>
         <div class="stat-card"><div class="stat-icon warning">📊</div><div class="stat-info"><h4>${calculateAvg(myAttempts)}%</h4><p>متوسطك</p></div></div>
       </div>
+      ${completedQuizzes.length > 0 ? `
+        <div class="card" style="border-right:4px solid var(--success); background: var(--success-light);">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div><h3 style="font-size:18px; font-weight:900; color:var(--success);">✅ ${completedQuizzes.length} اختبار تمت الإجابة عليه</h3><p style="font-size:13px; color:var(--text-light);">اعرض نتائجك في صفحة مستقلة</p></div>
+            <button class="btn btn-success" onclick="renderAnsweredScreen('all')">👁️ ما تمت الإجابة عليه</button>
+          </div>
+        </div>
+      ` : ''}
       <div class="chart-container"><canvas id="studentChart"></canvas></div>
-
       <div class="section-header">
         <div><h2 class="section-title">الاختبارات المتاحة</h2><p class="section-subtitle">${escapeHtml(currentUser.grade || '')} • ${escapeHtml(currentUser.stage || '')}${currentUser.school ? ' • ' + escapeHtml(currentUser.school) : ''}</p></div>
       </div>
-
-      ${myQuizzes.length === 0 ? `<div class="card"><div class="empty-state"><div class="empty-state-icon">📚</div><h3>لا اختبارات</h3></div></div>` : orderedSubjects.map(subj => {
-        const availableInSubject = subj.quizzes.filter(q => !solvedQuizIds.has(q.id)).length;
-        const completedInSubject = subj.quizzes.filter(q => solvedQuizIds.has(q.id)).length;
+      ${availableQuizzes.length === 0 ? `
+        <div class="card" style="text-align:center; padding:40px 20px; background: linear-gradient(135deg, var(--success-light), transparent);">
+          <div style="font-size:72px; margin-bottom:16px;">🎉</div>
+          <h3 style="font-size:22px; font-weight:900; margin-bottom:8px;">أكملت جميع الاختبارات!</h3>
+          <p style="color:var(--text-light); margin-bottom:20px;">راجع نتائجك في صفحة "ما تمت الإجابة عليه"</p>
+          <button class="btn btn-success btn-lg" onclick="renderAnsweredScreen('all')">👁️ عرض الإجابات</button>
+        </div>
+      ` : orderedSubjects.map(subj => {
+        const avail = subj.quizzes.filter(q => !solvedIds.has(q.id)).length;
         return `<div class="subject-group">
           <div class="subject-group-header">
             <span class="subject-group-emoji">${subj.emoji}</span>
             <span class="subject-group-title">${escapeHtml(subj.name)}</span>
-            <span class="subject-group-count">${subj.quizzes.length} اختبار</span>
-            ${availableInSubject > 0 ? `<span class="badge badge-primary">${availableInSubject} متاح</span>` : ''}
-            ${completedInSubject > 0 ? `<span class="badge badge-success">${completedInSubject} محلول</span>` : ''}
+            <span class="subject-group-count">${subj.quizzes.length}</span>
+            ${avail > 0 ? `<span class="badge badge-primary">${avail} متاح</span>` : ''}
           </div>
           <div class="cards-grid">${subj.quizzes.map(q => renderStudentQuizCard(q, myAttempts)).join('')}</div>
         </div>`;
       }).join('')}
-
       <div class="section-header" style="margin-top:32px;">
-        <div><h2 class="section-title">👨‍🏫 المدرسون</h2><p class="section-subtitle">تعرّف على المدرسين وقيّمهم</p></div>
+        <div><h2 class="section-title">👨‍🏫 المدرسون</h2><p class="section-subtitle">تعرّف وقيّم</p></div>
       </div>
       ${await renderTeachersForStudents()}
-
-      <div class="section-header" style="margin-top:32px;">
-        <div><h2 class="section-title">🏆 لوحة الشرف</h2></div>
-      </div>
-      ${renderLeaderboard(await DB.get('users'), allAttempts, 'all')}
-
-      <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">سجل نتائجي</h2></div></div>
-      ${myAttempts.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا نتائج</h3></div></div>` : await renderMyAttempts(myAttempts.sort((a,b) => b.createdAt - a.createdAt))}
+      <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">🏆 لوحة الشرف</h2></div></div>
+      ${renderLeaderboard(await DB.get('users'), allAttempts)}
     `;
 
     const ctx = document.getElementById('studentChart')?.getContext('2d');
@@ -2056,21 +2394,7 @@ async function renderStudentDashboard() {
 }
 
 function renderStudentQuizCard(quiz, myAttempts) {
-  const attempts = myAttempts.filter(a => a.quizId === quiz.id);
-  const isSolved = attempts.length > 0;
-  const best = isSolved ? Math.max(...attempts.map(a => Math.round((a.score / a.total) * 100))) : null;
-  const pending = attempts.some(a => a.needsGrading && !a.graded);
-  if (isSolved) {
-    return `<div class="subject-card completed" title="لقد حللت هذا الاختبار بالفعل">
-      <div class="subject-emoji">${getSubjectEmoji(quiz.subject)}</div>
-      <div class="subject-name">${escapeHtml(quiz.title)}</div>
-      <div class="subject-meta">${getSubjectName(quiz.subject)} • ${quiz.questions.length} سؤال</div>
-      <div class="subject-footer">
-        <span class="badge badge-success">✅ تم الحل</span>
-        ${pending ? `<span class="pending-badge"><span class="pending-dot"></span> بانتظار التصحيح</span>` : `<span class="badge badge-${best>=80?'success':best>=50?'warning':'info'}">الدرجة: ${best}%</span>`}
-      </div>
-    </div>`;
-  }
+  if (myAttempts.some(a => a.quizId === quiz.id)) return '';
   return `<div class="subject-card" onclick="startQuiz('${quiz.id}')">
     <div class="subject-emoji">${getSubjectEmoji(quiz.subject)}</div>
     <div class="subject-name">${escapeHtml(quiz.title)}</div>
@@ -2079,25 +2403,190 @@ function renderStudentQuizCard(quiz, myAttempts) {
   </div>`;
 }
 
-async function renderMyAttempts(attempts) {
-  if (!attempts.length) return '<div class="card"><div class="empty-state"><h3>لا نتائج</h3></div></div>';
-  const allQuizzes = await DB.get('quizzes');
-  return `<div class="card">${attempts.map(a => {
-    const quiz = allQuizzes.find(q => q.id === a.quizId);
-    if (!quiz) return '';
-    const pct = Math.round((a.score / a.total) * 100);
-    const pending = a.needsGrading && !a.graded;
-    return `<div class="history-item">
-      <div class="history-info"><h4>${escapeHtml(quiz.title)}</h4><p>${getSubjectName(quiz.subject)} • ${new Date(a.createdAt).toLocaleDateString('ar-EG')}</p></div>
-      ${pending ? `<span class="pending-badge"><span class="pending-dot"></span> بانتظار التصحيح</span>` : ''}
-      <div class="history-score">${a.score}/${a.total}</div>
-      <span class="badge badge-${pct>=80?'success':pct>=50?'warning':'danger'}">${pct}%</span>
-    </div>`;
-  }).join('')}</div>`;
+/* ============================================================
+   ============ Student: Answered Screen ============
+   ============================================================ */
+async function renderAnsweredScreen(filterTab = 'all') {
+  showLoading();
+  try {
+    const allQuizzes = await DB.get('quizzes');
+    const allAttempts = await DB.get('attempts');
+    const myAttempts = allAttempts.filter(a => a.studentId === currentUser.id).sort((a, b) => b.createdAt - a.createdAt);
+    let filtered = myAttempts;
+    if (filterTab !== 'all') filtered = myAttempts.filter(a => { const q = allQuizzes.find(x => x.id === a.quizId); return q && q.subject === filterTab; });
+    const subjectsInAttempts = [...new Set(myAttempts.map(a => { const q = allQuizzes.find(x => x.id === a.quizId); return q?.subject; }).filter(Boolean))];
+
+    const container = document.getElementById('dashboardContent');
+    container.innerHTML = `
+      <div class="card" style="background: linear-gradient(135deg, var(--success), #059669); color:#fff;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="font-size:48px;">✅</span>
+          <div><h2 style="font-size:24px; font-weight:900;">ما تمت الإجابة عليه</h2><p style="opacity:0.9;">${myAttempts.length} اختبار • متوسط ${calculateAvg(myAttempts)}%</p></div>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;">
+        <button class="btn btn-outline" onclick="renderStudentDashboard()">🏠 الرئيسية</button>
+        <button class="btn btn-primary" onclick="renderAnsweredScreen('all')">📋 الكل (${myAttempts.length})</button>
+      </div>
+      <div class="answered-tabs">
+        <button class="answered-tab ${filterTab === 'all' ? 'active' : ''}" onclick="renderAnsweredScreen('all')">📚 الكل <span class="count">${myAttempts.length}</span></button>
+        ${subjectsInAttempts.map(subjId => {
+          const count = myAttempts.filter(a => { const q = allQuizzes.find(x => x.id === a.quizId); return q?.subject === subjId; }).length;
+          return `<button class="answered-tab ${filterTab === subjId ? 'active' : ''}" onclick="renderAnsweredScreen('${subjId}')">${getSubjectEmoji(subjId)} ${getSubjectName(subjId)} <span class="count">${count}</span></button>`;
+        }).join('')}
+      </div>
+      ${filtered.length === 0 ? `<div class="card"><div class="empty-state"><div class="empty-state-icon">📝</div><h3>لا اختبارات محلولة</h3></div></div>` :
+        filtered.map(a => {
+          const quiz = allQuizzes.find(q => q.id === a.quizId);
+          if (!quiz) return '';
+          const pct = Math.round((a.score / a.total) * 100);
+          const pending = a.needsGrading && !a.graded;
+          return `<div class="quiz-result-card">
+            <div class="quiz-result-header">
+              <div class="quiz-result-title">
+                <h4>${escapeHtml(quiz.title)}</h4>
+                <p>${getSubjectEmoji(quiz.subject)} ${getSubjectName(quiz.subject)} • ${new Date(a.createdAt).toLocaleDateString('ar-EG')}</p>
+              </div>
+              <div class="quiz-result-score">${pct}%</div>
+            </div>
+            <div class="quiz-result-footer">
+              <span class="badge badge-primary">${a.score}/${a.total} درجة</span>
+              ${pending ? `<span class="pending-badge"><span class="pending-dot"></span> بانتظار تصحيح</span>` : `<span class="badge badge-${pct >= 80 ? 'success' : pct >= 50 ? 'warning' : 'danger'}">${pct >= 80 ? 'ممتاز' : pct >= 50 ? 'جيد' : 'يحتاج مراجعة'}</span>`}
+              <span class="badge badge-info">${quiz.questions.length} سؤال</span>
+            </div>
+          </div>`;
+        }).join('')}
+    `;
+  } finally { hideLoading(); }
 }
 
 /* ============================================================
-   ============ Notifications / Grading / Export / Modal ============
+   ============ Parent Dashboard ============
+   ============================================================ */
+async function renderParentDashboard() {
+  showLoading();
+  try {
+    const allUsers = await DB.get('users');
+    const allAttempts = await DB.get('attempts');
+    const children = allUsers.filter(u => u.role === 'student' && (currentUser.children || []).includes(u.id));
+    const totalAttempts = children.reduce((sum, c) => sum + allAttempts.filter(a => a.studentId === c.id).length, 0);
+    const avgAll = children.length > 0 ? Math.round(children.reduce((sum, c) => {
+      const ca = allAttempts.filter(a => a.studentId === c.id);
+      return sum + (ca.length ? calculateAvg(ca) : 0);
+    }, 0) / children.length) : 0;
+
+    const container = document.getElementById('dashboardContent');
+    container.innerHTML = `
+      <div class="card" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); color:#fff;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="font-size:48px;">👨‍👩‍👦</span>
+          <div><h2 style="font-size:24px; font-weight:900;">لوحة ولي الأمر</h2><p style="opacity:0.9;">متابعة أبنائك</p></div>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon primary">👨‍🎓</div><div class="stat-info"><h4>${children.length}</h4><p>أبنائي</p></div></div>
+        <div class="stat-card"><div class="stat-icon success">✅</div><div class="stat-info"><h4>${totalAttempts}</h4><p>محاولات</p></div></div>
+        <div class="stat-card"><div class="stat-icon warning">📊</div><div class="stat-info"><h4>${avgAll}%</h4><p>متوسط</p></div></div>
+      </div>
+      <div class="add-child-box">
+        <h4>➕ إضافة ابن/ابنة</h4>
+        <p>أدخل بريد الطالب أو رقم هاتف ولي الأمر</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+          <input type="text" class="form-input" id="childSearchInput" placeholder="البريد أو رقم الهاتف" style="max-width:400px;">
+          <button class="btn btn-primary" onclick="searchChild()">🔍 بحث وإضافة</button>
+        </div>
+      </div>
+      <div class="section-header" style="margin-top:32px;">
+        <div><h2 class="section-title">👨‍🎓 أبنائي</h2><p class="section-subtitle">${children.length} طالب</p></div>
+      </div>
+      ${children.length === 0 ? `<div class="card"><div class="empty-state"><div class="empty-state-icon">👨‍👩‍👦</div><h3>لا يوجد أبناء مرتبطون</h3></div></div>` :
+        children.map(child => {
+          const ca = allAttempts.filter(a => a.studentId === child.id);
+          const cAvg = ca.length ? calculateAvg(ca) : 0;
+          return `<div class="parent-child-card">
+            <div class="parent-child-header">
+              <div class="parent-child-avatar">${child.photoURL ? `<img src="${child.photoURL}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : '👨‍🎓'}</div>
+              <div class="parent-child-info">
+                <h4>${escapeHtml(child.name)}</h4>
+                <p>${escapeHtml(child.grade || '')} • ${escapeHtml(child.school || '')} • ${escapeHtml(child.email)}</p>
+              </div>
+              <button class="btn btn-sm btn-danger" onclick="removeChild('${child.id}')">🗑 إلغاء</button>
+            </div>
+            <div class="parent-child-stats">
+              <div class="parent-child-stat"><h5>${ca.length}</h5><p>محلول</p></div>
+              <div class="parent-child-stat"><h5>${cAvg}%</h5><p>المتوسط</p></div>
+              <div class="parent-child-stat"><h5>${ca.filter(a => (a.score / a.total) >= 0.8).length}</h5><p>ممتاز</p></div>
+            </div>
+            <button class="btn btn-outline btn-full btn-sm" onclick="openChildDetails('${child.id}')">👁️ التفاصيل</button>
+          </div>`;
+        }).join('')}
+      <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">👨‍🏫 المدرسون</h2></div></div>
+      ${await renderTeachersForParent()}
+    `;
+  } finally { hideLoading(); }
+}
+
+async function searchChild() {
+  const query = document.getElementById('childSearchInput').value.trim().toLowerCase();
+  if (!query) { alert('أدخل البريد أو الهاتف'); return; }
+  showLoading();
+  try {
+    const users = await DB.get('users');
+    const student = users.find(u => u.role === 'student' && (u.email?.toLowerCase() === query || u.parentPhone === query));
+    if (!student) { alert('❌ لم يتم العثور على طالب'); return; }
+    if ((currentUser.children || []).includes(student.id)) { alert('⚠️ مرتبط بالفعل'); return; }
+    if (!currentUser.children) currentUser.children = [];
+    currentUser.children.push(student.id);
+    const userIdx = users.findIndex(u => u.id === currentUser.id);
+    if (userIdx >= 0) { users[userIdx].children = currentUser.children; await DB.set('users', users); }
+    launchConfetti(30);
+    alert(`✅ تم ربط ${student.name}`);
+    renderParentDashboard();
+  } finally { hideLoading(); }
+}
+
+async function removeChild(childId) {
+  if (!confirm('إلغاء الربط؟')) return;
+  showLoading();
+  try {
+    currentUser.children = (currentUser.children || []).filter(id => id !== childId);
+    const users = await DB.get('users');
+    const userIdx = users.findIndex(u => u.id === currentUser.id);
+    if (userIdx >= 0) { users[userIdx].children = currentUser.children; await DB.set('users', users); }
+    alert('✅ تم الإلغاء');
+    renderParentDashboard();
+  } finally { hideLoading(); }
+}
+
+async function openChildDetails(childId) {
+  showLoading();
+  try {
+    const users = await DB.get('users');
+    const allAttempts = await DB.get('attempts');
+    const allQuizzes = await DB.get('quizzes');
+    const child = users.find(u => u.id === childId);
+    if (!child) return;
+    const ca = allAttempts.filter(a => a.studentId === childId).sort((a, b) => b.createdAt - a.createdAt);
+    const avg = ca.length ? calculateAvg(ca) : 0;
+
+    openModal(`<div class="modal-header"><h3 class="modal-title">👨‍🎓 ${escapeHtml(child.name)}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+      <div class="alert alert-info">📚 ${escapeHtml(child.grade || '')} • ${escapeHtml(child.school || '')}<br>📊 المتوسط: <strong>${avg}%</strong> • ${ca.length} اختبار</div>
+      <h4 style="font-size:16px;font-weight:800;margin:20px 0 12px;">📝 النتائج</h4>
+      ${ca.length === 0 ? `<div class="empty-state"><h3>لا نتائج</h3></div>` : ca.map(a => {
+        const quiz = allQuizzes.find(q => q.id === a.quizId);
+        if (!quiz) return '';
+        const pct = Math.round((a.score / a.total) * 100);
+        return `<div class="history-item">
+          <div class="history-info"><h4>${escapeHtml(quiz.title)}</h4><p>${getSubjectName(quiz.subject)} • ${new Date(a.createdAt).toLocaleDateString('ar-EG')}</p></div>
+          <div class="history-score">${a.score}/${a.total}</div>
+          <span class="badge badge-${pct>=80?'success':pct>=50?'warning':'danger'}">${pct}%</span>
+        </div>`;
+      }).join('')}`);
+  } finally { hideLoading(); }
+}
+
+/* ============================================================
+   ============ Notifications ============
    ============================================================ */
 async function updateNotifBadge() {
   if (!currentUser) return;
@@ -2130,20 +2619,24 @@ async function openNotifications() {
     updateNotifBadge();
   }
   openModal(`<div class="modal-header"><h3 class="modal-title">🔔 الإشعارات</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-    ${notifs.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">🔔</div><h3>لا إشعارات</h3></div>` : notifs.map(n => `<div class="history-item" style="${n.read?'opacity:0.6':''}">
-      <div class="history-info"><h4>${escapeHtml(n.title)}</h4><p>${escapeHtml(n.body)}</p><p style="font-size:11px;margin-top:4px;">${new Date(n.createdAt).toLocaleString('ar-EG')}</p></div>
-    </div>`).join('')}`);
+    ${notifs.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">🔔</div><h3>لا إشعارات</h3></div>` : notifs.map(n => `
+      <div class="history-item" style="${n.read?'opacity:0.6':''}">
+        <div class="history-info"><h4>${escapeHtml(n.title)}</h4><p>${escapeHtml(n.body)}</p><p style="font-size:11px;">${new Date(n.createdAt).toLocaleString('ar-EG')}</p></div>
+      </div>
+    `).join('')}`);
 }
+
 async function notifyStudents(quiz) {
   const users = await DB.get('users');
   const students = users.filter(u => u.role === 'student' && u.grade === quiz.grade);
   const notifs = await DB.get('notifications');
-  students.forEach(s => {
-    notifs.push({ id: uid(), userId: s.id, title: 'اختبار جديد', body: `تم إضافة "${quiz.title}" في مادة ${getSubjectName(quiz.subject)}`, createdAt: Date.now(), read: false });
-  });
+  students.forEach(s => notifs.push({ id: uid(), userId: s.id, title: 'اختبار جديد', body: `تم إضافة "${quiz.title}"`, createdAt: Date.now(), read: false }));
   await DB.set('notifications', notifs);
 }
 
+/* ============================================================
+   ============ Grading ============
+   ============================================================ */
 async function openGradingCenter() {
   showLoading();
   try {
@@ -2154,17 +2647,17 @@ async function openGradingCenter() {
     const allUsers = await DB.get('users');
     if (pending.length === 0) {
       openModal(`<div class="modal-header"><h3 class="modal-title">✏️ التصحيح</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-        <div class="empty-state"><div class="empty-state-icon">🎉</div><h3>لا توجد محاولات بحاجة للتصحيح</h3></div>`);
+        <div class="empty-state"><div class="empty-state-icon">🎉</div><h3>لا محاولات للتصحيح</h3></div>`);
       return;
     }
-    openModal(`<div class="modal-header"><h3 class="modal-title">✏️ مركز التصحيح (${pending.length})</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-      ${pending.sort((a,b) => a.createdAt - b.createdAt).map(a => {
+    openModal(`<div class="modal-header"><h3 class="modal-title">✏️ التصحيح (${pending.length})</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+      ${pending.map(a => {
         const quiz = quizzes.find(q => q.id === a.quizId);
         const student = allUsers.find(u => u.id === a.studentId);
         const essayCount = (a.results || []).filter(r => r.correct === null).length;
         return `<div class="history-item" onclick="openGradingAttempt('${a.id}')" style="cursor:pointer;">
-          <div class="history-info"><h4>${escapeHtml(student?.name || 'طالب')}</h4><p>${escapeHtml(quiz?.title || '')} • ${new Date(a.createdAt).toLocaleString('ar-EG')}</p></div>
-          <span class="badge badge-warning">${essayCount} سؤال مقالي</span>
+          <div class="history-info"><h4>${escapeHtml(student?.name || '')}</h4><p>${escapeHtml(quiz?.title || '')}</p></div>
+          <span class="badge badge-warning">${essayCount} مقالي</span>
         </div>`;
       }).join('')}`);
   } finally { hideLoading(); }
@@ -2178,35 +2671,27 @@ async function openGradingAttempt(attemptId) {
     if (!attempt) return;
     const allQuizzes = await DB.get('quizzes');
     const quiz = allQuizzes.find(q => q.id === attempt.quizId);
-    if (!quiz || quiz.teacherId !== currentUser.id) { openModal(`<div class="modal-header"><h3 class="modal-title">⛔ غير مصرح</h3><button class="modal-close" onclick="closeModal()">✕</button></div>`); return; }
+    if (!quiz || quiz.teacherId !== currentUser.id) { alert('غير مصرح'); return; }
     const allUsers = await DB.get('users');
     const student = allUsers.find(u => u.id === attempt.studentId);
-    const essayQuestions = quiz.questions.map((q, i) => ({ ...q, index: i })).filter(q => q.type === 'essay');
-    const prevEssayBonus = attempt.essayBonusPrev || 0;
-    const autoScore = attempt.score - prevEssayBonus;
+    const essayQs = quiz.questions.map((q, i) => ({ ...q, index: i })).filter(q => q.type === 'essay');
+    const autoScore = attempt.score - (attempt.essayBonusPrev || 0);
+
     openModal(`<div class="modal-header"><h3 class="modal-title">✏️ تصحيح: ${escapeHtml(student?.name || '')}</h3><button class="modal-close" onclick="openGradingCenter()">✕</button></div>
-      <div class="alert alert-info">
-        📝 ${escapeHtml(quiz.title)}<br>🏫 ${escapeHtml(student?.school || 'غير محدد')}<br>
-        📊 الحالية: ${attempt.score}/${attempt.total}<br>🤖 التلقائية: ${autoScore}
-      </div>
-      ${essayQuestions.map(q => {
+      <div class="alert alert-info">📝 ${escapeHtml(quiz.title)}<br>📊 الحالية: ${attempt.score}/${attempt.total}<br>🤖 التلقائية: ${autoScore}</div>
+      ${essayQs.map(q => {
         const answer = attempt.answers[q.index] || '(لم يجب)';
         const currentGrade = (attempt.essayGrades && attempt.essayGrades[q.index]) ?? 0;
         return `<div class="grading-card">
           <div class="grading-question">س${q.index + 1}: ${escapeHtml(q.text)}</div>
-          <div class="grading-answer-label">📝 إجابة الطالب:</div>
+          <div class="grading-answer-label">📝 الإجابة:</div>
           <div class="grading-answer">${escapeHtml(answer)}</div>
-          <div class="grading-answer-label">✏️ التقييم:</div>
           <div class="grading-btn-row">
-            ${[0, 0.25, 0.5, 0.75, 1].map(grade => `
-              <button class="grade-chip ${currentGrade === grade ? 'active' : ''}" onclick="setEssayGrade('${attempt.id}', ${q.index}, ${grade}, this)">
-                ${grade === 0 ? '❌ صفر' : grade === 1 ? '✅ كامل' : `${grade * 100}%`}
-              </button>
-            `).join('')}
+            ${[0, 0.25, 0.5, 0.75, 1].map(g => `<button class="grade-chip ${currentGrade === g ? 'active' : ''}" onclick="setEssayGrade('${attempt.id}', ${q.index}, ${g}, this)">${g === 0 ? '❌' : g === 1 ? '✅' : g * 100 + '%'}</button>`).join('')}
           </div>
         </div>`;
       }).join('')}
-      <button class="btn btn-success btn-full" onclick="finalizeGrading('${attempt.id}')">💾 حفظ التصحيح</button>`);
+      <button class="btn btn-success btn-full" onclick="finalizeGrading('${attempt.id}')">💾 حفظ</button>`);
   } finally { hideLoading(); }
 }
 
@@ -2231,16 +2716,15 @@ async function finalizeGrading(attemptId) {
     const quiz = allQuizzes.find(q => q.id === attempt.quizId);
     if (!quiz || quiz.teacherId !== currentUser.id) { alert('غير مصرح'); return; }
     if (attempt.autoScore === undefined) attempt.autoScore = attempt.score - (attempt.essayBonusPrev || 0);
-    const essayBonus = Object.values(attempt.essayGrades || {}).reduce((a, b) => a + Number(b || 0), 0);
-    attempt.score = attempt.autoScore + essayBonus;
-    attempt.essayBonusPrev = essayBonus;
+    const bonus = Object.values(attempt.essayGrades || {}).reduce((a, b) => a + Number(b || 0), 0);
+    attempt.score = attempt.autoScore + bonus;
+    attempt.essayBonusPrev = bonus;
     attempt.needsGrading = false;
     attempt.graded = true;
     attempt.gradedAt = Date.now();
-    attempt.gradedBy = currentUser.id;
     await DB.set('attempts', allAttempts);
     const notifs = await DB.get('notifications');
-    notifs.push({ id: uid(), userId: attempt.studentId, title: '✅ تم تصحيح اختبارك', body: `تم تصحيح "${quiz.title}". درجتك: ${attempt.score}/${attempt.total}`, createdAt: Date.now(), read: false });
+    notifs.push({ id: uid(), userId: attempt.studentId, title: '✅ تم التصحيح', body: `"${quiz.title}": ${attempt.score}/${attempt.total}`, createdAt: Date.now(), read: false });
     await DB.set('notifications', notifs);
     launchConfetti(20);
     closeModal();
@@ -2248,22 +2732,23 @@ async function finalizeGrading(attemptId) {
   } finally { hideLoading(); }
 }
 
+/* ============================================================
+   ============ Export ============
+   ============================================================ */
 async function exportResults() {
   const quizzes = (await DB.get('quizzes')).filter(q => q.teacherId === currentUser.id);
   const allAttempts = await DB.get('attempts');
   const users = await DB.get('users');
   const attempts = allAttempts.filter(a => quizzes.some(q => q.id === a.quizId));
-  if (attempts.length === 0) { alert('لا توجد نتائج'); return; }
+  if (attempts.length === 0) { alert('لا نتائج'); return; }
   const rows = attempts.map(a => {
     const quiz = quizzes.find(q => q.id === a.quizId);
     const student = users.find(u => u.id === a.studentId);
-    const pct = Math.round((a.score / a.total) * 100);
     return {
       'الطالب': student?.name || '', 'المدرسة': student?.school || '',
-      'ولي الأمر': student?.parentName || '', 'هاتف ولي الأمر': student?.parentPhone || '',
+      'ولي الأمر': student?.parentName || '', 'هاتف': student?.parentPhone || '',
       'الاختبار': quiz?.title || '', 'المادة': getSubjectName(quiz?.subject),
-      'الدرجة': a.score, 'الإجمالي': a.total, 'النسبة %': pct,
-      'الحالة': a.needsGrading && !a.graded ? 'بانتظار التصحيح' : 'مكتمل',
+      'الدرجة': a.score, 'الإجمالي': a.total, 'النسبة %': Math.round((a.score / a.total) * 100),
       'التاريخ': new Date(a.createdAt).toLocaleDateString('ar-EG')
     };
   });
@@ -2275,10 +2760,10 @@ async function exportResults() {
 
 async function exportStudents() {
   const users = (await DB.get('users')).filter(u => u.role === 'student');
-  if (!users.length) { alert('لا يوجد طلاب'); return; }
+  if (!users.length) { alert('لا طلاب'); return; }
   const rows = users.map(u => ({
     'الاسم': u.name, 'البريد': u.email, 'المدرسة': u.school || '', 'السنة': u.grade,
-    'ولي الأمر': u.parentName || '', 'هاتف ولي الأمر': u.parentPhone || '',
+    'ولي الأمر': u.parentName || '', 'هاتف': u.parentPhone || '',
     'طريقة التسجيل': u.provider === 'google' ? 'Google' : 'بريد',
     'تاريخ التسجيل': new Date(u.createdAt).toLocaleDateString('ar-EG')
   }));
@@ -2288,11 +2773,14 @@ async function exportStudents() {
   XLSX.writeFile(wb, 'الطلاب.xlsx');
 }
 
+/* ============================================================
+   ============ Modal Helpers ============
+   ============================================================ */
 function openModal(html) { document.getElementById('modalBox').innerHTML = html; document.getElementById('modalOverlay').classList.add('active'); }
 function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
 
 /* ============================================================
-   ============ Quiz Creation / Management ============
+   ============ Quiz Creation ============
    ============================================================ */
 function openNewQuizModal() {
   editingQuizId = null;
@@ -2314,13 +2802,13 @@ function continueToQuestions() {
 }
 
 function showQuestionsEditor() {
-  const questionsHtml = newQuizData.questions.map((q, i) => {
+  const qHtml = newQuizData.questions.map((q, i) => {
     const ti = QUESTION_TYPES[q.type] || QUESTION_TYPES.mcq;
     let body = '';
     if (q.type === 'mcq') body = `<div class="question-item-options">${q.options.map((o, oi) => `<div class="question-option-line ${oi === q.answer ? 'correct' : ''}">${oi === q.answer ? '✓' : ''} ${escapeHtml(o)}</div>`).join('')}</div>`;
     else if (q.type === 'tf') body = `<div class="question-item-options"><div class="question-option-line ${q.answer === true ? 'correct' : ''}">${q.answer === true ? '✓' : ''} صح</div><div class="question-option-line ${q.answer === false ? 'correct' : ''}">${q.answer === false ? '✓' : ''} خطأ</div></div>`;
     else if (q.type === 'fill') body = `<div class="question-option-line correct">✓ ${escapeHtml(q.answer)}</div>`;
-    else if (q.type === 'essay') body = `<div class="question-option-line">📄 مقالي</div>`;
+    else body = `<div class="question-option-line">📄 مقالي</div>`;
     return `<div class="question-item">
       <div class="question-item-header">
         <span style="font-weight:900;color:var(--primary);">س${i + 1}</span>
@@ -2329,11 +2817,11 @@ function showQuestionsEditor() {
         <button class="icon-btn icon-btn-danger" onclick="removeQuestion(${i})">🗑</button>
       </div>${body}</div>`;
   }).join('');
-  const headerTitle = editingQuizId ? 'تعديل: ' + escapeHtml(newQuizData.title) : escapeHtml(newQuizData.title);
-  openModal(`<div class="modal-header"><h3 class="modal-title">${headerTitle}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+  const title = editingQuizId ? 'تعديل: ' + escapeHtml(newQuizData.title) : escapeHtml(newQuizData.title);
+  openModal(`<div class="modal-header"><h3 class="modal-title">${title}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
     ${editingQuizId ? `<div class="edit-warning">⚠️ وضع التعديل</div>` : ''}
     <p style="margin-bottom:16px;">${newQuizData.questions.length} سؤال • ⏱️ ${newQuizData.timePerQuestion}ث</p>
-    ${newQuizData.questions.length > 0 ? questionsHtml : `<div class="empty-state"><h3>لم تضف أسئلة</h3></div>`}
+    ${newQuizData.questions.length > 0 ? qHtml : `<div class="empty-state"><h3>لم تضف أسئلة</h3></div>`}
     <button class="btn btn-outline btn-full" onclick="openAddQuestionForm()" style="margin-top:12px;">➕ إضافة سؤال</button>
     <div style="display:flex;gap:8px;margin-top:16px;">
       <button class="btn btn-ghost" onclick="${editingQuizId ? 'closeModal()' : 'openNewQuizModal()'}" style="flex:1;">رجوع</button>
@@ -2347,11 +2835,11 @@ function renderAddQuestionForm() {
   if (selectedQuestionType === 'mcq') fieldsHtml = `<div class="form-group"><label class="form-label">الخيارات</label>${[0, 1, 2, 3].map(i => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><input type="radio" name="correctOption" value="${i}" ${i === 0 ? 'checked' : ''} style="width:20px;height:20px;"><input type="text" class="form-input" id="opt${i}" placeholder="الخيار ${i + 1}"></div>`).join('')}</div>`;
   else if (selectedQuestionType === 'tf') fieldsHtml = `<div class="form-group"><label class="form-label">الإجابة</label><div class="tf-options"><button type="button" class="tf-btn true ${tfAnswer === true ? 'selected' : ''}" onclick="pickTFAnswer(true,this)">✓ صح</button><button type="button" class="tf-btn false ${tfAnswer === false ? 'selected' : ''}" onclick="pickTFAnswer(false,this)">✗ خطأ</button></div></div>`;
   else if (selectedQuestionType === 'fill') fieldsHtml = `<div class="form-group"><label class="form-label">الإجابة</label><input type="text" class="form-input" id="fillAnswer"></div>`;
-  else if (selectedQuestionType === 'essay') fieldsHtml = `<div class="alert alert-info">📄 سؤال مقالي</div>`;
+  else fieldsHtml = `<div class="alert alert-info">📄 سؤال مقالي</div>`;
   openModal(`<div class="modal-header"><h3 class="modal-title">سؤال جديد</h3><button class="modal-close" onclick="showQuestionsEditor()">✕</button></div>
     <div class="form-group"><label class="form-label">النوع</label><div class="qtype-picker">${Object.entries(QUESTION_TYPES).map(([k, v]) => `<button type="button" class="qtype-option ${k === selectedQuestionType ? 'active' : ''}" onclick="changeQType('${k}')"><span class="emoji">${v.emoji}</span><span class="label">${v.name}</span></button>`).join('')}</div></div>
     <div class="form-group"><label class="form-label">نص السؤال</label><textarea class="form-textarea" id="qText"></textarea></div>
-    <div class="form-group"><label class="form-label">🖼️ صورة</label><input type="file" class="form-input" accept="image/*" id="qImageFile" onchange="handleImageUpload(event)"><div id="imagePreview" style="margin-top:10px;">${uploadedImageData ? `<img src="${uploadedImageData}" style="max-width:100%;max-height:160px;border-radius:10px;"><button class="btn btn-sm btn-danger" onclick="clearImage()" style="margin-top:6px;">🗑 إزالة</button>` : ''}</div></div>
+    <div class="form-group"><label class="form-label">🖼️ صورة</label><input type="file" class="form-input" accept="image/*" id="qImageFile" onchange="handleImageUpload(event)"><div id="imagePreview" style="margin-top:10px;">${uploadedImageData ? `<img src="${uploadedImageData}" style="max-width:100%;max-height:160px;border-radius:10px;"><button class="btn btn-sm btn-danger" onclick="clearImage()" style="margin-top:6px;">🗑</button>` : ''}</div></div>
     ${fieldsHtml}
     <button class="btn btn-primary btn-full" onclick="addQuestion()">إضافة</button>`);
 }
@@ -2363,7 +2851,7 @@ function handleImageUpload(e) {
   const r = new FileReader();
   r.onload = (ev) => {
     uploadedImageData = ev.target.result;
-    document.getElementById('imagePreview').innerHTML = `<img src="${uploadedImageData}" style="max-width:100%;max-height:160px;border-radius:10px;"><button class="btn btn-sm btn-danger" onclick="clearImage()" style="margin-top:6px;">🗑 إزالة</button>`;
+    document.getElementById('imagePreview').innerHTML = `<img src="${uploadedImageData}" style="max-width:100%;max-height:160px;border-radius:10px;"><button class="btn btn-sm btn-danger" onclick="clearImage()" style="margin-top:6px;">🗑</button>`;
   };
   r.readAsDataURL(f);
 }
@@ -2374,7 +2862,7 @@ function addQuestion() {
   const q = { type: selectedQuestionType, text, image: uploadedImageData || null };
   if (selectedQuestionType === 'mcq') {
     const opts = [0, 1, 2, 3].map(i => document.getElementById(`opt${i}`).value.trim());
-    if (opts.some(o => !o)) { alert('أدخل جميع الخيارات'); return; }
+    if (opts.some(o => !o)) { alert('أدخل الخيارات'); return; }
     q.options = opts;
     q.answer = parseInt(document.querySelector('input[name="correctOption"]:checked').value);
   } else if (selectedQuestionType === 'tf') q.answer = tfAnswer;
@@ -2382,7 +2870,7 @@ function addQuestion() {
     const a = document.getElementById('fillAnswer').value.trim();
     if (!a) { alert('أدخل الإجابة'); return; }
     q.answer = a;
-  } else if (selectedQuestionType === 'essay') q.answer = null;
+  } else q.answer = null;
   newQuizData.questions.push(q);
   uploadedImageData = null; tfAnswer = true;
   showQuestionsEditor();
@@ -2398,15 +2886,16 @@ async function saveQuiz() {
       if (idx >= 0) {
         quizzes[idx] = { ...quizzes[idx], title: newQuizData.title, grade: newQuizData.grade, timePerQuestion: newQuizData.timePerQuestion, questions: newQuizData.questions, updatedAt: Date.now() };
         await DB.set('quizzes', quizzes);
+        await logActivity('تعديل اختبار', newQuizData.title);
       }
     } else {
       const quiz = { id: uid(), teacherId: currentUser.id, title: newQuizData.title, subject: newQuizData.subject, grade: newQuizData.grade, timePerQuestion: newQuizData.timePerQuestion, questions: newQuizData.questions, createdAt: Date.now() };
       quizzes.push(quiz);
       await DB.set('quizzes', quizzes);
       await notifyStudents(quiz);
+      await logActivity('إنشاء اختبار', newQuizData.title);
     }
-    editingQuizId = null;
-    newQuizData = null;
+    editingQuizId = null; newQuizData = null;
     closeModal();
     renderTeacherDashboard();
   } finally { hideLoading(); }
@@ -2429,11 +2918,7 @@ async function openQuizManage(quizId) {
       ${attempts.length > 0 ? `<h4 style="margin:20px 0 12px;">النتائج (${attempts.length})</h4>${attempts.map(a => {
         const st = users.find(u => u.id === a.studentId);
         const pct = Math.round((a.score / a.total) * 100);
-        return `<div class="history-item">
-          <div class="history-info"><h4>${escapeHtml(st?.name || 'طالب')}</h4><p>${escapeHtml(st?.school || '')}</p></div>
-          <div class="history-score">${a.score}/${a.total}</div>
-          <span class="badge badge-${pct>=80?'success':pct>=50?'warning':'danger'}">${pct}%</span>
-        </div>`;
+        return `<div class="history-item"><div class="history-info"><h4>${escapeHtml(st?.name || '')}</h4></div><div class="history-score">${a.score}/${a.total}</div><span class="badge badge-${pct>=80?'success':pct>=50?'warning':'danger'}">${pct}%</span></div>`;
       }).join('')}` : ''}
       <div style="display:flex;gap:8px;margin-top:20px;">
         <button class="btn btn-danger" onclick="deleteQuiz('${quiz.id}')" style="flex:1;">🗑 حذف</button>
@@ -2459,8 +2944,11 @@ async function deleteQuiz(quizId) {
   if (!confirm('حذف الاختبار؟')) return;
   showLoading();
   try {
-    await DB.set('quizzes', (await DB.get('quizzes')).filter(q => q.id !== quizId));
+    const quizzes = await DB.get('quizzes');
+    const quiz = quizzes.find(q => q.id === quizId);
+    await DB.set('quizzes', quizzes.filter(q => q.id !== quizId));
     await DB.set('attempts', (await DB.get('attempts')).filter(a => a.quizId !== quizId));
+    await logActivity('حذف اختبار', quiz?.title || quizId);
     closeModal();
     renderTeacherDashboard();
   } finally { hideLoading(); }
@@ -2476,11 +2964,7 @@ async function startQuiz(quizId) {
     const quiz = quizzes.find(q => q.id === quizId);
     if (!quiz) return;
     const allAttempts = await DB.get('attempts');
-    if (allAttempts.some(a => a.quizId === quizId && a.studentId === currentUser.id)) {
-      hideLoading();
-      alert('لقد قمت بحل هذا الاختبار بالفعل.');
-      return;
-    }
+    if (allAttempts.some(a => a.quizId === quizId && a.studentId === currentUser.id)) { hideLoading(); alert('حللت هذا الاختبار بالفعل.'); return; }
     currentQuiz = quiz; currentQuestionIndex = 0; currentAnswers = [];
     selectedAnswerIndex = null; tfSelected = null;
     showScreen('quiz');
@@ -2571,10 +3055,7 @@ async function finishQuiz() {
   try {
     const existing = await DB.get('attempts');
     if (existing.some(a => a.quizId === currentQuiz.id && a.studentId === currentUser.id)) {
-      hideLoading();
-      alert('لقد قمت بحل هذا الاختبار بالفعل.');
-      exitQuiz();
-      return;
+      hideLoading(); alert('حللت هذا الاختبار بالفعل.'); exitQuiz(); return;
     }
     let score = 0, autoGraded = 0, hasEssay = false;
     const results = currentQuiz.questions.map((q, i) => {
@@ -2585,18 +3066,12 @@ async function finishQuiz() {
       else if (c === null) hasEssay = true;
       return { questionIndex: i, answer: a, correct: c };
     });
-    const attempt = {
-      id: uid(), quizId: currentQuiz.id, studentId: currentUser.id,
-      score, total: currentQuiz.questions.length, autoGraded,
-      autoScore: score, answers: currentAnswers, results, createdAt: Date.now(),
-      needsGrading: hasEssay, graded: !hasEssay, essayGrades: {}, essayBonusPrev: 0
-    };
+    const attempt = { id: uid(), quizId: currentQuiz.id, studentId: currentUser.id, score, total: currentQuiz.questions.length, autoGraded, autoScore: score, answers: currentAnswers, results, createdAt: Date.now(), needsGrading: hasEssay, graded: !hasEssay, essayGrades: {}, essayBonusPrev: 0 };
     existing.push(attempt);
     await DB.set('attempts', existing);
     const pct = autoGraded > 0 ? Math.round((score / autoGraded) * 100) : 0;
     const emoji = pct >= 80 ? '🏆' : pct >= 50 ? '👍' : '💪';
     const title = pct >= 80 ? 'ممتاز! 🎉' : pct >= 50 ? 'جيد جداً' : 'حاول مرة أخرى';
-    const msg = pct >= 80 ? 'أداء رائع!' : pct >= 50 ? 'يمكنك الأفضل' : 'راجع وحاول مجدداً!';
     const essayCount = currentQuiz.questions.filter(q => q.type === 'essay').length;
     if (pct >= 80) launchConfetti(100);
     document.getElementById('quizContent').innerHTML = `
@@ -2606,7 +3081,7 @@ async function finishQuiz() {
         <div style="font-size:56px;font-weight:900;color:var(--primary);">${score}<span style="font-size:28px;color:var(--text-light);"> / ${autoGraded}</span></div>
         <p style="font-size:20px;font-weight:700;color:var(--text-light);">${pct}% (التلقائي)</p>
         ${essayCount > 0 ? `<div class="alert alert-warning" style="text-align:right;">📄 لديك ${essayCount} سؤال مقالي</div>` : ''}
-        <div class="alert alert-info" style="text-align:right;">🔒 لا يمكن إعادة حل هذا الاختبار.</div>
+        <div class="alert alert-info" style="text-align:right;">🔒 لا يمكن إعادة الحل. تجد نتيجتك في "ما تمت الإجابة عليه".</div>
         <button class="btn btn-primary btn-lg" onclick="exitQuiz()" style="margin-top:20px;">🏠 العودة</button>
       </div>`;
     document.getElementById('quizProgressFill').style.width = '100%';
@@ -2637,18 +3112,22 @@ document.getElementById('modalOverlay').addEventListener('click', (e) => { if (e
    ============================================================ */
 const globalFns = [
   switchAuthTab, pickRole, handleRegister, handleLogin, handleGoogleSignIn, handleForgotPassword, logout, toggleDarkMode,
-  openNotifications, closeModal,
-  openNewQuizModal, continueToQuestions, showQuestionsEditor, openAddQuestionForm, changeQType,
-  pickTFAnswer, handleImageUpload, clearImage, addQuestion, removeQuestion, saveQuiz,
+  openNotifications, closeModal, openNewQuizModal, continueToQuestions, showQuestionsEditor, openAddQuestionForm,
+  changeQType, pickTFAnswer, handleImageUpload, clearImage, addQuestion, removeQuestion, saveQuiz,
   openQuizManage, editQuiz, deleteQuiz, startQuiz, selectMcqAnswer, selectTfAnswer, onFillInput, onEssayInput,
   nextQuizQuestion, exitQuiz, exportResults, exportStudents, openGradingCenter, openGradingAttempt,
   setEssayGrade, finalizeGrading, pickGoogleRole, completeGoogleProfile, cancelGoogleProfile,
   openPendingTeachers, approveTeacher, deleteUser, openBroadcastModal, sendBroadcast,
-  saveExistingProfile, wipeQuizData, switchUserTab,
+  saveExistingProfile, wipeQuizData, switchUserTab, applyAdminFilters,
   openTeacherProfileEdit, saveTeacherProfile, rateTeacher,
-  searchChild, removeChild, openChildDetails
+  searchChild, removeChild, openChildDetails,
+  openTeacherContent, renderContentModal, addVideoLink, removeVideoLink,
+  handleMaterialUpload, removeMaterial, downloadMaterial, downloadTeacherMaterial,
+  handleAvatarUpload, removeAvatar, renderAnsweredScreen,
+  renderAdminQuizzes, filterAdminQuizzes, viewQuizDetails, adminDeleteQuiz,
+  renderAdminStats, renderAuditLog, openAdminBroadcast, sendAdminBroadcast
 ];
 globalFns.forEach(fn => { try { window[fn.name] = fn; } catch(e) {} });
 </script>
 </body>
-  </html>
+</html>
