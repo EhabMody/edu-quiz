@@ -368,6 +368,7 @@
   }
 </style>
 </head>
+
 <body>
 
 <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
@@ -382,8 +383,8 @@
         <p class="auth-subtitle">اختبارات ذكية • تصحيح فوري • متابعة شاملة</p>
       </div>
       <div class="tabs">
-        <button class="tab active" onclick="switchAuthTab('login')">تسجيل دخول</button>
-        <button class="tab" onclick="switchAuthTab('register')">حساب جديد</button>
+        <button class="tab active" data-tab="login" onclick="switchAuthTab('login')">تسجيل دخول</button>
+        <button class="tab" data-tab="register" onclick="switchAuthTab('register')">حساب جديد</button>
       </div>
       <div id="authAlert"></div>
 
@@ -488,9 +489,8 @@
 </section>
 
 <div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox"></div></div>
-
 <script>
-/* ⬇️ بداية الجزء الأول من JavaScript */
+/* ⬇️ الجزء الأول من JavaScript */
 
 const DEFAULT_FIREBASE_CONFIG = {
   apiKey: "AIzaSyBPuzIkp-Qc4CIBAYsY6hLwAVHwqY3oODg",
@@ -578,13 +578,26 @@ const DEFAULT_PLATFORM_SETTINGS = {
 
 let platformSettings = { ...DEFAULT_PLATFORM_SETTINGS };
 
+/* ✅ إصلاح: حجم الصور والملفات */
+const MAX_IMAGE_SIZE_MB = 5;          // صور (شعار/إعلان/سؤال) - 5MB
+const MAX_AVATAR_SIZE_MB = 2;         // صور شخصية - 2MB
+const MAX_MATERIAL_SIZE_MB = 20;      // ملازم PDF/Word - 20MB
+const MAX_IMAGE_DIMENSION = 1920;     // أقصى بعد للصورة بعد الضغط
+const IMAGE_QUALITY = 0.82;           // جودة JPEG بعد الضغط
+
 function uid() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 9); }
 function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 function getSubjectEmoji(id) { const s = SUBJECTS.find(x=>x.id===id); return s?s.emoji:'📚'; }
 function getSubjectName(id) { const s = SUBJECTS.find(x=>x.id===id); return s?s.name:id; }
 function showAlert(msg, type='error') { const b = document.getElementById('authAlert'); if (!b) return; b.innerHTML = `<div class="alert alert-${type}">${escapeHtml(msg)}</div>`; setTimeout(()=>{b.innerHTML='';},5000); }
 function showScreen(name) { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(name+'Screen').classList.add('active'); window.scrollTo(0,0); }
-function calculateAvg(attempts) { if(!attempts.length) return 0; return Math.round(attempts.reduce((a,x)=>a+(x.score/x.total)*100,0)/attempts.length); }
+
+/* ✅ إصلاح: حماية من القسمة على صفر */
+function calculateAvg(attempts) {
+  if (!attempts.length) return 0;
+  return Math.round(attempts.reduce((a, x) => a + (x.total > 0 ? (x.score / x.total) * 100 : 0), 0) / attempts.length);
+}
+
 function isMobileDevice() { return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && /Macintosh/.test(navigator.userAgent)); }
 function isAdmin(user) { return user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase(); }
 
@@ -624,17 +637,25 @@ function bindAutoDirToInputs() {
 
 const _autoDirObserver = new MutationObserver(() => bindAutoDirToInputs());
 
+/* ✅ إصلاح: حماية من xp >= maxXP */
 function getLevel(xp) { return LEVELS.find(l => xp >= l.minXP && xp < l.maxXP) || LEVELS[LEVELS.length - 1]; }
-function getNextLevel(xp) { const idx = LEVELS.findIndex(l => xp >= l.minXP && xp < l.maxXP); return idx < LEVELS.length - 1 ? LEVELS[idx + 1] : null; }
+function getNextLevel(xp) {
+  const idx = LEVELS.findIndex(l => xp >= l.minXP && xp < l.maxXP);
+  if (idx === -1) return null;
+  return idx < LEVELS.length - 1 ? LEVELS[idx + 1] : null;
+}
 
+/* ✅ إصلاح: switchAuthTab باستخدام data-tab */
 function switchAuthTab(tab) {
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>{if(t.textContent.includes(tab==='login'?'دخول':'حساب'))t.classList.add('active');});
-  document.getElementById('loginForm').style.display=tab==='login'?'block':'none';
-  document.getElementById('registerForm').style.display=tab==='register'?'block':'none';
-  document.getElementById('authAlert').innerHTML='';
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const activeTab = document.querySelector(`.tab[data-tab="${tab}"]`);
+  if (activeTab) activeTab.classList.add('active');
+  document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+  document.getElementById('authAlert').innerHTML = '';
   if (tab === 'register') pickRole(selectedRole || 'student');
 }
+
 function pickRole(role) {
   selectedRole = role;
   document.querySelectorAll('.role-option').forEach(o => o.classList.remove('active'));
@@ -672,6 +693,44 @@ function launchConfetti(count = 80) {
     container.appendChild(el);
     setTimeout(() => el.remove(), 5000);
   }
+}
+
+/* ✅ دوال ضغط الصور قبل الرفع */
+function compressImage(file, maxDimension = MAX_IMAGE_DIMENSION, quality = IMAGE_QUALITY) {
+  return new Promise((resolve, reject) => {
+    if (!file.type.startsWith('image/')) { resolve(file); return; }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) { height = Math.round((height * maxDimension) / width); width = maxDimension; }
+          else { width = Math.round((width * maxDimension) / height); height = maxDimension; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob((blob) => {
+          if (!blob) { reject(new Error('فشل ضغط الصورة')); return; }
+          const newFile = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' });
+          resolve(newFile);
+        }, 'image/jpeg', quality);
+      };
+      img.onerror = () => reject(new Error('فشل قراءة الصورة'));
+      img.src = ev.target.result;
+    };
+    reader.onerror = () => reject(new Error('فشل قراءة الملف'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function validateFileSize(file, maxMB, label = 'الملف') {
+  if (file.size > maxMB * 1024 * 1024) {
+    return { ok: false, msg: `${label} كبير جداً (${(file.size/1024/1024).toFixed(2)}MB). الحد: ${maxMB}MB` };
+  }
+  return { ok: true };
 }
 
 function loadFirebaseConfig() { try { const c = localStorage.getItem('edu_firebase_config'); return c ? JSON.parse(c) : DEFAULT_FIREBASE_CONFIG; } catch { return DEFAULT_FIREBASE_CONFIG; } }
@@ -761,7 +820,6 @@ const DB = {
     try { return fbDB.onValue(fbDB.ref(fbDB.db, key), (snapshot) => { callback(DB._toArray(snapshot.val())); }); } catch (e) { return () => {}; }
   }
 };
-
 async function hashPassword(password) {
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const km = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), { name: 'PBKDF2' }, false, ['deriveBits']);
@@ -824,9 +882,74 @@ function showMaintenanceScreen() {
   }
 }
 
+/* ============ ✅ الإعلانات: تظهر في كل الصفحات ============ */
+let _cachedAnnouncements = [];
+let _announcementListenerStarted = false;
 
-/* ⬇️ بداية الجزء الثاني من JavaScript */
+async function loadActiveAnnouncement() {
+  try {
+    _cachedAnnouncements = await DB.get('announcements');
+    renderAnnouncementEverywhere();
+  } catch (e) {}
+}
 
+function getActiveAnnouncement() {
+  const now = Date.now();
+  const active = _cachedAnnouncements.find(a => a.enabled && (!a.startDate || a.startDate <= now) && (!a.endDate || a.endDate >= now));
+  if (!active) return null;
+  const dismissed = localStorage.getItem('edu_announcement_dismissed');
+  if (dismissed === active.id) return null;
+  return active;
+}
+
+function renderAnnouncementEverywhere() {
+  const active = getActiveAnnouncement();
+  const containers = [
+    document.getElementById('announcementContainer'),
+    document.getElementById('announcementContainerQuiz')
+  ];
+  containers.forEach(container => {
+    if (!container) return;
+    if (!active) { container.innerHTML = ''; return; }
+    if (active.type === 'banner' || active.imageUrl) {
+      const bg = active.imageUrl
+        ? `background-image: url('${active.imageUrl}');`
+        : `background: linear-gradient(135deg, ${active.bgColor || '#4f46e5'}, ${active.bgColorEnd || '#8b5cf6'});`;
+      const textDir = detectDirection(active.text || '');
+      const titleDir = detectDirection(active.title || '');
+      container.innerHTML = `<div class="announcement-banner" style="${bg}">
+        <button class="announcement-banner-close" onclick="dismissAnnouncement('${active.id}')" title="إغلاق">✕</button>
+        <div class="announcement-banner-inner">
+          ${active.emoji ? `<span class="announcement-banner-emoji">${active.emoji}</span>` : ''}
+          ${active.title ? `<h2 class="announcement-banner-title" dir="${titleDir}" style="text-align:${titleDir === 'ltr' ? 'left' : 'right'};">${escapeHtml(active.title)}</h2>` : ''}
+          ${active.text ? `<p class="announcement-banner-text" dir="${textDir}" style="text-align:${textDir === 'ltr' ? 'left' : 'right'};">${escapeHtml(active.text)}</p>` : ''}
+          ${active.link ? `<a href="${escapeHtml(active.link)}" target="_blank" rel="noopener" class="announcement-banner-cta">${escapeHtml(active.linkText || 'اعرف أكثر')} ←</a>` : ''}
+        </div>
+      </div>`;
+    } else {
+      const textDir = detectDirection(active.text || '');
+      container.innerHTML = `<div class="announcement-bar" style="background: linear-gradient(135deg, ${active.bgColor || 'var(--primary)'}, ${active.bgColorEnd || 'var(--purple)'});">
+        <span class="announcement-bar-emoji">${active.emoji || '📢'}</span>
+        <div class="announcement-bar-content" dir="${textDir}" style="text-align:${textDir === 'ltr' ? 'left' : 'right'};">
+          ${active.title ? `<strong>${escapeHtml(active.title)}:</strong> ` : ''}${escapeHtml(active.text)}
+          ${active.link ? ` <a href="${escapeHtml(active.link)}" target="_blank" rel="noopener">${escapeHtml(active.linkText || 'اعرف أكثر')}</a>` : ''}
+        </div>
+        <button class="announcement-bar-close" onclick="dismissAnnouncement('${active.id}')" title="إغلاق">✕</button>
+      </div>`;
+    }
+  });
+}
+
+function dismissAnnouncement(id) {
+  localStorage.setItem('edu_announcement_dismissed', id);
+  renderAnnouncementEverywhere();
+}
+
+/* ✅ مراقب لتحديث الإعلانات عند تبديل الشاشات */
+function ensureAnnouncementsOnScreens() {
+  // إعادة رسم الإعلانات عند تبديل الشاشة
+  renderAnnouncementEverywhere();
+}
 async function ensureUserProfile(fbUser, existingProfile) {
   if (existingProfile) return existingProfile;
   const fallback = {
@@ -933,60 +1056,6 @@ function calculateXPForAttempt(attempt) {
   else if (pct >= 80) xp += 20;
   else if (pct >= 50) xp += 10;
   return xp;
-}
-
-/* ============ ANNOUNCEMENTS: Load + Render (Bar/Banner) ============ */
-async function loadActiveAnnouncement() {
-  try {
-    const announcements = await DB.get('announcements');
-    const now = Date.now();
-    const active = announcements.find(a => a.enabled && (!a.startDate || a.startDate <= now) && (!a.endDate || a.endDate >= now));
-    const dismissed = localStorage.getItem('edu_announcement_dismissed');
-    if (dismissed && active && dismissed === active.id) return;
-    renderAnnouncement(active);
-  } catch (e) {}
-}
-
-function renderAnnouncement(active) {
-  const containers = [document.getElementById('announcementContainer'), document.getElementById('announcementContainerQuiz')];
-  containers.forEach(container => {
-    if (!container) return;
-    if (!active) { container.innerHTML = ''; return; }
-
-    // ✅ بانر كامل إذا كان النوع banner أو لديه صورة
-    if (active.type === 'banner' || active.imageUrl) {
-      const bg = active.imageUrl
-        ? `background-image: url('${active.imageUrl}');`
-        : `background: linear-gradient(135deg, ${active.bgColor || '#4f46e5'}, ${active.bgColorEnd || '#8b5cf6'});`;
-      const textDir = detectDirection(active.text || '');
-      const titleDir = detectDirection(active.title || '');
-      container.innerHTML = `<div class="announcement-banner" style="${bg}">
-        <button class="announcement-banner-close" onclick="dismissAnnouncement('${active.id}')" title="إغلاق">✕</button>
-        <div class="announcement-banner-inner">
-          ${active.emoji ? `<span class="announcement-banner-emoji">${active.emoji}</span>` : ''}
-          ${active.title ? `<h2 class="announcement-banner-title" dir="${titleDir}" style="text-align:${titleDir === 'ltr' ? 'left' : 'right'};">${escapeHtml(active.title)}</h2>` : ''}
-          ${active.text ? `<p class="announcement-banner-text" dir="${textDir}" style="text-align:${textDir === 'ltr' ? 'left' : 'right'};">${escapeHtml(active.text)}</p>` : ''}
-          ${active.link ? `<a href="${escapeHtml(active.link)}" target="_blank" rel="noopener" class="announcement-banner-cta">${escapeHtml(active.linkText || 'اعرف أكثر')} ←</a>` : ''}
-        </div>
-      </div>`;
-    } else {
-      // شريط بسيط
-      const textDir = detectDirection(active.text || '');
-      container.innerHTML = `<div class="announcement-bar" style="background: linear-gradient(135deg, ${active.bgColor || 'var(--primary)'}, ${active.bgColorEnd || 'var(--purple)'});">
-        <span class="announcement-bar-emoji">${active.emoji || '📢'}</span>
-        <div class="announcement-bar-content" dir="${textDir}" style="text-align:${textDir === 'ltr' ? 'left' : 'right'};">
-          ${active.title ? `<strong>${escapeHtml(active.title)}:</strong> ` : ''}${escapeHtml(active.text)}
-          ${active.link ? ` <a href="${escapeHtml(active.link)}" target="_blank" rel="noopener">${escapeHtml(active.linkText || 'اعرف أكثر')}</a>` : ''}
-        </div>
-        <button class="announcement-bar-close" onclick="dismissAnnouncement('${active.id}')" title="إغلاق">✕</button>
-      </div>`;
-    }
-  });
-}
-
-function dismissAnnouncement(id) {
-  localStorage.setItem('edu_announcement_dismissed', id);
-  document.querySelectorAll('.announcement-bar, .announcement-banner').forEach(el => el.parentElement.innerHTML = '');
 }
 
 /* ============ AUTH ============ */
@@ -1391,6 +1460,7 @@ async function checkSession() {
 function enterDashboard() {
   if (platformSettings.maintenanceMode && !isAdmin(currentUser)) { showMaintenanceScreen(); return; }
   showScreen('dashboard');
+  /* ✅ تحميل الإعلانات في كل الصفحات بعد تبديل الشاشة */
   loadActiveAnnouncement();
   updateHeader();
   updateNotifBadge();
@@ -1421,10 +1491,6 @@ function updateHeader() {
   }
   document.getElementById('userMeta').textContent = meta;
 }
-
-
-/* ⬇️ بداية الجزء الثالث من JavaScript */
-
 /* ============ NOTIFICATIONS ============ */
 async function updateNotifBadge() {
   if (!currentUser) return;
@@ -1475,7 +1541,6 @@ async function notifyStudents(quiz) {
 /* ============ MODAL ============ */
 function openModal(html) { document.getElementById('modalBox').innerHTML = html; document.getElementById('modalOverlay').classList.add('active'); bindAutoDirToInputs(); }
 function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
-
 /* ============ ADMIN DASHBOARD ============ */
 async function renderAdminDashboard() {
   showLoading();
@@ -1635,7 +1700,6 @@ async function applyAdminFilters(tab) {
   const body = document.getElementById(`usersListBody_${tab}`);
   if (body) body.innerHTML = renderUsersBody(filtered, allAttempts, tab);
 }
-
 /* ============ ADMIN: QUIZZES ============ */
 async function renderAdminQuizzes() {
   showLoading();
@@ -1776,7 +1840,7 @@ async function renderAdminStats() {
     if (c2) new Chart(c2, { type: 'bar', data: { labels: labels7, datasets: [{ label: 'محاولات', data: attempts7, backgroundColor: 'rgba(16,185,129,0.7)', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'المحاولات اليومية', font: { size: 16, weight: 'bold' } } } } });
     const dist = { 'ممتاز (90+)': 0, 'جيد جداً (80-89)': 0, 'جيد (70-79)': 0, 'مقبول (50-69)': 0, 'ضعيف (<50)': 0 };
     allAttempts.forEach(a => {
-      const pct = Math.round((a.score / a.total) * 100);
+      const pct = a.total > 0 ? Math.round((a.score / a.total) * 100) : 0;
       if (pct >= 90) dist['ممتاز (90+)']++;
       else if (pct >= 80) dist['جيد جداً (80-89)']++;
       else if (pct >= 70) dist['جيد (70-79)']++;
@@ -1951,12 +2015,12 @@ async function resetStudentGamification(studentId) {
     renderAdminGamification();
   } finally { hideLoading(); }
 }
-
-/* ============ ADMIN: ANNOUNCEMENTS (Bar + Banner) ============ */
+/* ============ ADMIN: ANNOUNCEMENTS ============ */
 async function renderAdminAnnouncements() {
   showLoading();
   try {
     const announcements = await DB.get('announcements');
+    _cachedAnnouncements = announcements;
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
       <div class="card" style="background: linear-gradient(135deg, #ec4899, #8b5cf6); color:#fff;">
@@ -2022,7 +2086,7 @@ async function openAnnouncementEditor(id = null) {
       </div>
       <input type="file" accept="image/*" class="form-input" id="annImageFile" onchange="handleAnnImageUpload(event)">
       ${a?.imageUrl ? `<button class="btn btn-sm btn-danger" onclick="removeAnnImage()" style="margin-top:6px;">🗑 إزالة الصورة</button>` : ''}
-      <p style="font-size:11px;color:var(--text-light);margin-top:6px;">الحد: ${platformSettings.maxUploadSizeMB}MB • يُستخدم كخلفية للبانر</p>
+      <p style="font-size:11px;color:var(--text-light);margin-top:6px;">الحد: ${MAX_IMAGE_SIZE_MB}MB • يتم ضغطها تلقائياً • تُستخدم كخلفية للبانر</p>
     </div>
 
     <div class="form-group"><label class="form-label">الإيموجي</label><input type="text" class="form-input" id="annEmoji" value="${escapeHtml(a?.emoji || '📢')}" maxlength="4" style="text-align:center;font-size:24px;"></div>
@@ -2048,33 +2112,41 @@ function pickAnnType(type) {
   document.getElementById('annTypeBanner').classList.toggle('active', type === 'banner');
 }
 
+/* ✅ إصلاح: رفع صورة الإعلان مع ضغط تلقائي */
 async function handleAnnImageUpload(e) {
-  const f = e.target.files[0]; if (!f) return;
-  const maxMB = platformSettings.maxUploadSizeMB || 20;
-  if (f.size > maxMB * 1024 * 1024) { alert(`الصورة كبيرة (الحد ${maxMB}MB)`); e.target.value = ''; return; }
-  if (!f.type.startsWith('image/')) { alert('اختر صورة فقط'); e.target.value = ''; return; }
-
-  if (!firebaseStorageEnabled) {
-    if (f.size > 500 * 1024) { alert('Storage غير مفعّل، الحد 500KB'); e.target.value = ''; return; }
-    const r = new FileReader();
-    r.onload = (ev) => {
-      _tempAnnImage = ev.target.result;
-      document.getElementById('annImagePreview').innerHTML = `<img src="${ev.target.result}" style="max-width:100%;max-height:160px;border-radius:10px;">`;
-    };
-    r.readAsDataURL(f);
-    return;
-  }
+  const originalFile = e.target.files[0]; if (!originalFile) return;
+  if (!originalFile.type.startsWith('image/')) { alert('اختر صورة فقط'); e.target.value = ''; return; }
+  const sizeCheck = validateFileSize(originalFile, MAX_IMAGE_SIZE_MB, 'الصورة');
+  if (!sizeCheck.ok) { alert(sizeCheck.msg); e.target.value = ''; return; }
 
   showLoading();
   try {
-    const path = `announcements/${Date.now()}_${f.name}`;
+    /* ضغط الصورة */
+    let file;
+    try { file = await compressImage(originalFile); }
+    catch (err) { file = originalFile; }
+
+    if (!firebaseStorageEnabled) {
+      if (file.size > 800 * 1024) { alert('Storage غير مفعّل، الحد بعد الضغط 800KB'); e.target.value = ''; hideLoading(); return; }
+      const r = new FileReader();
+      r.onload = (ev) => {
+        _tempAnnImage = ev.target.result;
+        _tempAnnImagePath = null;
+        document.getElementById('annImagePreview').innerHTML = `<img src="${ev.target.result}" style="max-width:100%;max-height:160px;border-radius:10px;">`;
+      };
+      r.readAsDataURL(file);
+      hideLoading();
+      return;
+    }
+
+    const path = `announcements/${Date.now()}_${file.name}`;
     const storageRef = fbStorage.ref(fbStorage.storage, path);
-    await fbStorage.uploadBytes(storageRef, f);
+    await fbStorage.uploadBytes(storageRef, file);
     const downloadURL = await fbStorage.getDownloadURL(storageRef);
     _tempAnnImage = downloadURL;
     _tempAnnImagePath = path;
     document.getElementById('annImagePreview').innerHTML = `<img src="${downloadURL}" style="max-width:100%;max-height:160px;border-radius:10px;">`;
-    alert('✅ تم رفع الصورة. اضغط "حفظ" للتأكيد.');
+    alert(`✅ تم رفع الصورة (${(file.size/1024).toFixed(0)}KB). اضغط "حفظ" للتأكيد.`);
   } catch (err) { alert('فشل الرفع: ' + err.message); }
   finally { hideLoading(); }
 }
@@ -2117,10 +2189,13 @@ async function saveAnnouncement(id) {
       announcements.push({ id: uid(), emoji, title, text, link, linkText, bgColor, bgColorEnd, type, imageUrl, imagePath, startDate: startDate ? new Date(startDate).getTime() : null, endDate: endDate ? new Date(endDate).getTime() : null, enabled: true, createdAt: Date.now() });
     }
     await DB.set('announcements', announcements);
+    _cachedAnnouncements = announcements;
     await logActivity(id ? 'تعديل إعلان' : 'إنشاء إعلان', title || text.slice(0, 30));
     launchConfetti(20);
     alert('✅ تم الحفظ');
     closeModal();
+    /* ✅ إعادة رسم الإعلانات فوراً في كل الصفحات */
+    renderAnnouncementEverywhere();
     renderAdminAnnouncements();
   } finally { hideLoading(); }
 }
@@ -2130,7 +2205,13 @@ async function toggleAnnouncement(id) {
   try {
     const announcements = await DB.get('announcements');
     const idx = announcements.findIndex(a => a.id === id);
-    if (idx >= 0) { announcements[idx].enabled = !announcements[idx].enabled; await DB.set('announcements', announcements); renderAdminAnnouncements(); }
+    if (idx >= 0) {
+      announcements[idx].enabled = !announcements[idx].enabled;
+      await DB.set('announcements', announcements);
+      _cachedAnnouncements = announcements;
+      renderAnnouncementEverywhere();
+      renderAdminAnnouncements();
+    }
   } finally { hideLoading(); }
 }
 
@@ -2143,9 +2224,12 @@ async function deleteAnnouncement(id) {
     if (ann?.imagePath && firebaseStorageEnabled) {
       try { await fbStorage.deleteObject(fbStorage.ref(fbStorage.storage, ann.imagePath)); } catch (e) {}
     }
-    await DB.set('announcements', announcements.filter(a => a.id !== id));
+    const filtered = announcements.filter(a => a.id !== id);
+    await DB.set('announcements', filtered);
+    _cachedAnnouncements = filtered;
     await logActivity('حذف إعلان', id);
     alert('تم الحذف');
+    renderAnnouncementEverywhere();
     renderAdminAnnouncements();
   } finally { hideLoading(); }
 }
@@ -2370,10 +2454,6 @@ function renderPendingTeacherDashboard() {
     <p style="color:var(--text-light);">مرحباً ${escapeHtml(currentUser.name)}! سيتم مراجعة طلبك قريباً.</p>
   </div>`;
 }
-
-
-/* ⬇️ بداية الجزء الرابع (الأخير) */
-
 /* ============ TEACHER DASHBOARD ============ */
 async function renderTeacherDashboard() {
   showLoading();
@@ -2443,7 +2523,7 @@ async function renderTeacherDashboard() {
       ${students.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا طلاب</h3></div></div>` : renderStudentsList(students, allAttempts)}
       ${platformSettings.leaderboardEnabled ? `<div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">🏆 لوحة الشرف</h2></div></div>${renderLeaderboard(allUsers, allAttempts)}` : ''}
       <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">آخر النتائج</h2></div></div>
-      ${attempts.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا نتائج</h3></div></div>` : await renderAttemptsList(attempts.sort((a,b) => b.createdAt - a.createdAt).slice(0, 20))}
+      ${attempts.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا نتائج</h3></div></div>` : await renderAttemptsList([...attempts].sort((a,b) => b.createdAt - a.createdAt).slice(0, 20))}
     `;
 
     const ctx = document.getElementById('teacherChart')?.getContext('2d');
@@ -2451,7 +2531,7 @@ async function renderTeacherDashboard() {
       const names = quizzes.map(q => q.title.length > 15 ? q.title.slice(0, 15) + '...' : q.title);
       const avgs = quizzes.map(q => {
         const at = attempts.filter(a => a.quizId === q.id);
-        return at.length ? Math.round(at.reduce((s, a) => s + (a.score / a.total) * 100, 0) / at.length) : 0;
+        return at.length ? Math.round(at.reduce((s, a) => s + (a.total > 0 ? (a.score / a.total) * 100 : 0), 0) / at.length) : 0;
       });
       new Chart(ctx, { type: 'bar', data: { labels: names, datasets: [{ label: 'متوسط %', data: avgs, backgroundColor: 'rgba(79,70,229,0.7)', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100 } } } });
     }
@@ -2562,7 +2642,7 @@ async function renderAttemptsList(attempts) {
     const quiz = allQuizzes.find(q => q.id === a.quizId);
     const student = allUsers.find(u => u.id === a.studentId);
     if (!quiz || !student) return '';
-    const pct = Math.round((a.score / a.total) * 100);
+    const pct = a.total > 0 ? Math.round((a.score / a.total) * 100) : 0;
     const pending = a.needsGrading && !a.graded;
     return `<div class="history-item">
       <div class="history-info"><h4>${escapeHtml(student.name)}</h4><p>${escapeHtml(quiz.title)} • ${new Date(a.createdAt).toLocaleDateString('ar-EG')}</p></div>
@@ -2572,7 +2652,6 @@ async function renderAttemptsList(attempts) {
     </div>`;
   }).join('')}</div>`;
 }
-
 /* ============ STUDENT DASHBOARD ============ */
 async function renderStudentDashboard() {
   showLoading();
@@ -2651,7 +2730,7 @@ async function renderStudentDashboard() {
     const ctx = document.getElementById('studentChart')?.getContext('2d');
     if (ctx && myAttempts.length > 0) {
       const labels = myAttempts.slice(0, 10).reverse().map(a => { const q = allQuizzes.find(x => x.id === a.quizId); return q ? q.title.slice(0, 10) : 'اختبار'; });
-      const data = myAttempts.slice(0, 10).reverse().map(a => Math.round((a.score / a.total) * 100));
+      const data = myAttempts.slice(0, 10).reverse().map(a => a.total > 0 ? Math.round((a.score / a.total) * 100) : 0);
       new Chart(ctx, { type: 'line', data: { labels, datasets: [{ label: 'درجاتك %', data, borderColor: '#4f46e5', backgroundColor: 'rgba(79,70,229,0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100 } } } });
     }
   } finally { hideLoading(); }
@@ -2700,7 +2779,7 @@ async function renderAnsweredScreen(filterTab = 'all') {
         filtered.map(a => {
           const quiz = allQuizzes.find(q => q.id === a.quizId);
           if (!quiz) return '';
-          const pct = Math.round((a.score / a.total) * 100);
+          const pct = a.total > 0 ? Math.round((a.score / a.total) * 100) : 0;
           const pending = a.needsGrading && !a.graded;
           return `<div class="quiz-result-card">
             <div class="quiz-result-header">
@@ -2831,7 +2910,7 @@ async function openChildDetails(childId) {
       ${ca.length === 0 ? `<div class="empty-state"><h3>لا نتائج</h3></div>` : ca.map(a => {
         const quiz = allQuizzes.find(q => q.id === a.quizId);
         if (!quiz) return '';
-        const pct = Math.round((a.score / a.total) * 100);
+        const pct = a.total > 0 ? Math.round((a.score / a.total) * 100) : 0;
         return `<div class="history-item">
           <div class="history-info"><h4>${escapeHtml(quiz.title)}</h4><p>${getSubjectName(quiz.subject)} • ${new Date(a.createdAt).toLocaleDateString('ar-EG')}</p></div>
           <div class="history-score">${a.score}/${a.total}</div>
@@ -2840,7 +2919,6 @@ async function openChildDetails(childId) {
       }).join('')}`);
   } finally { hideLoading(); }
 }
-
 /* ============ TEACHER PROFILE + CONTENT ============ */
 function openTeacherProfileEdit() {
   if (currentUser.role !== 'teacher') { alert('للمدرسين فقط'); return; }
@@ -2855,33 +2933,39 @@ function openTeacherProfileEdit() {
         <button class="btn btn-primary btn-sm" onclick="document.getElementById('avatarFile').click()">📷 صورة</button>
         ${u.photoURL ? `<button class="btn btn-danger btn-sm" onclick="removeAvatar()">🗑 إزالة</button>` : ''}
       </div>
-      <p style="font-size:11px;color:var(--text-light);">الحد: ${platformSettings.maxUploadSizeMB}MB</p>
+      <p style="font-size:11px;color:var(--text-light);">الحد: ${MAX_AVATAR_SIZE_MB}MB • يتم ضغطها تلقائياً</p>
     </div>
     <div class="form-group"><label class="form-label">نبذة عنك</label><textarea class="form-textarea auto-dir" id="tBio" maxlength="300" dir="rtl">${escapeHtml(u.bio || '')}</textarea></div>
     <button class="btn btn-success btn-full" onclick="saveTeacherProfile()">💾 حفظ</button>`);
 }
 
+/* ✅ إصلاح: رفع الصورة الشخصية مع ضغط */
 async function handleAvatarUpload(e) {
-  const f = e.target.files[0]; if (!f) return;
-  const maxMB = platformSettings.maxUploadSizeMB || 20;
-  if (f.size > maxMB * 1024 * 1024) { alert(`الصورة كبيرة (الحد ${maxMB}MB)`); e.target.value = ''; return; }
-  if (!f.type.startsWith('image/')) { alert('اختر صورة فقط'); e.target.value = ''; return; }
-  if (!firebaseStorageEnabled) {
-    if (f.size > 500 * 1024) { alert('Storage غير مفعّل، الحد 500KB'); e.target.value = ''; return; }
-    const r = new FileReader();
-    r.onload = (ev) => { _tempAvatar = ev.target.result; document.getElementById('avatarPreview').innerHTML = `<img src="${ev.target.result}">`; };
-    r.readAsDataURL(f);
-    return;
-  }
+  const originalFile = e.target.files[0]; if (!originalFile) return;
+  if (!originalFile.type.startsWith('image/')) { alert('اختر صورة فقط'); e.target.value = ''; return; }
+  const sizeCheck = validateFileSize(originalFile, MAX_AVATAR_SIZE_MB, 'الصورة');
+  if (!sizeCheck.ok) { alert(sizeCheck.msg); e.target.value = ''; return; }
   showLoading();
   try {
+    let file;
+    try { file = await compressImage(originalFile, 600, 0.85); }
+    catch (err) { file = originalFile; }
+
+    if (!firebaseStorageEnabled) {
+      if (file.size > 800 * 1024) { alert('Storage غير مفعّل، الحد بعد الضغط 800KB'); e.target.value = ''; hideLoading(); return; }
+      const r = new FileReader();
+      r.onload = (ev) => { _tempAvatar = ev.target.result; document.getElementById('avatarPreview').innerHTML = `<img src="${ev.target.result}">`; };
+      r.readAsDataURL(file);
+      hideLoading();
+      return;
+    }
     const path = `avatars/${currentUser.id}_${Date.now()}.jpg`;
     const storageRef = fbStorage.ref(fbStorage.storage, path);
-    await fbStorage.uploadBytes(storageRef, f);
+    await fbStorage.uploadBytes(storageRef, file);
     const downloadURL = await fbStorage.getDownloadURL(storageRef);
     _tempAvatar = downloadURL;
     document.getElementById('avatarPreview').innerHTML = `<img src="${downloadURL}">`;
-    alert('✅ تم الرفع. اضغط "حفظ" للتأكيد.');
+    alert(`✅ تم الرفع (${(file.size/1024).toFixed(0)}KB). اضغط "حفظ" للتأكيد.`);
   } catch (err) { alert('فشل الرفع: ' + err.message); }
   finally { hideLoading(); }
 }
@@ -2951,7 +3035,7 @@ function renderContentModal(activeTab = 'videos') {
       <div class="form-group">
         <label class="form-label">➕ رفع ملزمة</label>
         <input type="file" class="form-input" id="newMaterialFile" accept=".pdf,.doc,.docx,image/*,.ppt,.pptx" onchange="handleMaterialUpload(event)">
-        <p style="font-size:11px;color:var(--text-light);margin-top:6px;">الحد: ${platformSettings.maxUploadSizeMB}MB</p>
+        <p style="font-size:11px;color:var(--text-light);margin-top:6px;">الحد: ${MAX_MATERIAL_SIZE_MB}MB</p>
       </div>
       <h4 style="font-size:15px;font-weight:800;margin:16px 0 10px;">📋 الملازم (${materials.length})</h4>
       ${materialsHtml}
@@ -2995,10 +3079,12 @@ async function removeVideoLink(index) {
   } finally { hideLoading(); }
 }
 
+/* ✅ إصلاح: رفع الملازم مع التحقق من الحجم */
 async function handleMaterialUpload(e) {
   const f = e.target.files[0]; if (!f) return;
-  const maxMB = platformSettings.maxUploadSizeMB || 20;
-  if (f.size > maxMB * 1024 * 1024) { alert(`الحد ${maxMB}MB`); e.target.value = ''; return; }
+  const sizeCheck = validateFileSize(f, MAX_MATERIAL_SIZE_MB, 'الملف');
+  if (!sizeCheck.ok) { alert(sizeCheck.msg); e.target.value = ''; return; }
+
   if (firebaseStorageEnabled) {
     showLoading();
     try {
@@ -3145,7 +3231,6 @@ async function renderTeachersForParent() {
   if (teachers.length === 0) return `<div class="card"><div class="empty-state"><h3>لا يوجد مدرسون</h3></div></div>`;
   return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px;">${teachers.map(t => renderTeacherCard(t, false)).join('')}</div>`;
 }
-
 /* ============ QUIZ CREATION ============ */
 function openNewQuizModal() {
   editingQuizId = null;
@@ -3195,6 +3280,8 @@ function showQuestionsEditor() {
 }
 
 function openAddQuestionForm() { selectedQuestionType = 'mcq'; tfAnswer = true; uploadedImageData = null; renderAddQuestionForm(); }
+
+/* ✅ إصلاح: style مكرر + رفع صورة السؤال مع ضغط */
 function renderAddQuestionForm() {
   let fieldsHtml = '';
   if (selectedQuestionType === 'mcq') fieldsHtml = `<div class="form-group"><label class="form-label">الخيارات</label>${[0, 1, 2, 3].map(i => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><input type="radio" name="correctOption" value="${i}" ${i === 0 ? 'checked' : ''} style="width:20px;height:20px;"><input type="text" class="form-input auto-dir" id="opt${i}" placeholder="الخيار ${i + 1}" dir="rtl"></div>`).join('')}</div>`;
@@ -3208,19 +3295,31 @@ function renderAddQuestionForm() {
     ${fieldsHtml}
     <button class="btn btn-primary btn-full" onclick="addQuestion()">إضافة</button>`);
 }
+
 function changeQType(t) { selectedQuestionType = t; const txt = document.getElementById('qText')?.value || ''; renderAddQuestionForm(); const ta = document.getElementById('qText'); if (ta) ta.value = txt; }
 function pickTFAnswer(v, btn) { tfAnswer = v; document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); }
-function handleImageUpload(e) {
-  const f = e.target.files[0]; if (!f) return;
-  if (f.size > 800 * 1024) { alert('الصورة كبيرة (الحد 800KB)'); e.target.value = ''; return; }
-  const r = new FileReader();
-  r.onload = (ev) => {
-    uploadedImageData = ev.target.result;
-    document.getElementById('imagePreview').innerHTML = `<img src="${uploadedImageData}" style="max-width:100%;max-height:160px;border-radius:10px;"><button class="btn btn-sm btn-danger" onclick="clearImage()" style="margin-top:6px;">🗑</button>`;
-  };
-  r.readAsDataURL(f);
+
+/* ✅ إصلاح: ضغط صورة السؤال + حد 5MB */
+async function handleImageUpload(e) {
+  const originalFile = e.target.files[0]; if (!originalFile) return;
+  if (!originalFile.type.startsWith('image/')) { alert('اختر صورة فقط'); e.target.value = ''; return; }
+  const sizeCheck = validateFileSize(originalFile, MAX_IMAGE_SIZE_MB, 'الصورة');
+  if (!sizeCheck.ok) { alert(sizeCheck.msg); e.target.value = ''; return; }
+  try {
+    let file;
+    try { file = await compressImage(originalFile, 1200, 0.8); }
+    catch (err) { file = originalFile; }
+    if (file.size > 900 * 1024) { alert('الصورة كبيرة بعد الضغط (الحد 900KB)'); e.target.value = ''; return; }
+    const r = new FileReader();
+    r.onload = (ev) => {
+      uploadedImageData = ev.target.result;
+      document.getElementById('imagePreview').innerHTML = `<img src="${uploadedImageData}" style="max-width:100%;max-height:160px;border-radius:10px;"><button class="btn btn-sm btn-danger" onclick="clearImage()" style="margin-top:6px;">🗑</button>`;
+    };
+    r.readAsDataURL(file);
+  } catch (err) { alert('فشل معالجة الصورة'); e.target.value = ''; }
 }
 function clearImage() { uploadedImageData = null; document.getElementById('imagePreview').innerHTML = ''; const fi = document.getElementById('qImageFile'); if (fi) fi.value = ''; }
+
 function addQuestion() {
   const text = document.getElementById('qText').value.trim();
   if (!text) { alert('أدخل السؤال'); return; }
@@ -3241,6 +3340,7 @@ function addQuestion() {
   showQuestionsEditor();
 }
 function removeQuestion(i) { newQuizData.questions.splice(i, 1); showQuestionsEditor(); }
+
 async function saveQuiz() {
   if (!newQuizData.questions.length) return;
   if (newQuizData.questions.length < platformSettings.minQuizQuestions) { alert(`أدنى عدد أسئلة: ${platformSettings.minQuizQuestions}`); return; }
@@ -3284,7 +3384,7 @@ async function openQuizManage(quizId) {
       </div>
       ${attempts.length > 0 ? `<h4 style="margin:20px 0 12px;">النتائج (${attempts.length})</h4>${attempts.map(a => {
         const st = users.find(u => u.id === a.studentId);
-        const pct = Math.round((a.score / a.total) * 100);
+        const pct = a.total > 0 ? Math.round((a.score / a.total) * 100) : 0;
         return `<div class="history-item"><div class="history-info"><h4>${escapeHtml(st?.name || '')}</h4></div><div class="history-score">${a.score}/${a.total}</div><span class="badge badge-${pct>=80?'success':pct>=50?'warning':'danger'}">${pct}%</span></div>`;
       }).join('')}` : ''}
       <div style="display:flex;gap:8px;margin-top:20px;">
@@ -3428,7 +3528,7 @@ async function exportResults() {
       'الطالب': student?.name || '', 'المدرسة': student?.school || '',
       'ولي الأمر': student?.parentName || '', 'هاتف': student?.parentPhone || '',
       'الاختبار': quiz?.title || '', 'المادة': getSubjectName(quiz?.subject),
-      'الدرجة': a.score, 'الإجمالي': a.total, 'النسبة %': Math.round((a.score / a.total) * 100),
+      'الدرجة': a.score, 'الإجمالي': a.total, 'النسبة %': a.total > 0 ? Math.round((a.score / a.total) * 100) : 0,
       'XP': student?.xp || 0,
       'التاريخ': new Date(a.createdAt).toLocaleDateString('ar-EG')
     };
@@ -3454,7 +3554,6 @@ async function exportStudents() {
   XLSX.utils.book_append_sheet(wb, ws, 'الطلاب');
   XLSX.writeFile(wb, 'الطلاب.xlsx');
 }
-
 /* ============ TAKE QUIZ ============ */
 async function startQuiz(quizId) {
   showLoading();
@@ -3467,11 +3566,13 @@ async function startQuiz(quizId) {
     currentQuiz = quiz; currentQuestionIndex = 0; currentAnswers = [];
     selectedAnswerIndex = null; tfSelected = null;
     showScreen('quiz');
+    /* ✅ تحميل الإعلانات في شاشة الاختبار */
     loadActiveAnnouncement();
     renderCurrentQuestion();
   } finally { hideLoading(); }
 }
 
+/* ✅ إصلاح: style مكرر في <h3> */
 function renderCurrentQuestion() {
   const q = currentQuiz.questions[currentQuestionIndex];
   const ti = QUESTION_TYPES[q.type] || QUESTION_TYPES.mcq;
@@ -3490,7 +3591,7 @@ function renderCurrentQuestion() {
     <div class="question-type-badge qtype-${q.type}">${ti.emoji} ${ti.name}</div>
     ${q.image ? `<img src="${q.image}" class="question-image">` : ''}
     <div style="background:var(--primary-light);padding:20px;border-radius:14px;margin-bottom:20px;border-right:4px solid var(--primary);">
-      <h3 style="font-size:18px;font-weight:800;" dir="${dir}" style="text-align:${dir === 'ltr' ? 'left' : 'right'};">${escapeHtml(q.text)}</h3>
+      <h3 dir="${dir}" style="font-size:18px;font-weight:800;text-align:${dir === 'ltr' ? 'left' : 'right'};">${escapeHtml(q.text)}</h3>
     </div>
     ${answerHtml}
     <div style="margin-top:20px;">
@@ -3554,6 +3655,8 @@ function checkAnswer(q, a) {
   if (q.type === 'essay') return null;
   return false;
 }
+
+/* ✅ إصلاح: معالجة الاختبار المقالي بالكامل */
 async function finishQuiz() {
   clearInterval(timerInterval);
   showLoading();
@@ -3579,17 +3682,19 @@ async function finishQuiz() {
     const freshUsers = await DB.get('users');
     const freshMe = freshUsers.find(u => u.id === currentUser.id);
     if (freshMe) currentUser = freshMe;
-    const pct = autoGraded > 0 ? Math.round((score / autoGraded) * 100) : 0;
-    const emoji = pct >= 80 ? '🏆' : pct >= 50 ? '👍' : '💪';
-    const title = pct >= 80 ? 'ممتاز! 🎉' : pct >= 50 ? 'جيد جداً' : 'حاول مرة أخرى';
+    const pct = autoGraded > 0 ? Math.round((score / autoGraded) * 100) : null;
     const essayCount = currentQuiz.questions.filter(q => q.type === 'essay').length;
-    if (pct >= 80) launchConfetti(100);
+    let emoji, title, color;
+    if (pct === null) { emoji = '⏳'; title = 'بانتظار التصحيح'; color = 'var(--warning)'; }
+    else if (pct >= 80) { emoji = '🏆'; title = 'ممتاز! 🎉'; color = 'var(--success)'; launchConfetti(100); }
+    else if (pct >= 50) { emoji = '👍'; title = 'جيد جداً'; color = 'var(--primary)'; }
+    else { emoji = '💪'; title = 'حاول مرة أخرى'; color = 'var(--danger)'; }
     document.getElementById('quizContent').innerHTML = `
       <div style="text-align:center;padding:20px 0;">
         <div style="font-size:80px;margin-bottom:16px;">${emoji}</div>
-        <h2 style="font-size:26px;font-weight:900;margin-bottom:12px;color:${pct>=80?'var(--success)':pct>=50?'var(--primary)':'var(--danger)'};">${title}</h2>
+        <h2 style="font-size:26px;font-weight:900;margin-bottom:12px;color:${color};">${title}</h2>
         <div style="font-size:56px;font-weight:900;color:var(--primary);">${score}<span style="font-size:28px;color:var(--text-light);"> / ${autoGraded}</span></div>
-        <p style="font-size:20px;font-weight:700;color:var(--text-light);">${pct}% (التلقائي)</p>
+        <p style="font-size:20px;font-weight:700;color:var(--text-light);">${pct !== null ? pct + '% (التلقائي)' : 'سيتم تصحيح الأسئلة المقالية قريباً'}</p>
         <div class="alert alert-success" style="margin-top:16px;">🎉 <strong>+${xpGain} XP</strong> • إجمالي: ${currentUser.xp || 0} XP</div>
         ${newBadges.length > 0 ? `<div class="alert alert-warning" style="text-align:right;">🏆 <strong>شارات جديدة:</strong> ${newBadges.map(b => `${BADGES[b].emoji} ${BADGES[b].name}`).join(' • ')}</div>` : ''}
         ${essayCount > 0 ? `<div class="alert alert-warning" style="text-align:right;">📄 لديك ${essayCount} سؤال مقالي</div>` : ''}
@@ -3618,6 +3723,15 @@ window.addEventListener('DOMContentLoaded', async () => {
   const ok = await checkSession();
   if (!ok) { loadActiveAnnouncement(); showScreen('auth'); }
 });
+
+/* ✅ مراقب لتبديل الشاشات لتحديث الإعلانات */
+const _screenObserver = new MutationObserver(() => {
+  if (_cachedAnnouncements.length > 0 || true) {
+    renderAnnouncementEverywhere();
+  }
+});
+document.querySelectorAll('.screen').forEach(s => _screenObserver.observe(s, { attributes: true, attributeFilter: ['class'] }));
+
 document.getElementById('modalOverlay').addEventListener('click', (e) => { if (e.target.id === 'modalOverlay') closeModal(); });
 
 const globalFns = [
@@ -3646,3 +3760,4 @@ globalFns.forEach(fn => { try { window[fn.name] = fn; } catch(e) {} });
 </script>
 </body>
 </html>
+
