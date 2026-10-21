@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>منصة تعليمية | EduPlatform Pro</title>
+<title>عِلْم | منصة تعليمية ذكية</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
@@ -410,9 +410,9 @@
   <div class="auth-wrapper">
     <div class="card">
       <div class="auth-header">
-        <div class="auth-logo">🎓</div>
-        <h1 class="auth-title">منصة تعليمية</h1>
-        <p class="auth-subtitle">اختبارات ذكية • تصحيح فوري • متابعة شاملة</p>
+        <div class="auth-logo">📖</div>
+        <h1 class="auth-title">عِلْم</h1>
+        <p class="auth-subtitle">تعلّم بذكاء • اختبر معرفتك</p>
       </div>
       <div class="tabs">
         <button class="tab active" data-tab="login" onclick="switchAuthTab('login')">تسجيل دخول</button>
@@ -454,20 +454,87 @@
           </div>
         </div>
         <div id="studentFields">
-          <div class="form-group"><label class="form-label">المدرسة</label><input type="text" class="form-input auto-dir" id="regSchool" placeholder="اسم المدرسة" dir="rtl" style="text-align:right;"></div>
+          <div class="form-group">
+            <label class="form-label">المحافظة <span style="color:var(--danger)">*</span></label>
+            <select class="form-select" id="regGovernorate" required>
+              <option value="">اختر المحافظة</option>
+              <option value="cairo">القاهرة</option>
+              <option value="alexandria">الإسكندرية</option>
+              <option value="giza">الجيزة</option>
+              <option value="sharqia">الشرقية</option>
+              <option value="dakahlia">الدقهلية</option>
+              <option value="beheira">البحيرة</option>
+              <option value="qalyubia">القليوبية</option>
+              <option value="minya">المنيا</option>
+              <option value="assiut">أسيوط</option>
+              <option value="sohag">سوهاج</option>
+              <option value="gharbia">الغربية</option>
+              <option value="menoufia">المنوفية</option>
+              <option value="kafr-el-sheikh">كفر الشيخ</option>
+              <option value="beni-suef">بني سويف</option>
+              <option value="fayoum">الفيوم</option>
+              <option value="qena">قنا</option>
+              <option value="aswan">أسوان</option>
+              <option value="damietta">دمياط</option>
+              <option value="luxor">الأقصر</option>
+              <option value="ismailia">الإسماعيلية</option>
+              <option value="matrouh">مطروح</option>
+              <option value="north-sinai">شمال سيناء</option>
+              <option value="port-said">بورسعيد</option>
+              <option value="new-valley">الوادي الجديد</option>
+              <option value="suez">السويس</option>
+              <option value="red-sea">البحر الأحمر</option>
+              <option value="south-sinai">جنوب سيناء</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">اسم المدرسة <span style="color:var(--danger)">*</span></label>
+            <input type="text" class="form-input auto-dir" id="regSchool" placeholder="اكتب اسم مدرستك" dir="rtl" style="text-align:right;">
+            <p style="font-size:11px;color:var(--text-light);margin-top:4px;">💡 اكتب اسم المدرسة كاملاً كما هو مسجل في الشهادة</p>
+          </div>
           <div class="form-group"><label class="form-label">المرحلة</label><select class="form-select" id="regStage"><option value="">اختر</option><option value="ابتدائي">ابتدائي</option><option value="إعدادي">إعدادي</option><option value="ثانوي">ثانوي</option></select></div>
           <div class="form-group"><label class="form-label">السنة</label><select class="form-select" id="regGrade"><option value="">اختر</option></select></div>
           <div style="padding:12px;background:var(--info-light);border-radius:12px;margin-bottom:16px;">
             <p style="font-size:13px;font-weight:700;color:var(--info);margin-bottom:10px;">👨‍👩‍👦 بيانات ولي الأمر</p>
             <div class="form-group" style="margin-bottom:10px;"><label class="form-label">اسم ولي الأمر</label><input type="text" class="form-input auto-dir" id="regParentName" dir="rtl" style="text-align:right;"></div>
-            <div class="form-group" style="margin-bottom:0;"><label class="form-label">هاتف ولي الأمر</label><input type="tel" class="form-input" id="regParentPhone" dir="ltr" style="text-align:left;"></div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">هاتف ولي الأمر</label>
+              <input type="tel" class="form-input" id="regParentPhone" dir="ltr" style="text-align:left;" placeholder="مثال: 01012345678">
+              <p style="font-size:11px;color:var(--text-light);margin-top:4px;">💡 إذا كان لديك أشقاء مسجلون بنفس الرقم، سيظهرون تلقائياً لولي أمرك</p>
+            </div>
           </div>
         </div>
         <div id="teacherFields" style="display:none;">
           <div class="form-group"><label class="form-label">المادة</label><select class="form-select" id="regSubject"><option value="">اختر</option></select></div>
+          <div style="padding:14px;background:var(--warning-light);border:2px solid var(--warning);border-radius:12px;margin-bottom:16px;">
+            <h4 style="font-size:14px;font-weight:800;margin-bottom:12px;color:var(--warning);">📋 بيانات التحقق (للمدرسين فقط)</h4>
+            <div class="form-group" style="margin-bottom:10px;">
+              <label class="form-label">رقم بطاقة المدرس *</label>
+              <input type="text" class="form-input auto-dir" id="regTeacherId" placeholder="مثال: 1234567890" dir="rtl">
+            </div>
+            <div class="form-group" style="margin-bottom:10px;">
+              <label class="form-label">المدرسة/الجهة التعليمية *</label>
+              <input type="text" class="form-input auto-dir" id="regTeacherSchool" placeholder="مثال: مدرسة النور الثانوية" dir="rtl">
+            </div>
+            <div class="form-group" style="margin-bottom:10px;">
+              <label class="form-label">سنوات الخبرة</label>
+              <input type="number" class="form-input" id="regTeacherYears" placeholder="عدد سنوات التدريس" min="0" max="50" value="0">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">📸 صورة بطاقة المدرس (اختياري)</label>
+              <input type="file" class="form-input" id="regTeacherCard" accept="image/*" onchange="handleTeacherCardUpload(event)">
+              <p style="font-size:11px;color:var(--text-light);margin-top:4px;">⚠️ الحد: 2MB</p>
+              <div id="teacherCardPreview" style="margin-top:8px;"></div>
+            </div>
+          </div>
         </div>
         <div id="parentFields" style="display:none;">
-          <div class="alert alert-info">📌 يمكنك ربط أبنائك لاحقاً.</div>
+          <div class="form-group">
+            <label class="form-label">رقم هاتفك (للربط التلقائي بأبنائك)</label>
+            <input type="tel" class="form-input" id="regParentOwnPhone" dir="ltr" style="text-align:left;" placeholder="01012345678">
+            <p style="font-size:11px;color:var(--text-light);margin-top:4px;">💡 سيتم ربط أبنائك تلقائياً إذا سجلوا نفس الرقم</p>
+          </div>
+          <div class="alert alert-info">📌 يمكنك ربط أبنائك لاحقاً أيضاً.</div>
         </div>
         <button type="submit" class="btn btn-primary btn-full btn-lg">إنشاء الحساب</button>
       </form>
@@ -520,7 +587,7 @@
 <div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox"></div></div>
 
 <script>
-/* ⬇️ الجزء الثاني من JavaScript */
+  /* ⬇️ الجزء الثاني من JavaScript */
 
 const DEFAULT_FIREBASE_CONFIG = {
   apiKey: "AIzaSyBPuzIkp-Qc4CIBAYsY6hLwAVHwqY3oODg",
@@ -541,6 +608,7 @@ let notifUnsubscribe = null;
 let isProcessingRedirect = false;
 let _tempAvatar = null;
 let _tempAnnImage = null;
+let _tempTeacherCard = null;
 
 let currentUser = null, currentQuiz = null, currentQuestionIndex = 0, currentAnswers = [];
 let selectedAnswerIndex = null, timerInterval = null, timeLeft = 0;
@@ -599,8 +667,8 @@ const BADGES = {
   high_scorer: { name: 'نجم', emoji: '💫', desc: 'حصل على 800 نقطة' }
 };
 const DEFAULT_PLATFORM_SETTINGS = {
-  platformName: 'منصة تعليمية', platformTagline: 'اختبارات ذكية • تصحيح فوري • متابعة شاملة',
-  platformLogo: '🎓', primaryColor: '#4f46e5', secondaryColor: '#7c3aed', theme: 'indigo',
+  platformName: 'عِلْم', platformTagline: 'تعلّم بذكاء • اختبر معرفتك',
+  platformLogo: '📖', primaryColor: '#4f46e5', secondaryColor: '#7c3aed', theme: 'indigo',
   registrationEnabled: true, maintenanceMode: false,
   maintenanceMessage: 'المنصة تحت الصيانة. يرجى المحاولة لاحقاً.',
   maxUploadSizeMB: 4, minQuizQuestions: 1, maxQuizQuestions: 100,
@@ -615,6 +683,20 @@ const MAX_QUESTION_IMAGE_KB = 400;
 const MAX_MATERIAL_SIZE_MB = 4;
 const MAX_IMAGE_DIMENSION = 1280;
 const IMAGE_QUALITY = 0.75;
+
+/* ✅ خريطة المحافظات المصرية */
+const GOVERNORATES_MAP = {
+  'cairo': 'القاهرة', 'alexandria': 'الإسكندرية', 'giza': 'الجيزة',
+  'sharqia': 'الشرقية', 'dakahlia': 'الدقهلية', 'beheira': 'البحيرة',
+  'qalyubia': 'القليوبية', 'minya': 'المنيا', 'assiut': 'أسيوط',
+  'sohag': 'سوهاج', 'gharbia': 'الغربية', 'menoufia': 'المنوفية',
+  'kafr-el-sheikh': 'كفر الشيخ', 'beni-suef': 'بني سويف', 'fayoum': 'الفيوم',
+  'qena': 'قنا', 'aswan': 'أسوان', 'damietta': 'دمياط',
+  'luxor': 'الأقصر', 'ismailia': 'الإسماعيلية', 'matrouh': 'مطروح',
+  'north-sinai': 'شمال سيناء', 'port-said': 'بورسعيد', 'new-valley': 'الوادي الجديد',
+  'suez': 'السويس', 'red-sea': 'البحر الأحمر', 'south-sinai': 'جنوب سيناء'
+};
+function getGovernorateName(id) { return GOVERNORATES_MAP[id] || id; }
 
 function uid() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 9); }
 function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
@@ -728,8 +810,6 @@ function pickRole(role) {
   document.getElementById('studentFields').style.display = role === 'student' ? 'block' : 'none';
   document.getElementById('teacherFields').style.display = role === 'teacher' ? 'block' : 'none';
   document.getElementById('parentFields').style.display = role === 'parent' ? 'block' : 'none';
-  const schoolInput = document.getElementById('regSchool');
-  if (schoolInput) schoolInput.required = (role === 'student');
   if (role === 'teacher') {
     document.getElementById('regSubject').innerHTML = '<option value="">اختر المادة</option>' + SUBJECTS.map(s => `<option value="${s.id}">${s.emoji} ${s.name}</option>`).join('');
   }
@@ -832,10 +912,8 @@ async function initFirebase() {
    ✅ دوال الكتابة المباشرة — تحل مشكلة PERMISSION_DENIED
    ═══════════════════════════════════════════════════════════ */
 
-/* ✅ كتابة عقدة واحدة (users/{uid}, quizzes/{id}, etc.) */
 async function dbSetNode(key, nodeId, data) {
   if (!key || !nodeId) { console.error('dbSetNode: key and nodeId required'); return false; }
-  // اكتب إلى localStorage
   try {
     const d = localStorage.getItem('edu_' + key);
     const arr = d ? JSON.parse(d) : [];
@@ -846,7 +924,6 @@ async function dbSetNode(key, nodeId, data) {
     localStorage.setItem('edu_' + key, JSON.stringify(arr));
   } catch (e) { console.warn('localStorage write failed:', e); }
   
-  // اكتب إلى Firebase مباشرة
   if (firebaseEnabled && fbDB) {
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
@@ -862,7 +939,6 @@ async function dbSetNode(key, nodeId, data) {
   return true;
 }
 
-/* ✅ تحديث عقدة واحدة */
 async function dbUpdateNode(key, nodeId, updates) {
   if (!key || !nodeId) return false;
   try {
@@ -884,7 +960,6 @@ async function dbUpdateNode(key, nodeId, updates) {
   return false;
 }
 
-/* ✅ حذف عقدة واحدة */
 async function dbRemoveNode(key, nodeId) {
   if (!key || !nodeId) return false;
   try {
@@ -905,7 +980,6 @@ async function dbRemoveNode(key, nodeId) {
   return false;
 }
 
-/* ✅ دالة البحث عن مستخدم */
 function findUserByIdOrEmail(users, idOrEmail) {
   if (!idOrEmail) return null;
   const lower = String(idOrEmail).toLowerCase();
@@ -915,7 +989,7 @@ function findUserByIdOrEmail(users, idOrEmail) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ✅ DB - للقراءة والمزامنة (لا للكتابة الجماعية)
+   ✅ DB - للقراءة
    ═══════════════════════════════════════════════════════════ */
 const DB = {
   _toArray(data) {
@@ -960,7 +1034,6 @@ const DB = {
     } catch {}
     return Array.isArray(defaultValue) ? defaultValue : this._toArray(defaultValue);
   },
-  /* ⚠️ DB.set للاستخدام فقط مع البيانات الصغيرة التي ليست في /users */
   async set(key, value) {
     const arr = Array.isArray(value) ? value : this._toArray(value);
     try { localStorage.setItem('edu_' + key, JSON.stringify(arr)); } catch {}
@@ -1039,9 +1112,9 @@ function applyPlatformSettings() {
   const logos = document.querySelectorAll('.auth-logo');
   logos.forEach(t => {
     if (platformSettings.platformLogo && platformSettings.platformLogo.startsWith('http')) t.innerHTML = `<img src="${platformSettings.platformLogo}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;">`;
-    else t.textContent = platformSettings.platformLogo || '🎓';
+    else t.textContent = platformSettings.platformLogo || '📖';
   });
-  document.title = platformSettings.platformName + ' | EduPlatform Pro';
+  document.title = platformSettings.platformName + ' | منصة تعليمية';
   document.documentElement.style.setProperty('--primary', platformSettings.primaryColor);
   document.documentElement.style.setProperty('--secondary', platformSettings.secondaryColor);
   const header = document.querySelector('.dashboard-header');
@@ -1071,7 +1144,7 @@ function applyThemeColors(key) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ✅ الإعلانات - اشتراك فوري
+   ✅ الإعلانات
    ═══════════════════════════════════════════════════════════ */
 let _cachedAnnouncements = [];
 let _announcementUnsubscribe = null;
@@ -1152,7 +1225,7 @@ function renderAnnouncementEverywhere() {
 function dismissAnnouncement(id) { localStorage.setItem('edu_announcement_dismissed', id); renderAnnouncementEverywhere(); }
 
 /* ═══════════════════════════════════════════════════════════
-   ✅ logActivity - كتابة عقدة واحدة
+   ✅ logActivity
    ═══════════════════════════════════════════════════════════ */
 async function logActivity(action, details = '') {
   try {
@@ -1168,7 +1241,7 @@ async function logActivity(action, details = '') {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ✅ XP & Badges & Streak - كتابة مباشرة
+   ✅ XP & Badges & Streak
    ═══════════════════════════════════════════════════════════ */
 async function awardXP(studentId, amount, reason) {
   if (amount <= 0) return;
@@ -1182,7 +1255,6 @@ async function awardXP(studentId, amount, reason) {
       lastXpReason: reason, 
       lastXpAt: Date.now() 
     });
-    // إشعار
     const notifId = uid();
     await dbSetNode('notifications', notifId, { 
       userId: studentId, 
@@ -1261,50 +1333,32 @@ function calculateXPForAttempt(attempt) {
   return xp;
 }
 /* ═══════════════════════════════════════════════════════════
-   ✅ AUTH - حفظ مباشر (يحل PERMISSION_DENIED)
+   ✅ AUTH - مع التحقق من المدرس + المحافظة
    ═══════════════════════════════════════════════════════════ */
 
-/* ✅ ensureUserProfile - حفظ مباشر */
-async function ensureUserProfile(fbUser, existingProfile) {
-  if (existingProfile) return existingProfile;
-  const nameParts = (fbUser.displayName || '').split(/\s+/).filter(p => p.length > 0);
-  const isName3 = nameParts.length >= 3;
-  const fallback = {
-    email: fbUser.email,
-    name: fbUser.displayName || (fbUser.email || '').split('@')[0] || 'مستخدم',
-    role: 'student', 
-    provider: 'google', 
-    photoURL: fbUser.photoURL || null,
-    createdAt: Date.now(), 
-    needsProfileCompletion: !isName3,
-    xp: 0, badges: [], streak: 0, lastQuizDate: null, friends: [], following: []
-  };
-  if (fbUser.email && fbUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-    fallback.role = 'admin'; 
-    fallback.approved = true; 
-    fallback.needsProfileCompletion = false;
-  }
-  
+async function handleTeacherCardUpload(e) {
+  const file = e.target.files[0]; if (!file) return;
+  if (!file.type.startsWith('image/')) { alert('صورة فقط'); e.target.value = ''; return; }
+  const sizeCheck = validateFileSize(file, 2, 'الصورة');
+  if (!sizeCheck.ok) { alert(sizeCheck.msg); e.target.value = ''; return; }
+  showLoading();
   try {
-    // التحقق أولاً من وجود المستخدم
-    const users = await DB.get('users');
-    const exists = users.find(u => u.id === fbUser.uid) || users.find(u => u.email === fbUser.email);
-    if (exists) return exists;
-    
-    // ✅ حفظ مباشر
-    const saved = await dbSetNode('users', fbUser.uid, fallback);
-    if (!saved) {
-      console.error('ensureUserProfile: Failed to save');
-      return { ...fallback, id: fbUser.uid };
-    }
-    return { ...fallback, id: fbUser.uid };
-  } catch (e) {
-    console.error('ensureUserProfile failed:', e);
-    return { ...fallback, id: fbUser.uid };
-  }
+    let compressed;
+    try { compressed = await compressImage(file, 1280, 0.7); }
+    catch { compressed = file; }
+    if (compressed.size > 1.5 * 1024 * 1024) { alert('الصورة كبيرة بعد الضغط'); e.target.value = ''; return; }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      _tempTeacherCard = ev.target.result;
+      document.getElementById('teacherCardPreview').innerHTML = `
+        <img src="${ev.target.result}" style="max-width:100%;max-height:120px;border-radius:8px;border:2px solid var(--success);">
+        <p style="font-size:11px;color:var(--success);margin-top:4px;">✅ تم تجهيز الصورة</p>
+      `;
+    };
+    reader.readAsDataURL(compressed);
+  } finally { hideLoading(); }
 }
 
-/* ✅ handleRegister - حفظ مباشر + فحص نجاح */
 async function handleRegister(e) {
   e.preventDefault();
   if (!platformSettings.registrationEnabled) { showAlert('التسجيل متوقف مؤقتاً', 'warning'); return; }
@@ -1324,25 +1378,56 @@ async function handleRegister(e) {
   };
   
   if (selectedRole === 'student') {
+    const governorate = document.getElementById('regGovernorate').value;
     const school = document.getElementById('regSchool').value.trim();
     const stage = document.getElementById('regStage').value;
     const grade = document.getElementById('regGrade').value;
+    if (!governorate) { showAlert('اختر المحافظة'); return; }
     if (!school) { showAlert('أدخل اسم المدرسة'); return; }
     if (!stage || !grade) { showAlert('اختر المرحلة والسنة'); return; }
-    profile.school = school; profile.stage = stage; profile.grade = grade;
+    
+    profile.governorate = governorate;
+    profile.governorateName = getGovernorateName(governorate);
+    profile.school = school;
+    profile.stage = stage; 
+    profile.grade = grade;
     profile.parentName = document.getElementById('regParentName').value.trim();
     profile.parentPhone = document.getElementById('regParentPhone').value.trim();
+    if (profile.parentPhone && !/^[\d+\- ]{7,20}$/.test(profile.parentPhone)) {
+      showAlert('رقم هاتف ولي الأمر غير صالح'); return;
+    }
   } else if (selectedRole === 'teacher') {
     const subject = document.getElementById('regSubject').value;
     if (!subject) { showAlert('اختر المادة'); return; }
+    const teacherId = document.getElementById('regTeacherId').value.trim();
+    const teacherSchool = document.getElementById('regTeacherSchool').value.trim();
+    const teacherYears = parseInt(document.getElementById('regTeacherYears').value) || 0;
+    if (!teacherId) { showAlert('أدخل رقم بطاقة المدرس'); return; }
+    if (!teacherSchool) { showAlert('أدخل اسم المدرسة/الجهة'); return; }
+    
     profile.subject = subject; 
     profile.approved = false;
+    profile.verificationStatus = 'pending';
+    profile.teacherId = teacherId;
+    profile.teacherSchool = teacherSchool;
+    profile.teacherYears = teacherYears;
+    profile.documents = [];
     profile.bio = ''; 
     profile.videoLinks = []; 
     profile.materialFiles = []; 
     profile.ratings = [];
+    
+    if (_tempTeacherCard) {
+      profile.documents = [{
+        type: 'teacher_card',
+        name: 'بطاقة المدرس',
+        data: _tempTeacherCard,
+        uploadedAt: Date.now()
+      }];
+    }
   } else if (selectedRole === 'parent') { 
     profile.children = []; 
+    profile.phone = document.getElementById('regParentOwnPhone')?.value.trim() || '';
   }
   if (email === ADMIN_EMAIL.toLowerCase()) { 
     profile.role = 'admin'; 
@@ -1353,12 +1438,10 @@ async function handleRegister(e) {
   try {
     if (firebaseAuthEnabled) {
       try {
-        // 1️⃣ إنشاء حساب Firebase Auth
         const cred = await fbAuth.createUserWithEmailAndPassword(fbAuth.auth, email, password);
         const uid = cred.user.uid;
         profile.id = uid;
         
-        // 2️⃣ التحقق من عدم وجود البريد في DB
         const users = await DB.get('users');
         if (users.find(u => u.email === email)) {
           try { await cred.user.delete(); } catch {}
@@ -1366,35 +1449,20 @@ async function handleRegister(e) {
           return;
         }
         
-        // 3️⃣ ✅ حفظ مباشر إلى users/{uid} (وليس /users)
-        const saved = await dbSetNode('users', uid, profile);
+        const profileForDB = { ...profile };
+        delete profileForDB.id;
+        const saved = await dbSetNode('users', uid, profileForDB);
         
-        // 4️⃣ فحص النجاح
         if (!saved) {
           try { await cred.user.delete(); } catch {}
-          showAlert('⚠️ فشل حفظ البيانات في Firebase. تحقق من الصلاحيات.', 'error');
+          showAlert('⚠️ فشل حفظ البيانات. تحقق من الصلاحيات.', 'error');
           return;
         }
         
-        // 5️⃣ التحقق النهائي
-        try {
-          const verifySnapshot = await fbDB.get(fbDB.ref(fbDB.db, `users/${uid}`));
-          if (!verifySnapshot.val()) {
-            try { await cred.user.delete(); } catch {}
-            showAlert('⚠️ البيانات لم تُحفظ. حاول مرة أخرى.', 'error');
-            return;
-          }
-        } catch (vErr) {
-          console.warn('Verification failed:', vErr);
-        }
-        
-        // 6️⃣ تعيين currentUser
+        _tempTeacherCard = null;
         currentUser = profile;
         saveSession(uid, true);
-        
-        // 7️⃣ تسجيل النشاط
         await logActivity('تسجيل حساب جديد', `${name} (${selectedRole})`);
-        
         showAlert('✅ تم إنشاء الحساب بنجاح!', 'success');
         launchConfetti(50);
         setTimeout(() => enterDashboard(), 500);
@@ -1403,22 +1471,21 @@ async function handleRegister(e) {
         console.error('Registration error:', err);
         const msgs = { 
           'auth/email-already-in-use': 'البريد مسجل بالفعل', 
-          'auth/weak-password': 'كلمة المرور ضعيفة (6 أحرف على الأقل)', 
-          'auth/invalid-email': 'البريد غير صالح',
-          'PERMISSION_DENIED': '⚠️ قواعد Firebase تمنع الحفظ'
+          'auth/weak-password': 'كلمة المرور ضعيفة', 
+          'auth/invalid-email': 'البريد غير صالح'
         };
-        showAlert(msgs[err.code] || msgs[err.message] || err.message, 'error');
+        showAlert(msgs[err.code] || err.message, 'error');
       }
       return;
     }
     
-    // Fallback: بدون Firebase Auth
     const users = await DB.get('users');
     if (users.find(u => u.email === email)) { showAlert('هذا البريد مسجل'); return; }
     profile.id = uid();
     profile.passwordHash = await hashPassword(password);
     const saved = await dbSetNode('users', profile.id, profile);
     if (!saved) { showAlert('فشل الحفظ'); return; }
+    _tempTeacherCard = null;
     currentUser = profile;
     saveSession(profile.id, true);
     showAlert('✅ تم إنشاء الحساب!', 'success');
@@ -1427,7 +1494,6 @@ async function handleRegister(e) {
   } finally { hideLoading(); }
 }
 
-/* ✅ handleLogin - يبحث بـ uid ثم email */
 async function handleLogin(e) {
   e.preventDefault();
   const email = document.getElementById('loginEmail').value.trim().toLowerCase();
@@ -1446,11 +1512,9 @@ async function handleLogin(e) {
         if (!user) user = users.find(u => u.email && cred.user.email && u.email.toLowerCase() === cred.user.email.toLowerCase());
         if (!user) user = await ensureUserProfile(cred.user, null);
         
-        // تحديث id إذا كان مختلفاً
         if (user.id !== cred.user.uid) {
           const oldId = user.id;
           user.id = cred.user.uid;
-          // نقل العقدة في Firebase
           if (oldId && oldId !== cred.user.uid) {
             const oldData = { ...user };
             delete oldData.id;
@@ -1459,14 +1523,12 @@ async function handleLogin(e) {
           }
         }
         
-        // تحديث صلاحية الأدمن
         if (email === ADMIN_EMAIL.toLowerCase() && user.role !== 'admin') {
           user.role = 'admin'; 
           user.approved = true;
           await dbUpdateNode('users', user.id, { role: 'admin', approved: true });
         }
         
-        // إصلاح needsProfileCompletion
         const np = (user.name || '').split(/\s+/).filter(x => x.length > 0);
         if (np.length >= 3 && user.needsProfileCompletion) {
           user.needsProfileCompletion = false;
@@ -1487,7 +1549,6 @@ async function handleLogin(e) {
       return;
     }
     
-    // Fallback
     const users = await DB.get('users');
     let user = users.find(u => u.email === email);
     if (!user) { showAlert('البريد أو كلمة المرور خاطئة'); return; }
@@ -1506,7 +1567,6 @@ async function handleLogin(e) {
   } finally { hideLoading(); }
 }
 
-/* ✅ Google Sign In */
 async function handleGoogleSignIn() {
   if (!firebaseAuthEnabled) { showAlert('غير متاح', 'warning'); return; }
   const btn = document.getElementById('googleBtn');
@@ -1532,6 +1592,43 @@ async function handleGoogleSignIn() {
   }
 }
 
+async function ensureUserProfile(fbUser, existingProfile) {
+  if (existingProfile) return existingProfile;
+  const nameParts = (fbUser.displayName || '').split(/\s+/).filter(p => p.length > 0);
+  const isName3 = nameParts.length >= 3;
+  const fallback = {
+    email: fbUser.email,
+    name: fbUser.displayName || (fbUser.email || '').split('@')[0] || 'مستخدم',
+    role: 'student', 
+    provider: 'google', 
+    photoURL: fbUser.photoURL || null,
+    createdAt: Date.now(), 
+    needsProfileCompletion: !isName3,
+    xp: 0, badges: [], streak: 0, lastQuizDate: null, friends: [], following: []
+  };
+  if (fbUser.email && fbUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+    fallback.role = 'admin'; 
+    fallback.approved = true; 
+    fallback.needsProfileCompletion = false;
+  }
+  
+  try {
+    const users = await DB.get('users');
+    const exists = users.find(u => u.id === fbUser.uid) || users.find(u => u.email === fbUser.email);
+    if (exists) return exists;
+    
+    const saved = await dbSetNode('users', fbUser.uid, fallback);
+    if (!saved) {
+      console.error('ensureUserProfile: Failed to save');
+      return { ...fallback, id: fbUser.uid };
+    }
+    return { ...fallback, id: fbUser.uid };
+  } catch (e) {
+    console.error('ensureUserProfile failed:', e);
+    return { ...fallback, id: fbUser.uid };
+  }
+}
+
 async function processGoogleUser(g) {
   if (!g || !g.email) { showAlert('تعذر الحصول على البيانات'); return; }
   const users = await DB.get('users');
@@ -1539,7 +1636,6 @@ async function processGoogleUser(g) {
     || users.find(u => u.email && g.email && u.email.toLowerCase() === g.email.toLowerCase());
   if (!existing && !platformSettings.registrationEnabled) { showAlert('التسجيل متوقف مؤقتاً', 'warning'); return; }
   
-  // تحديث id إذا كان مختلفاً
   if (existing && existing.id !== g.uid) {
     const oldId = existing.id;
     existing.id = g.uid;
@@ -1608,12 +1704,15 @@ function openProfileCompletionModal(isExisting = false) {
       </div>
     </div>
     <div id="gStudentFields" style="display:none;">
+      <div class="form-group"><label class="form-label">المحافظة</label><select class="form-select" id="gGovernorate"><option value="">اختر المحافظة</option>${Object.entries(GOVERNORATES_MAP).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select></div>
       <div class="form-group"><label class="form-label">المدرسة</label><input type="text" class="form-input auto-dir" id="gSchool" dir="rtl"></div>
       <div class="form-group"><label class="form-label">المرحلة</label><select class="form-select" id="gStage"><option value="">اختر</option><option value="ابتدائي">ابتدائي</option><option value="إعدادي">إعدادي</option><option value="ثانوي">ثانوي</option></select></div>
       <div class="form-group"><label class="form-label">السنة</label><select class="form-select" id="gGrade"><option value="">اختر</option></select></div>
     </div>
     <div id="gTeacherFields" style="display:none;">
       <div class="form-group"><label class="form-label">المادة</label><select class="form-select" id="gSubject"><option value="">اختر</option></select></div>
+      <div class="form-group"><label class="form-label">رقم بطاقة المدرس</label><input type="text" class="form-input auto-dir" id="gTeacherId" dir="rtl"></div>
+      <div class="form-group"><label class="form-label">المدرسة/الجهة</label><input type="text" class="form-input auto-dir" id="gTeacherSchool" dir="rtl"></div>
     </div>
     <div id="gParentFields" style="display:none;"><div class="alert alert-info">📌 يمكنك ربط أبنائك لاحقاً.</div></div>
     <div style="display:flex;gap:8px;margin-top:16px;">
@@ -1667,16 +1766,28 @@ async function completeGoogleProfile() {
     profile.approved = true; 
   }
   if (googleSelectedRole === 'student' && profile.role !== 'admin') {
+    const governorate = document.getElementById('gGovernorate').value;
     const school = document.getElementById('gSchool').value.trim();
     const stage = document.getElementById('gStage').value;
     const grade = document.getElementById('gGrade').value;
-    if (!school || !stage || !grade) { alert('أكمل البيانات'); return; }
-    profile.school = school; profile.stage = stage; profile.grade = grade;
+    if (!governorate || !school || !stage || !grade) { alert('أكمل البيانات'); return; }
+    profile.governorate = governorate;
+    profile.governorateName = getGovernorateName(governorate);
+    profile.school = school; 
+    profile.stage = stage; 
+    profile.grade = grade;
   } else if (googleSelectedRole === 'teacher' && profile.role !== 'admin') {
     const subject = document.getElementById('gSubject').value;
-    if (!subject) { alert('اختر المادة'); return; }
+    const teacherId = document.getElementById('gTeacherId').value.trim();
+    const teacherSchool = document.getElementById('gTeacherSchool').value.trim();
+    if (!subject || !teacherId || !teacherSchool) { alert('أكمل البيانات'); return; }
     profile.subject = subject; 
     profile.approved = false;
+    profile.verificationStatus = 'pending';
+    profile.teacherId = teacherId;
+    profile.teacherSchool = teacherSchool;
+    profile.teacherYears = 0;
+    profile.documents = [];
     profile.bio = ''; 
     profile.videoLinks = []; 
     profile.materialFiles = []; 
@@ -1721,12 +1832,15 @@ function openProfileCompletionForExisting() {
       </div>
     </div>
     <div id="gStudentFields" style="display:none;">
+      <div class="form-group"><label class="form-label">المحافظة</label><select class="form-select" id="gGovernorate"><option value="">اختر المحافظة</option>${Object.entries(GOVERNORATES_MAP).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select></div>
       <div class="form-group"><label class="form-label">المدرسة</label><input type="text" class="form-input auto-dir" id="gSchool" dir="rtl"></div>
       <div class="form-group"><label class="form-label">المرحلة</label><select class="form-select" id="gStage"><option value="">اختر</option><option value="ابتدائي">ابتدائي</option><option value="إعدادي">إعدادي</option><option value="ثانوي">ثانوي</option></select></div>
       <div class="form-group"><label class="form-label">السنة</label><select class="form-select" id="gGrade"><option value="">اختر السنة</option></select></div>
     </div>
     <div id="gTeacherFields" style="display:none;">
       <div class="form-group"><label class="form-label">المادة</label><select class="form-select" id="gSubject"><option value="">اختر</option></select></div>
+      <div class="form-group"><label class="form-label">رقم بطاقة المدرس</label><input type="text" class="form-input auto-dir" id="gTeacherId" dir="rtl"></div>
+      <div class="form-group"><label class="form-label">المدرسة/الجهة</label><input type="text" class="form-input auto-dir" id="gTeacherSchool" dir="rtl"></div>
     </div>
     <div id="gParentFields" style="display:none;"><div class="alert alert-info">يمكنك ربط أبنائك لاحقاً.</div></div>
     <button class="btn btn-success btn-full" onclick="saveExistingProfile()" style="margin-top:16px;">✅ حفظ</button>`);
@@ -1745,15 +1859,26 @@ async function saveExistingProfile() {
   if (np.length < 3) { alert('الاسم الثلاثي مطلوب'); return; }
   const updates = { name: fullName, role: googleSelectedRole, needsProfileCompletion: false };
   if (googleSelectedRole === 'student') {
+    const governorate = document.getElementById('gGovernorate').value;
     const school = document.getElementById('gSchool').value.trim();
     const stage = document.getElementById('gStage').value;
     const grade = document.getElementById('gGrade').value;
-    if (!school || !stage || !grade) { alert('أكمل الحقول'); return; }
-    updates.school = school; updates.stage = stage; updates.grade = grade;
+    if (!governorate || !school || !stage || !grade) { alert('أكمل الحقول'); return; }
+    updates.governorate = governorate;
+    updates.governorateName = getGovernorateName(governorate);
+    updates.school = school; 
+    updates.stage = stage; 
+    updates.grade = grade;
   } else if (googleSelectedRole === 'teacher') {
     const subject = document.getElementById('gSubject').value;
-    if (!subject) { alert('اختر المادة'); return; }
-    updates.subject = subject; updates.approved = false;
+    const teacherId = document.getElementById('gTeacherId').value.trim();
+    const teacherSchool = document.getElementById('gTeacherSchool').value.trim();
+    if (!subject || !teacherId || !teacherSchool) { alert('أكمل الحقول'); return; }
+    updates.subject = subject; 
+    updates.approved = false;
+    updates.verificationStatus = 'pending';
+    updates.teacherId = teacherId;
+    updates.teacherSchool = teacherSchool;
   } else { updates.children = currentUser.children || []; }
   showLoading();
   try {
@@ -1798,7 +1923,6 @@ async function logout() {
   document.getElementById('registerForm').reset();
 }
 
-/* ✅ checkSession - بحث دقيق */
 async function checkSession() {
   await handleGoogleRedirectResult();
   if (isProcessingRedirect) return false;
@@ -1817,7 +1941,6 @@ async function checkSession() {
             if (!p) p = users.find(u => u.email && user.email && u.email.toLowerCase() === user.email.toLowerCase());
             if (!p) p = await ensureUserProfile(user, null);
             
-            // تحديث id إذا مختلف
             if (p.id !== user.uid) {
               const oldId = p.id;
               p.id = user.uid;
@@ -1831,14 +1954,12 @@ async function checkSession() {
             
             if (!p) { resolve(false); return; }
             
-            // تحديث صلاحية الأدمن
             if (user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() && p.role !== 'admin') {
               p.role = 'admin'; 
               p.approved = true;
               await dbUpdateNode('users', p.id, { role: 'admin', approved: true });
             }
             
-            // إصلاح needsProfileCompletion
             const np = (p.name || '').split(/\s+/).filter(x => x.length > 0);
             if (np.length >= 3 && p.needsProfileCompletion) {
               p.needsProfileCompletion = false;
@@ -2001,7 +2122,7 @@ function stopRealtimeAnalytics() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ✅ Friends & Challenges - كامل مع حفظ مباشر
+   ✅ Friends & Challenges
    ═══════════════════════════════════════════════════════════ */
 let _challengesUnsubscribe = null;
 let _challengesCache = [];
@@ -2204,7 +2325,6 @@ function renderChallengeCard(c) {
   </div>`;
 }
 
-/* ✅ إضافة صديق - حفظ مباشر */
 async function addFriend(friendId) {
   if (!currentUser || !friendId) return;
   if (friendId === currentUser.id) { alert('لا يمكنك إضافة نفسك'); return; }
@@ -2225,7 +2345,6 @@ async function addFriend(friendId) {
     const myFriends = [...(users[meIdx].friends || []), friendId];
     const friendFriends = [...(users[friendIdx].friends || []), currentUser.id];
     
-    // ✅ حفظ مباشر للطرفين
     const saved1 = await dbUpdateNode('users', currentUser.id, { friends: myFriends });
     const saved2 = await dbUpdateNode('users', friendId, { friends: friendFriends });
     
@@ -2234,10 +2353,8 @@ async function addFriend(friendId) {
       return;
     }
     
-    // تحديث currentUser
     currentUser = { ...users[meIdx], friends: myFriends };
     
-    // إشعار
     const notifId = uid();
     await dbSetNode('notifications', notifId, { 
       userId: friendId, 
@@ -2256,7 +2373,6 @@ async function addFriend(friendId) {
   } finally { hideLoading(); }
 }
 
-/* ✅ حذف صديق */
 async function removeFriend(friendId) {
   if (!confirm('حذف هذا الصديق؟')) return;
   showLoading();
@@ -2314,7 +2430,6 @@ async function challengeFriend(friendId) {
     <button class="btn btn-warning btn-full" onclick="sendChallenge('${friendId}')">📤 إرسال التحدي</button>`);
 }
 
-/* ✅ إرسال تحدي - حفظ مباشر */
 async function sendChallenge(friendId) {
   const quizId = document.getElementById('challengeQuizSelect').value;
   if (!quizId) { alert('اختر اختباراً'); return; }
@@ -2361,11 +2476,9 @@ async function sendChallenge(friendId) {
       solveAttemptId: null
     };
     
-    // ✅ حفظ مباشر
     const saved = await dbSetNode('challenges', challengeId, newChallenge);
     if (!saved) { alert('⚠️ فشل الحفظ'); return; }
     
-    // إشعار
     const notifId = uid();
     await dbSetNode('notifications', notifId, { 
       userId: friendId, 
@@ -2414,7 +2527,6 @@ async function respondChallenge(challengeId, response) {
   } finally { hideLoading(); }
 }
 
-/* ✅ حل التحدي */
 async function solveChallenge(challengeId) {
   const challenges = await DB.get('challenges');
   const challenge = challenges.find(c => c.id === challengeId);
@@ -2522,6 +2634,7 @@ async function renderAdminDashboard() {
     const pendingTeachers = teachers.filter(t => t.approved === false);
     const students = allUsers.filter(u => u.role === 'student');
     const parents = allUsers.filter(u => u.role === 'parent');
+    const publicQuizzes = allQuizzes.filter(q => q.isPublic || q.isDemo);
     const activeChallenges = allChallenges.filter(c => c.status === 'pending' || c.status === 'accepted').length;
     const completedChallenges = allChallenges.filter(c => c.status === 'completed').length;
     
@@ -2535,35 +2648,36 @@ async function renderAdminDashboard() {
       </div>
       <div class="admin-nav-grid">
         <div class="admin-nav-card" onclick="renderAdminQuizzes()"><div class="admin-nav-icon">📝</div><div class="admin-nav-title">إدارة الاختبارات</div><div class="admin-nav-desc">${allQuizzes.length} اختبار</div></div>
+        <div class="admin-nav-card" onclick="renderAdminPublicQuizzes()" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0);"><div class="admin-nav-icon">🌐</div><div class="admin-nav-title">الاختبارات العامة</div><div class="admin-nav-desc">${publicQuizzes.length} اختبار</div></div>
         <div class="admin-nav-card" onclick="renderAdminStats()"><div class="admin-nav-icon">📊</div><div class="admin-nav-title">الإحصائيات</div><div class="admin-nav-desc">رسوم بيانية</div></div>
         <div class="admin-nav-card" onclick="renderAdminGamification()"><div class="admin-nav-icon">🎮</div><div class="admin-nav-title">التحفيز</div><div class="admin-nav-desc">XP + شارات</div></div>
         <div class="admin-nav-card" onclick="renderAdminAnnouncements()"><div class="admin-nav-icon">📢</div><div class="admin-nav-title">الإعلانات</div><div class="admin-nav-desc">شريط/بانر</div></div>
-        <div class="admin-nav-card" onclick="renderAdminChallenges()"><div class="admin-nav-icon">⚔️</div><div class="admin-nav-title">التحديات</div><div class="admin-nav-desc">${activeChallenges} نشط • ${completedChallenges} مكتمل</div></div>
-        <div class="admin-nav-card" onclick="renderAdminSettings()"><div class="admin-nav-icon">⚙️</div><div class="admin-nav-title">إعدادات المنصة</div><div class="admin-nav-desc">الاسم + الألوان</div></div>
-        <div class="admin-nav-card" onclick="renderAuditLog()"><div class="admin-nav-icon">📜</div><div class="admin-nav-title">سجل النشاط</div><div class="admin-nav-desc">آخر الأحداث</div></div>
+        <div class="admin-nav-card" onclick="renderAdminChallenges()"><div class="admin-nav-icon">⚔️</div><div class="admin-nav-title">التحديات</div><div class="admin-nav-desc">${activeChallenges} نشط</div></div>
+        <div class="admin-nav-card" onclick="renderAdminSettings()"><div class="admin-nav-icon">⚙️</div><div class="admin-nav-title">إعدادات</div><div class="admin-nav-desc">الاسم + الألوان</div></div>
+        <div class="admin-nav-card" onclick="renderAuditLog()"><div class="admin-nav-icon">📜</div><div class="admin-nav-title">السجل</div><div class="admin-nav-desc">آخر الأحداث</div></div>
         <div class="admin-nav-card" onclick="openAdminBroadcast()"><div class="admin-nav-icon">💬</div><div class="admin-nav-title">إشعار شامل</div><div class="admin-nav-desc">لكل المستخدمين</div></div>
       </div>
       <div class="stats-grid">
         <div class="stat-card"><div class="stat-icon primary">👥</div><div class="stat-info"><h4 id="liveUsersCount">${allUsers.length}</h4><p>المستخدمون <span class="live-indicator"><span class="live-dot"></span> LIVE</span></p></div></div>
         <div class="stat-card"><div class="stat-icon success">👨‍🎓</div><div class="stat-info"><h4 id="liveStudentsCount">${students.length}</h4><p>طلاب</p></div></div>
         <div class="stat-card"><div class="stat-icon info">📝</div><div class="stat-info"><h4 id="liveQuizzesCount">${allQuizzes.length}</h4><p>اختبارات</p></div></div>
-        <div class="stat-card"><div class="stat-icon warning">✅</div><div class="stat-info"><h4 id="liveAttemptsCount">${allAttempts.length}</h4><p>محاولات <span class="live-indicator"><span class="live-dot"></span> LIVE</span></p></div></div>
+        <div class="stat-card"><div class="stat-icon warning">✅</div><div class="stat-info"><h4 id="liveAttemptsCount">${allAttempts.length}</h4><p>محاولات</p></div></div>
       </div>
-      <div class="stats-grid">
-        <div class="stat-card"><div class="stat-icon warning">📊</div><div class="stat-info"><h4 id="liveAvgScore">${calculateAvg(allAttempts)}%</h4><p>المتوسط</p></div></div>
-        <div class="stat-card"><div class="stat-icon info">👨‍🏫</div><div class="stat-info"><h4>${teachers.length}</h4><p>مدرسون</p></div></div>
-        <div class="stat-card"><div class="stat-icon pink">👨‍👩‍👦</div><div class="stat-info"><h4>${parents.length}</h4><p>أولياء أمور</p></div></div>
-        <div class="stat-card"><div class="stat-icon purple">🎮</div><div class="stat-info"><h4>${students.reduce((s, u) => s + (u.xp || 0), 0)}</h4><p>إجمالي XP</p></div></div>
-      </div>
+      ${publicQuizzes.length === 0 ? `<div class="card" style="border-right:4px solid var(--info); background: var(--info-light);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div><h3 style="font-size:16px; font-weight:900; color:var(--info);">🌐 لا يوجد اختبارات عامة</h3><p style="font-size:12px;">أضف اختبارات عامة ليراها كل الطلاب</p></div>
+          <button class="btn btn-primary" onclick="renderAdminPublicQuizzes()">➕ إضافة</button>
+        </div>
+      </div>` : ''}
       <div class="card" style="border-right:4px solid var(--danger); background: var(--danger-light);">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-          <div><h3 style="font-size:16px; font-weight:900; color:var(--danger);">🗑 منطقة الخطر</h3><p style="font-size:12px; color:var(--text-light);">مسح الاختبارات والمحاولات والتحديات</p></div>
+          <div><h3 style="font-size:16px; font-weight:900; color:var(--danger);">🗑 منطقة الخطر</h3></div>
           <button class="btn btn-danger" onclick="wipeQuizData()">🗑 مسح</button>
         </div>
       </div>
       ${pendingTeachers.length > 0 ? `<div class="card" style="border-right:4px solid var(--warning); background: var(--warning-light);">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-          <div><h3 style="font-size:18px; font-weight:900; color:var(--warning);">⏳ ${pendingTeachers.length} مدرس بانتظار الاعتماد</h3></div>
+          <div><h3 style="font-size:18px; font-weight:900; color:var(--warning);">⏳ ${pendingTeachers.length} مدرس بانتظار الاعتماد</h3><p style="font-size:12px;">راجع البطاقات والبيانات</p></div>
           <button class="btn btn-primary" onclick="openPendingTeachers()">👀 مراجعة</button>
         </div>
       </div>` : ''}
@@ -2578,7 +2692,6 @@ async function renderAdminDashboard() {
       <div class="card" id="usersListContainer">${renderUsersListForTab(allUsers, allAttempts, currentUserTab)}</div>
     `;
     startRealtimeAnalytics();
-    setTimeout(observeLazyImages, 100);
   } finally { hideLoading(); }
 }
 
@@ -2595,8 +2708,8 @@ function renderUsersListForTab(allUsers, allAttempts, tab) {
   const filterId = `filter_${tab}`;
   let filterOptions = '';
   if (tab === 'students') {
-    const grades = [...new Set(filtered.map(u => u.grade).filter(Boolean))];
-    filterOptions = `<option value="">كل السنوات</option>${grades.map(g => `<option value="${g}">${g}</option>`).join('')}`;
+    const govs = [...new Set(filtered.map(u => u.governorateName).filter(Boolean))];
+    filterOptions = `<option value="">كل المحافظات</option>${govs.map(g => `<option value="${g}">${g}</option>`).join('')}`;
   } else if (tab === 'teachers') {
     filterOptions = `<option value="">كل الحالات</option><option value="approved">✅ معتمد</option><option value="pending">⏳ معلق</option>`;
   }
@@ -2625,7 +2738,7 @@ async function refreshAdminUsersList(tab) {
   else filtered = allUsers.filter(u => u.role === 'parent');
   if (query) filtered = filtered.filter(u => (u.name || '').toLowerCase().includes(query) || (u.email || '').toLowerCase().includes(query));
   if (filterVal) {
-    if (tab === 'students') filtered = filtered.filter(u => u.grade === filterVal);
+    if (tab === 'students') filtered = filtered.filter(u => u.governorateName === filterVal);
     else if (tab === 'teachers') {
       if (filterVal === 'approved') filtered = filtered.filter(u => u.approved !== false);
       if (filterVal === 'pending') filtered = filtered.filter(u => u.approved === false);
@@ -2652,7 +2765,7 @@ function renderUsersBody(filtered, allAttempts, tab) {
       return `<div class="student-row">
         <div class="student-info">
           <h4>${escapeHtml(u.name)} ${u.provider === 'google' ? '🔵' : ''}</h4>
-          <p>${escapeHtml(u.email)} • ${escapeHtml(u.grade || '')} • ${escapeHtml(u.school || '')} • ${sAttempts.length} محاولة • متوسط ${avg}%</p>
+          <p>${escapeHtml(u.email)} • ${escapeHtml(u.grade || '')} • ${escapeHtml(u.school || '')} • ${escapeHtml(u.governorateName || '')}</p>
           <p style="font-size:11px;">${lvl.emoji} ${lvl.name} • ${u.xp || 0} XP • 🔥 ${u.streak || 0} • 🏆 ${(u.badges || []).length}</p>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
@@ -2667,6 +2780,7 @@ function renderUsersBody(filtered, allAttempts, tab) {
         <div class="student-info">
           <h4>${escapeHtml(u.name)} ${isAdmin(u) ? '<span class="admin-badge">👑</span>' : ''} ${u.approved === false ? '<span class="badge badge-warning">⏳ معلق</span>' : ''}</h4>
           <p>${escapeHtml(u.email)} • ${getSubjectName(u.subject)} • ⭐ ${avgR} (${ratings.length})</p>
+          ${u.teacherSchool ? `<p style="font-size:11px;">🏫 ${escapeHtml(u.teacherSchool)} • 🆔 ${escapeHtml(u.teacherId || '')}</p>` : ''}
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
           ${u.approved === false ? `<button class="btn btn-sm btn-success" onclick="approveTeacher('${u.id}')">✅ اعتماد</button>` : ''}
@@ -2675,7 +2789,7 @@ function renderUsersBody(filtered, allAttempts, tab) {
       </div>`;
     } else {
       return `<div class="student-row">
-        <div class="student-info"><h4>${escapeHtml(u.name)}</h4><p>${escapeHtml(u.email)} • ${(u.children || []).length} أبناء</p></div>
+        <div class="student-info"><h4>${escapeHtml(u.name)}</h4><p>${escapeHtml(u.email)} • ${(u.children || []).length} أبناء • ${escapeHtml(u.phone || '')}</p></div>
         <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')">🗑</button>
       </div>`;
     }
@@ -2720,13 +2834,15 @@ function renderAdminQuizzesList(quizzes, teachers, attempts) {
     const teacher = teachers.find(t => t.id === quiz.teacherId);
     const qa = attempts.filter(a => a.quizId === quiz.id);
     const avg = qa.length ? calculateAvg(qa) : 0;
-    return `<div class="card" style="border-right:4px solid var(--primary);">
+    return `<div class="card" style="border-right:4px solid ${quiz.isDemo ? 'var(--warning)' : 'var(--primary)'};">
       <h3 style="font-size:18px; font-weight:800; margin-bottom:8px;">${getSubjectEmoji(quiz.subject)} ${escapeHtml(quiz.title)}</h3>
-      <p style="font-size:13px; color:var(--text-light); margin-bottom:12px;">${getSubjectName(quiz.subject)} • ${escapeHtml(quiz.grade)} • المدرس: ${escapeHtml(teacher?.name || 'محذوف')}</p>
+      <p style="font-size:13px; color:var(--text-light); margin-bottom:12px;">${getSubjectName(quiz.subject)} • ${escapeHtml(quiz.grade)} • المدرس: ${escapeHtml(teacher?.name || (quiz.isDemo ? 'تجريبي' : 'محذوف'))}</p>
       <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
         <span class="badge badge-primary">${quiz.questions.length} سؤال</span>
         <span class="badge badge-info">⏱️ ${quiz.timePerQuestion || 30}ث</span>
         <span class="badge badge-success">${qa.length} محاولة</span>
+        ${quiz.isDemo ? '<span class="badge badge-warning">🎯 تجريبي</span>' : ''}
+        ${quiz.isPublic ? '<span class="badge badge-info">🌐 عام</span>' : ''}
         <span class="badge badge-${avg >= 80 ? 'success' : avg >= 50 ? 'warning' : 'danger'}">متوسط ${avg}%</span>
       </div>
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -2777,7 +2893,7 @@ async function viewQuizDetails(quizId) {
   const allAttempts = await DB.get('attempts');
   const qa = allAttempts.filter(a => a.quizId === quizId);
   openModal(`<div class="modal-header"><h3 class="modal-title">${escapeHtml(quiz.title)}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-    <div class="alert alert-info">${getSubjectEmoji(quiz.subject)} ${getSubjectName(quiz.subject)} • ${escapeHtml(quiz.grade)}<br>المدرس: ${escapeHtml(teacher?.name || 'محذوف')}<br>${quiz.questions.length} سؤال • ${qa.length} محاولة</div>
+    <div class="alert alert-info">${getSubjectEmoji(quiz.subject)} ${getSubjectName(quiz.subject)} • ${escapeHtml(quiz.grade)}<br>المدرس: ${escapeHtml(teacher?.name || (quiz.isDemo ? 'تجريبي' : 'محذوف'))}<br>${quiz.questions.length} سؤال • ${qa.length} محاولة</div>
     <h4 style="margin:16px 0 12px;">📋 الأسئلة</h4>
     ${quiz.questions.map((q, i) => {
       const ti = QUESTION_TYPES[q.type] || QUESTION_TYPES.mcq;
@@ -2811,6 +2927,185 @@ async function adminDeleteQuiz(quizId) {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   ✅ ADMIN: الاختبارات العامة
+   ═══════════════════════════════════════════════════════════ */
+async function renderAdminPublicQuizzes() {
+  showLoading();
+  try {
+    const allQuizzes = await DB.get('quizzes');
+    const publicQuizzes = allQuizzes.filter(q => q.isPublic || q.isDemo);
+    
+    const container = document.getElementById('dashboardContent');
+    container.innerHTML = `
+      <div class="card" style="background: linear-gradient(135deg, #10b981, #059669); color:#fff;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="font-size:48px;">🌐</span>
+          <div><h2 style="font-size:24px; font-weight:900;">الاختبارات العامة</h2><p style="opacity:0.9;">${publicQuizzes.length} اختبار • تظهر لكل الطلاب</p></div>
+        </div>
+      </div>
+      <button class="btn btn-outline" onclick="renderAdminDashboard()" style="margin-bottom:16px;">← العودة</button>
+      
+      <div class="alert alert-info">
+        📌 <strong>الاختبارات العامة</strong> تظهر <strong>لكل الطلاب</strong> بغض النظر عن المدرس. استخدمها لملء المنصة بالاختبارات حتى يسجل المدرسون اختباراتهم الخاصة.
+      </div>
+      
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        <button class="btn btn-success btn-lg" onclick="seedDemoQuizzes()" style="flex:1;">⚡ تحميل اختبارات جاهزة 2026/2027 (13 اختبار)</button>
+        <button class="btn btn-primary btn-lg" onclick="openNewQuizModal()" style="flex:1;">➕ إنشاء اختبار جديد</button>
+      </div>
+      
+      <div class="section-header"><div><h2 class="section-title">📋 الاختبارات العامة (${publicQuizzes.length})</h2></div></div>
+      ${publicQuizzes.length === 0 ? `
+        <div class="card"><div class="empty-state">
+          <div class="empty-state-icon">🌐</div>
+          <h3>لا اختبارات عامة بعد</h3>
+          <p style="margin-top:8px;color:var(--text-light);">اضغط "تحميل اختبارات جاهزة" لإضافة 13 اختبار تجريبي لكل المراحل فوراً</p>
+        </div></div>
+      ` : publicQuizzes.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).map(quiz => `
+        <div class="card" style="border-right:4px solid ${quiz.isDemo ? 'var(--warning)' : 'var(--success)'};">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+            <div style="flex:1;min-width:200px;">
+              <h3 style="font-size:16px;font-weight:800;margin-bottom:4px;">${getSubjectEmoji(quiz.subject)} ${escapeHtml(quiz.title)}</h3>
+              <p style="font-size:13px;color:var(--text-light);">${getSubjectName(quiz.subject)} • ${escapeHtml(quiz.grade)} • ${quiz.questions.length} سؤال • ⏱️ ${quiz.timePerQuestion || 30}ث</p>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
+                ${quiz.isDemo ? '<span class="badge badge-warning">🎯 تجريبي</span>' : '<span class="badge badge-success">✅ مخصص</span>'}
+                <span class="badge badge-info">🌐 عام</span>
+                ${quiz.curriculum ? `<span class="badge badge-purple">📚 ${escapeHtml(quiz.curriculum)}</span>` : ''}
+              </div>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button class="btn btn-sm btn-outline" onclick="viewQuizDetails('${quiz.id}')">👁️</button>
+              <button class="btn btn-sm btn-primary" onclick="editQuiz('${quiz.id}')">✏️</button>
+              <button class="btn btn-sm btn-danger" onclick="adminDeleteQuiz('${quiz.id}')">🗑</button>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    `;
+  } finally { hideLoading(); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ✅ seedDemoQuizzes - اختبارات 2026/2027
+   ═══════════════════════════════════════════════════════════ */
+async function seedDemoQuizzes() {
+  if (!isAdmin(currentUser)) { alert('للأدمن فقط'); return; }
+  if (!confirm('⚠️ سيتم إضافة 13 اختبار تجريبي مطابقة لمناهج 2026/2027.\n\nهل تريد المتابعة؟')) return;
+  
+  showLoading();
+  try {
+    const existingQuizzes = await DB.get('quizzes');
+    const existingDemos = existingQuizzes.filter(q => q.isDemo);
+    if (existingDemos.length > 0) {
+      if (!confirm(`⚠️ يوجد بالفعل ${existingDemos.length} اختبار تجريبي.\n\nهل تريد إضافة 13 اختبار إضافي؟`)) {
+        hideLoading();
+        return;
+      }
+    }
+    
+    const demoQuizzes = [
+      // ═══════════ ابتدائي ═══════════
+      { title: 'اختبار تجريبي - الرياضيات (1 ابتدائي)', subject: 'math', grade: 'الصف الأول الابتدائي', timePerQuestion: 30, questions: [
+        { type: 'mcq', text: 'كم يساوي 3 + 4؟', options: ['5', '6', '7', '8'], answer: 2, image: null },
+        { type: 'mcq', text: 'كم يساوي 9 - 5؟', options: ['3', '4', '5', '6'], answer: 1, image: null },
+        { type: 'tf', text: '7 أكبر من 5', answer: true, image: null },
+        { type: 'fill', text: 'أكمل: 2 + 2 = ___', answer: '4', image: null }
+      ]},
+      { title: 'اختبار تجريبي - اللغة العربية (1 ابتدائي)', subject: 'arabic', grade: 'الصف الأول الابتدائي', timePerQuestion: 30, questions: [
+        { type: 'mcq', text: 'ما الحرف الأول في كلمة "مدرسة"؟', options: ['م', 'د', 'ر', 'س'], answer: 0, image: null },
+        { type: 'mcq', text: 'ما الحرف الأخير في كلمة "قلم"؟', options: ['ق', 'ل', 'م', 'ن'], answer: 2, image: null },
+        { type: 'tf', text: 'كلمة "شمس" تبدأ بحرف الشين', answer: true, image: null }
+      ]},
+      { title: 'اختبار تجريبي - العلوم (4 ابتدائي)', subject: 'science', grade: 'الصف الرابع الابتدائي', timePerQuestion: 45, questions: [
+        { type: 'mcq', text: 'ما وحدة بناء الكائن الحي؟', options: ['الذرة', 'الخلية', 'النسيج', 'العضو'], answer: 1, image: null },
+        { type: 'mcq', text: 'أي من التالي من الثدييات؟', options: ['الحوت', 'التمساح', 'الضفدع', 'السمكة'], answer: 0, image: null },
+        { type: 'tf', text: 'الشمس نجم', answer: true, image: null },
+        { type: 'tf', text: 'القمر كوكب', answer: false, image: null }
+      ]},
+      { title: 'اختبار تجريبي - الدراسات الاجتماعية (6 ابتدائي)', subject: 'social', grade: 'الصف السادس الابتدائي', timePerQuestion: 45, questions: [
+        { type: 'mcq', text: 'ما عاصمة مصر؟', options: ['الإسكندرية', 'القاهرة', 'الجيزة', 'الأقصر'], answer: 1, image: null },
+        { type: 'mcq', text: 'ما أطول نهر في العالم؟', options: ['النيل', 'الأمازون', 'المسيسيبي', 'اليانغتسي'], answer: 0, image: null },
+        { type: 'tf', text: 'مصر تقع في قارة أفريقيا', answer: true, image: null }
+      ]},
+      
+      // ═══════════ إعدادي ═══════════
+      { title: 'اختبار تجريبي - الرياضيات (1 إعدادي)', subject: 'math', grade: 'الصف الأول الإعدادي', timePerQuestion: 60, questions: [
+        { type: 'mcq', text: 'ما حل المعادلة: 2x + 5 = 15؟', options: ['3', '4', '5', '6'], answer: 2, image: null },
+        { type: 'mcq', text: 'ما ناتج 5²؟', options: ['10', '20', '25', '50'], answer: 2, image: null },
+        { type: 'fill', text: 'أكمل: 3 × 7 = ___', answer: '21', image: null },
+        { type: 'tf', text: 'المثلث متساوي الأضلاع له 3 أضلاع متساوية', answer: true, image: null }
+      ]},
+      { title: 'اختبار تجريبي - العلوم (1 إعدادي)', subject: 'science', grade: 'الصف الأول الإعدادي', timePerQuestion: 60, questions: [
+        { type: 'mcq', text: 'ما العنصر الكيميائي الذي رمزه O؟', options: ['الذهب', 'الفضة', 'الأكسجين', 'الحديد'], answer: 2, image: null },
+        { type: 'mcq', text: 'ما وحدة قياس القوة؟', options: ['نيوتن', 'جول', 'واط', 'أمبير'], answer: 0, image: null },
+        { type: 'tf', text: 'الماء يتكون من ذرتي هيدروجين وذرة أكسجين', answer: true, image: null }
+      ]},
+      { title: 'اختبار تجريبي - الدراسات (3 إعدادي)', subject: 'social', grade: 'الصف الثالث الإعدادي', timePerQuestion: 60, questions: [
+        { type: 'mcq', text: 'ما عاصمة مصر؟', options: ['الإسكندرية', 'القاهرة', 'الجيزة', 'الأقصر'], answer: 1, image: null },
+        { type: 'mcq', text: 'ما أكبر قارة في العالم؟', options: ['أفريقيا', 'آسيا', 'أوروبا', 'أمريكا'], answer: 1, image: null },
+        { type: 'tf', text: 'مصر تقع في قارة أفريقيا', answer: true, image: null }
+      ]},
+      
+      // ═══════════ ثانوي - بكالوريا 2026/2027 ═══════════
+      { title: 'اختبار تجريبي - الفيزياء (1 ثانوي)', subject: 'physics', grade: 'الصف الأول الثانوي', timePerQuestion: 60, questions: [
+        { type: 'mcq', text: 'ما وحدة قياس الشغل؟', options: ['نيوتن', 'جول', 'واط', 'فولت'], answer: 1, image: null },
+        { type: 'mcq', text: 'ما قانون نيوتن الثاني؟', options: ['F = ma', 'E = mc²', 'V = IR', 'P = IV'], answer: 0, image: null },
+        { type: 'tf', text: 'السرعة متجهة (لها اتجاه)', answer: true, image: null },
+        { type: 'tf', text: 'الكتلة تتغير بتغير المكان', answer: false, image: null }
+      ]},
+      { title: 'اختبار تجريبي - الكيمياء (1 ثانوي)', subject: 'chemistry', grade: 'الصف الأول الثانوي', timePerQuestion: 60, questions: [
+        { type: 'mcq', text: 'ما الرقم الذري للهيدروجين؟', options: ['0', '1', '2', '3'], answer: 1, image: null },
+        { type: 'mcq', text: 'ما الرمز الكيميائي للماء؟', options: ['H₂O', 'CO₂', 'O₂', 'NaCl'], answer: 0, image: null },
+        { type: 'tf', text: 'الجدول الدوري يحتوي على 118 عنصراً', answer: true, image: null }
+      ]},
+      { title: 'اختبار تجريبي - الفيزياء (2 ثانوي - بكالوريا)', subject: 'physics', grade: 'الصف الثاني الثانوي', timePerQuestion: 90, questions: [
+        { type: 'mcq', text: 'ما وحدة قياس المقاومة الكهربائية؟', options: ['أوم', 'فولت', 'أمبير', 'واط'], answer: 0, image: null },
+        { type: 'mcq', text: 'ما قانون أوم؟', options: ['V = IR', 'F = ma', 'E = mc²', 'P = IV'], answer: 0, image: null },
+        { type: 'tf', text: 'التيار الكهربائي يقاس بالأمبير', answer: true, image: null },
+        { type: 'essay', text: 'اشرح قانون نيوتن الثالث مع مثال', answer: null, image: null }
+      ]},
+      { title: 'اختبار تجريبي - الأحياء (3 ثانوي - بكالوريا)', subject: 'biology', grade: 'الصف الثالث الثانوي', timePerQuestion: 90, questions: [
+        { type: 'mcq', text: 'ما وحدة بناء الكائن الحي؟', options: ['الذرة', 'الخلية', 'النسيج', 'العضو'], answer: 1, image: null },
+        { type: 'mcq', text: 'ما الحمض النووي المسؤول عن الوراثة؟', options: ['RNA', 'DNA', 'ATP', 'ADP'], answer: 1, image: null },
+        { type: 'tf', text: 'الميتوكوندريا هي مصنع الطاقة في الخلية', answer: true, image: null },
+        { type: 'essay', text: 'اشرح عملية الانقسام الميتوزي', answer: null, image: null }
+      ]},
+      { title: 'اختبار تجريبي - اللغة الإنجليزية (3 ثانوي)', subject: 'english', grade: 'الصف الثالث الثانوي', timePerQuestion: 60, questions: [
+        { type: 'mcq', text: 'Choose the correct: The sun ___ in the east.', options: ['rise', 'rises', 'rising', 'rose'], answer: 1, image: null },
+        { type: 'mcq', text: 'What is the past of "go"?', options: ['goed', 'went', 'gone', 'going'], answer: 1, image: null },
+        { type: 'tf', text: '"Beautiful" is an adjective', answer: true, image: null },
+        { type: 'fill', text: 'Complete: She ___ a doctor. (is/are/am)', answer: 'is', image: null }
+      ]}
+    ];
+    
+    let added = 0;
+    for (const demo of demoQuizzes) {
+      const quizId = uid();
+      const quiz = {
+        ...demo,
+        teacherId: currentUser.id,
+        teacherName: currentUser.name,
+        isDemo: true,
+        isPublic: true,
+        approved: true,
+        curriculum: '2026/2027',
+        createdAt: Date.now()
+      };
+      const saved = await dbSetNode('quizzes', quizId, quiz);
+      if (saved) added++;
+    }
+    
+    await logActivity('تحميل اختبارات تجريبية 2026/2027', `${added} اختبار`);
+    launchConfetti(50);
+    alert(`✅ تم إضافة ${added} اختبار تجريبي مطابق لمناهج 2026/2027!\n\n📚 المراحل:\n• ابتدائي (4)\n• إعدادي (3)\n• ثانوي بكالوريا (6)`);
+    renderAdminPublicQuizzes();
+  } catch (e) {
+    console.error('seedDemoQuizzes failed:', e);
+    alert('فشل: ' + e.message);
+  } finally { hideLoading(); }
+}
+
+/* ═══════════════════════════════════════════════════════════
    ✅ ADMIN: STATS
    ═══════════════════════════════════════════════════════════ */
 async function renderAdminStats() {
@@ -2837,7 +3132,7 @@ async function renderAdminStats() {
       <div class="chart-container" style="height:340px;"><canvas id="usersGrowthChart"></canvas></div>
       <div class="chart-container" style="height:340px;"><canvas id="attemptsChart"></canvas></div>
       <div class="chart-container" style="height:340px;"><canvas id="gradeDistChart"></canvas></div>
-      <div class="chart-container" style="height:340px;"><canvas id="topTeachersChart"></canvas></div>
+      <div class="chart-container" style="height:340px;"><canvas id="govDistChart"></canvas></div>
     `;
     const labels7 = [], users7 = [], attempts7 = [];
     for (let i = 6; i >= 0; i--) {
@@ -2862,13 +3157,15 @@ async function renderAdminStats() {
     });
     const c3 = document.getElementById('gradeDistChart')?.getContext('2d');
     if (c3) new Chart(c3, { type: 'doughnut', data: { labels: Object.keys(dist), datasets: [{ data: Object.values(dist), backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#64748b'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'توزيع الدرجات', font: { size: 16, weight: 'bold' } } } } });
-    const teachers = allUsers.filter(u => u.role === 'teacher');
-    const topT = teachers.map(t => {
-      const r = t.ratings || [];
-      return { name: t.name, avg: r.length ? parseFloat((r.reduce((a, x) => a + x.stars, 0) / r.length).toFixed(1)) : 0 };
-    }).sort((a, b) => b.avg - a.avg).slice(0, 5);
-    const c4 = document.getElementById('topTeachersChart')?.getContext('2d');
-    if (c4) new Chart(c4, { type: 'bar', data: { labels: topT.map(t => t.name.length > 15 ? t.name.slice(0, 15) + '...' : t.name), datasets: [{ label: 'متوسط التقييم', data: topT.map(t => t.avg), backgroundColor: 'rgba(245,158,11,0.7)', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { title: { display: true, text: 'أفضل 5 مدرسين', font: { size: 16, weight: 'bold' } }, legend: { display: false } }, scales: { x: { beginAtZero: true, max: 5 } } } });
+    // توزيع المحافظات
+    const govDist = {};
+    students.forEach(s => {
+      const g = s.governorateName || 'غير محدد';
+      govDist[g] = (govDist[g] || 0) + 1;
+    });
+    const topGovs = Object.entries(govDist).sort((a, b) => b[1] - a[1]).slice(0, 10);
+    const c4 = document.getElementById('govDistChart')?.getContext('2d');
+    if (c4) new Chart(c4, { type: 'bar', data: { labels: topGovs.map(g => g[0]), datasets: [{ label: 'عدد الطلاب', data: topGovs.map(g => g[1]), backgroundColor: 'rgba(139,92,246,0.7)', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { title: { display: true, text: 'توزيع الطلاب حسب المحافظة', font: { size: 16, weight: 'bold' } }, legend: { display: false } } } });
   } finally { hideLoading(); }
 }
 
@@ -2990,13 +3287,7 @@ async function awardBadgeManually(studentId, badgeKey) {
       const newBadges = [...badges, badgeKey];
       await dbUpdateNode('users', studentId, { badges: newBadges });
       const notifId = uid();
-      await dbSetNode('notifications', notifId, { 
-        userId: studentId, 
-        title: `🏆 شارة: ${BADGES[badgeKey].name}`, 
-        body: BADGES[badgeKey].desc, 
-        createdAt: Date.now(), 
-        read: false 
-      });
+      await dbSetNode('notifications', notifId, { userId: studentId, title: `🏆 شارة: ${BADGES[badgeKey].name}`, body: BADGES[badgeKey].desc, createdAt: Date.now(), read: false });
       launchConfetti(20);
       alert('✅ تم');
       closeModal();
@@ -3043,7 +3334,6 @@ async function renderAdminChallenges() {
     const accepted = challenges.filter(c => c.status === 'accepted');
     const completed = challenges.filter(c => c.status === 'completed');
     const declined = challenges.filter(c => c.status === 'declined');
-    
     const sorted = challenges.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
     
     container.innerHTML = `
@@ -3054,14 +3344,12 @@ async function renderAdminChallenges() {
         </div>
       </div>
       <button class="btn btn-outline" onclick="renderAdminDashboard()" style="margin-bottom:16px;">← العودة</button>
-      
       <div class="stats-grid">
         <div class="stat-card"><div class="stat-icon warning">⏳</div><div class="stat-info"><h4>${pending.length}</h4><p>معلقة</p></div></div>
         <div class="stat-card"><div class="stat-icon info">✅</div><div class="stat-info"><h4>${accepted.length}</h4><p>مقبولة</p></div></div>
         <div class="stat-card"><div class="stat-icon success">🏁</div><div class="stat-info"><h4>${completed.length}</h4><p>مكتملة</p></div></div>
         <div class="stat-card"><div class="stat-icon danger">❌</div><div class="stat-info"><h4>${declined.length}</h4><p>مرفوضة</p></div></div>
       </div>
-      
       <div class="section-header"><div><h2 class="section-title">⚔️ كل التحديات</h2></div></div>
       <div class="card">
         ${sorted.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">⚔️</div><h3>لا توجد تحديات</h3></div>` :
@@ -3074,7 +3362,6 @@ async function renderAdminChallenges() {
                 <div class="challenge-info">
                   <h4>${escapeHtml(c.fromName)} ⚔️ ${escapeHtml(c.toName)}</h4>
                   <p>📝 ${escapeHtml(c.quizTitle)} • <span class="badge badge-${statusClasses[c.status]}">${statusLabels[c.status]}</span></p>
-                  <p style="font-size:11px;">${new Date(c.createdAt).toLocaleDateString('ar-EG')}</p>
                 </div>
               </div>
               ${c.status === 'completed' ? `<div class="challenge-result">
@@ -3122,7 +3409,7 @@ async function renderAdminAnnouncements() {
       <div class="card" style="background: linear-gradient(135deg, #ec4899, #8b5cf6); color:#fff;">
         <div style="display:flex; align-items:center; gap:12px;">
           <span style="font-size:48px;">📢</span>
-          <div><h2 style="font-size:24px; font-weight:900;">الإعلانات</h2><p style="opacity:0.9;">${announcements.length} إعلان • تظهر في كل الصفحات</p></div>
+          <div><h2 style="font-size:24px; font-weight:900;">الإعلانات</h2><p style="opacity:0.9;">${announcements.length} إعلان</p></div>
         </div>
       </div>
       <button class="btn btn-outline" onclick="renderAdminDashboard()" style="margin-bottom:16px;">← العودة</button>
@@ -3163,7 +3450,6 @@ async function openAnnouncementEditor(id = null) {
   const a = id ? announcements.find(x => x.id === id) : null;
   _tempAnnImage = a?.imageUrl || null;
   const currentType = a?.type || (a?.imageUrl ? 'banner' : 'bar');
-  
   const startDateVal = a?.startDate ? new Date(a.startDate - a.startDate % 60000).toISOString().slice(0, 16) : '';
   const endDateVal = a?.endDate ? new Date(a.endDate - a.endDate % 60000).toISOString().slice(0, 16) : '';
   
@@ -3176,11 +3462,10 @@ async function openAnnouncementEditor(id = null) {
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">🖼️ صورة الإعلان (اختياري)</label>
+      <label class="form-label">🖼️ صورة (اختياري)</label>
       <div id="annImagePreview" style="margin-bottom:8px;text-align:center;">${a?.imageUrl ? `<img src="${a.imageUrl}" style="max-width:100%;max-height:160px;border-radius:10px;">` : '<div style="padding:20px;background:var(--bg);border-radius:10px;color:var(--text-light);">لا توجد صورة</div>'}</div>
       <input type="file" accept="image/*" class="form-input" id="annImageFile" onchange="handleAnnImageUpload(event)">
       ${a?.imageUrl ? `<button class="btn btn-sm btn-danger" onclick="removeAnnImage()" style="margin-top:6px;">🗑 إزالة</button>` : ''}
-      <p style="font-size:11px;color:var(--warning);margin-top:6px;">⚠️ الحد: ${MAX_IMAGE_SIZE_MB}MB</p>
     </div>
     <div class="form-group"><label class="form-label">الإيموجي</label><input type="text" class="form-input" id="annEmoji" value="${escapeHtml(a?.emoji || '📢')}" maxlength="4" style="text-align:center;font-size:24px;"></div>
     <div class="form-group"><label class="form-label">العنوان</label><input type="text" class="form-input auto-dir" id="annTitle" value="${escapeHtml(a?.title || '')}" dir="rtl"></div>
@@ -3193,8 +3478,8 @@ async function openAnnouncementEditor(id = null) {
     </div>
     <div class="card" style="background:var(--info-light);border:2px dashed var(--info);margin-bottom:16px;">
       <h4 style="font-size:14px;font-weight:800;margin-bottom:12px;color:var(--info);">⏰ جدولة الإعلان (اختياري)</h4>
-      <div class="form-group"><label class="form-label">📅 يبدأ من</label><input type="datetime-local" class="form-input" id="annStart" value="${startDateVal}"><p style="font-size:11px;color:var(--text-light);margin-top:4px;">اتركه فارغاً ليبدأ فوراً</p></div>
-      <div class="form-group" style="margin-bottom:0;"><label class="form-label">📅 ينتهي في</label><input type="datetime-local" class="form-input" id="annEnd" value="${endDateVal}"><p style="font-size:11px;color:var(--text-light);margin-top:4px;">اتركه فارغاً ليستمر بدون نهاية</p></div>
+      <div class="form-group"><label class="form-label">📅 يبدأ من</label><input type="datetime-local" class="form-input" id="annStart" value="${startDateVal}"></div>
+      <div class="form-group" style="margin-bottom:0;"><label class="form-label">📅 ينتهي في</label><input type="datetime-local" class="form-input" id="annEnd" value="${endDateVal}"></div>
     </div>
     <button class="btn btn-success btn-full" onclick="saveAnnouncement('${id || ''}')">💾 حفظ</button>`);
   window._currentAnnType = currentType;
@@ -3207,23 +3492,23 @@ function pickAnnType(type) {
 }
 
 async function handleAnnImageUpload(e) {
-  const originalFile = e.target.files[0]; if (!originalFile) return;
-  if (!originalFile.type.startsWith('image/')) { alert('صورة فقط'); e.target.value = ''; return; }
-  const sizeCheck = validateFileSize(originalFile, MAX_IMAGE_SIZE_MB, 'الصورة');
+  const file = e.target.files[0]; if (!file) return;
+  if (!file.type.startsWith('image/')) { alert('صورة فقط'); e.target.value = ''; return; }
+  const sizeCheck = validateFileSize(file, MAX_IMAGE_SIZE_MB, 'الصورة');
   if (!sizeCheck.ok) { alert(sizeCheck.msg); e.target.value = ''; return; }
   showLoading();
   try {
-    let file;
-    try { file = await compressImage(originalFile, 1280, 0.7); }
-    catch (err) { file = originalFile; }
-    if (file.size > 2 * 1024 * 1024) { alert(`الصورة كبيرة (${(file.size/1024/1024).toFixed(2)}MB). الحد: 2MB`); e.target.value = ''; return; }
+    let compressed;
+    try { compressed = await compressImage(file, 1280, 0.7); }
+    catch { compressed = file; }
+    if (compressed.size > 2 * 1024 * 1024) { alert('الصورة كبيرة'); e.target.value = ''; return; }
     const r = new FileReader();
     r.onload = (ev) => {
       _tempAnnImage = ev.target.result;
       document.getElementById('annImagePreview').innerHTML = `<img src="${ev.target.result}" style="max-width:100%;max-height:160px;border-radius:10px;">`;
-      alert(`✅ تم تجهيز الصورة (${(file.size/1024).toFixed(0)}KB)`);
+      alert(`✅ تم تجهيز الصورة`);
     };
-    r.readAsDataURL(file);
+    r.readAsDataURL(compressed);
   } catch (err) { alert('فشل: ' + err.message); }
   finally { hideLoading(); }
 }
@@ -3248,23 +3533,20 @@ async function saveAnnouncement(id) {
   const endDate = endVal ? new Date(endVal).getTime() : null;
   const type = window._currentAnnType || 'bar';
   const imageUrl = _tempAnnImage || null;
-
   if (!text) { alert('أدخل نص الإعلان'); return; }
-  if (imageUrl && imageUrl.length > 10 * 1024 * 1024) { alert('الصورة كبيرة'); return; }
-
   showLoading();
   try {
-    const announcements = await DB.get('announcements');
     if (id) {
-      const idx = announcements.findIndex(a => a.id === id);
-      if (idx >= 0) {
-        const updates = { emoji, title, text, link, linkText, bgColor, bgColorEnd, type, imageUrl, startDate, endDate, updatedAt: Date.now() };
-        await dbUpdateNode('announcements', id, updates);
-      }
+      await dbUpdateNode('announcements', id, { 
+        emoji, title, text, link, linkText, bgColor, bgColorEnd, type, imageUrl, 
+        startDate, endDate, updatedAt: Date.now() 
+      });
     } else {
       const annId = uid();
-      const newAnn = { emoji, title, text, link, linkText, bgColor, bgColorEnd, type, imageUrl, startDate, endDate, enabled: true, createdAt: Date.now() };
-      await dbSetNode('announcements', annId, newAnn);
+      await dbSetNode('announcements', annId, { 
+        emoji, title, text, link, linkText, bgColor, bgColorEnd, type, imageUrl, 
+        startDate, endDate, enabled: true, createdAt: Date.now() 
+      });
     }
     _cachedAnnouncements = await DB.get('announcements');
     localStorage.removeItem('edu_announcement_dismissed');
@@ -3344,13 +3626,11 @@ async function renderAdminSettings() {
         <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;">📋 المحتوى</h3>
         <label class="checkbox-label" style="display:flex; justify-content:space-between; padding:12px; background:var(--bg); border-radius:10px; margin-bottom:10px;"><span>⭐ تفعيل التقييم</span><input type="checkbox" id="setRatings" ${s.ratingsEnabled ? 'checked' : ''}></label>
         <label class="checkbox-label" style="display:flex; justify-content:space-between; padding:12px; background:var(--bg); border-radius:10px; margin-bottom:10px;"><span>🏆 لوحة الشرف</span><input type="checkbox" id="setLeaderboard" ${s.leaderboardEnabled ? 'checked' : ''}></label>
-        <div class="form-group"><label class="form-label">الحد الأقصى للرفع (MB)</label><input type="number" class="form-input" id="setUpload" value="${s.maxUploadSizeMB}" min="1" max="100"></div>
       </div>
       <div class="card">
         <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;">📞 التواصل</h3>
         <div class="form-group"><label class="form-label">نص التذييل</label><input type="text" class="form-input auto-dir" id="setFooter" value="${escapeHtml(s.footerText)}" dir="rtl"></div>
         <div class="form-group"><label class="form-label">بريد الدعم</label><input type="email" class="form-input" id="setSupportEmail" value="${escapeHtml(s.supportEmail)}" dir="ltr"></div>
-        <div class="form-group"><label class="form-label">هاتف الدعم</label><input type="tel" class="form-input" id="setSupportPhone" value="${escapeHtml(s.supportPhone)}" dir="ltr"></div>
       </div>
       <button class="btn btn-success btn-full btn-lg" onclick="savePlatformSettingsForm()">💾 حفظ</button>
     `;
@@ -3365,9 +3645,9 @@ window.selectAdminTheme = (key) => {
 };
 
 async function savePlatformSettingsForm() {
-  platformSettings.platformName = document.getElementById('setName').value.trim() || 'منصة تعليمية';
+  platformSettings.platformName = document.getElementById('setName').value.trim() || 'عِلْم';
   platformSettings.platformTagline = document.getElementById('setTagline').value.trim();
-  platformSettings.platformLogo = document.getElementById('setLogo').value.trim() || '🎓';
+  platformSettings.platformLogo = document.getElementById('setLogo').value.trim() || '📖';
   platformSettings.theme = document.getElementById('setTheme').value || 'indigo';
   const theme = THEMES[platformSettings.theme] || THEMES.indigo;
   platformSettings.primaryColor = theme.primary;
@@ -3377,10 +3657,8 @@ async function savePlatformSettingsForm() {
   platformSettings.maintenanceMessage = document.getElementById('setMaintenanceMsg').value.trim();
   platformSettings.ratingsEnabled = document.getElementById('setRatings').checked;
   platformSettings.leaderboardEnabled = document.getElementById('setLeaderboard').checked;
-  platformSettings.maxUploadSizeMB = parseInt(document.getElementById('setUpload').value) || 4;
   platformSettings.footerText = document.getElementById('setFooter').value.trim();
   platformSettings.supportEmail = document.getElementById('setSupportEmail').value.trim();
-  platformSettings.supportPhone = document.getElementById('setSupportPhone').value.trim();
   showLoading();
   try {
     await savePlatformSettings();
@@ -3449,13 +3727,7 @@ async function sendAdminBroadcast() {
     if (recipients.length === 0) { alert('لا مستلمين'); return; }
     for (const r of recipients) {
       const notifId = uid();
-      await dbSetNode('notifications', notifId, { 
-        userId: r.id, 
-        title: `📢 ${title}`, 
-        body, 
-        createdAt: Date.now(), 
-        read: false 
-      });
+      await dbSetNode('notifications', notifId, { userId: r.id, title: `📢 ${title}`, body, createdAt: Date.now(), read: false });
     }
     await logActivity('إشعار شامل', `${title} → ${target}`);
     launchConfetti(30);
@@ -3463,38 +3735,120 @@ async function sendAdminBroadcast() {
     closeModal();
   } finally { hideLoading(); }
 }
+
 async function openPendingTeachers() {
   const users = await DB.get('users');
   const pending = users.filter(u => u.role === 'teacher' && u.approved === false);
-  if (pending.length === 0) { openModal(`<div class="modal-header"><h3 class="modal-title">⏳ المعلقون</h3><button class="modal-close" onclick="closeModal()">✕</button></div><div class="empty-state"><h3>لا معلقين</h3></div>`); return; }
-  openModal(`<div class="modal-header"><h3 class="modal-title">⏳ المعلقون (${pending.length})</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-    ${pending.map(t => `<div class="history-item">
-      <div class="history-info"><h4>${escapeHtml(t.name)}</h4><p>${escapeHtml(t.email)} • ${getSubjectName(t.subject)}</p></div>
-      <div style="display:flex;gap:6px;">
-        <button class="btn btn-sm btn-success" onclick="approveTeacher('${t.id}')">✅</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteUser('${t.id}')">❌</button>
-      </div>
-    </div>`).join('')}`);
+  
+  if (pending.length === 0) {
+    openModal(`<div class="modal-header"><h3 class="modal-title">⏳ المعلقون</h3><button class="modal-close" onclick="closeModal()">✕</button></div><div class="empty-state"><h3>لا معلقين</h3></div>`);
+    return;
+  }
+  
+  openModal(`<div class="modal-header">
+    <h3 class="modal-title">⏳ مراجعة المدرسين (${pending.length})</h3>
+    <button class="modal-close" onclick="closeModal()">✕</button>
+  </div>
+    <div class="alert alert-info">📋 راجع بيانات كل مدرس بدقة قبل الاعتماد</div>
+    ${pending.map(t => {
+      const docs = t.documents || [];
+      const hasCard = docs.some(d => d.type === 'teacher_card');
+      const cardDoc = docs.find(d => d.type === 'teacher_card');
+      return `
+        <div class="card" style="border-right:4px solid var(--warning);margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+            <div class="user-avatar" style="width:48px;height:48px;font-size:22px;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;border-radius:50%;overflow:hidden;">
+              ${t.photoURL ? `<img src="${t.photoURL}" style="width:100%;height:100%;object-fit:cover;">` : '👨‍🏫'}
+            </div>
+            <div style="flex:1;">
+              <h4 style="font-size:16px;font-weight:800;margin-bottom:2px;">${escapeHtml(t.name)}</h4>
+              <p style="font-size:12px;color:var(--text-light);">${escapeHtml(t.email)} • ${getSubjectName(t.subject)}</p>
+            </div>
+            ${hasCard ? '<span class="badge badge-success">📸 بطاقة مرفوعة</span>' : '<span class="badge badge-danger">⚠️ لا بطاقة</span>'}
+          </div>
+          <div style="background:var(--bg);padding:12px;border-radius:8px;margin-bottom:12px;font-size:13px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div><strong>رقم البطاقة:</strong> ${escapeHtml(t.teacherId || '—')}</div>
+              <div><strong>المدرسة:</strong> ${escapeHtml(t.teacherSchool || '—')}</div>
+              <div><strong>سنوات الخبرة:</strong> ${t.teacherYears || 0}</div>
+              <div><strong>التسجيل:</strong> ${new Date(t.createdAt).toLocaleDateString('ar-EG')}</div>
+            </div>
+          </div>
+          ${hasCard && cardDoc ? `
+            <div style="text-align:center;margin-bottom:12px;">
+              <img src="${cardDoc.data}" 
+                   style="max-width:100%;max-height:180px;border-radius:10px;cursor:pointer;border:2px solid var(--border);"
+                   onclick="openImagePreview('${t.id}')">
+              <p style="font-size:11px;color:var(--text-light);margin-top:4px;">🔍 اضغط للتكبير</p>
+            </div>
+          ` : ''}
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-success btn-sm" onclick="approveTeacher('${t.id}')" style="flex:1;">✅ اعتماد</button>
+            <button class="btn btn-danger btn-sm" onclick="rejectTeacher('${t.id}')" style="flex:1;">❌ رفض</button>
+          </div>
+        </div>
+      `;
+    }).join('')}
+  `);
 }
+
+function openImagePreview(teacherId) {
+  DB.get('users').then(allUsers => {
+    const teacher = allUsers.find(u => u.id === teacherId);
+    if (!teacher) return;
+    const card = (teacher.documents || []).find(d => d.type === 'teacher_card');
+    if (!card) return;
+    openModal(`<div class="modal-header">
+      <h3 class="modal-title">📸 ${escapeHtml(teacher.name)}</h3>
+      <button class="modal-close" onclick="openPendingTeachers()">✕</button>
+    </div>
+      <img src="${card.data}" style="width:100%;border-radius:12px;">
+      <button class="btn btn-outline btn-full" onclick="openPendingTeachers()" style="margin-top:16px;">← رجوع للقائمة</button>
+    `);
+  });
+}
+
+async function rejectTeacher(userId) {
+  const reason = prompt('سبب الرفض (سيُرسل للمدرس):');
+  if (reason === null) return;
+  if (!reason.trim()) { alert('يجب إدخال سبب الرفض'); return; }
+  showLoading();
+  try {
+    await dbUpdateNode('users', userId, { 
+      approved: false, rejected: true, rejectionReason: reason.trim(), rejectedAt: Date.now()
+    });
+    const notifId = uid();
+    await dbSetNode('notifications', notifId, {
+      userId, title: '❌ تم رفض طلب الاعتماد', body: `السبب: ${reason.trim()}`, createdAt: Date.now(), read: false
+    });
+    await logActivity('رفض مدرس', `${userId}: ${reason}`);
+    alert('✅ تم الرفض');
+    closeModal();
+    openPendingTeachers();
+  } finally { hideLoading(); }
+}
+
 async function approveTeacher(userId) {
   showLoading();
   try {
-    await dbUpdateNode('users', userId, { approved: true });
-    const notifId = uid();
-    await dbSetNode('notifications', notifId, { 
-      userId, 
-      title: '✅ تم اعتماد حسابك', 
-      body: 'تم اعتمادك', 
-      createdAt: Date.now(), 
-      read: false 
+    const users = await DB.get('users');
+    const teacher = users.find(u => u.id === userId);
+    if (!teacher) return;
+    await dbUpdateNode('users', userId, { 
+      approved: true, rejected: false, rejectionReason: null, approvedAt: Date.now(), verificationStatus: 'verified'
     });
-    await logActivity('اعتماد مدرس', userId);
+    const notifId = uid();
+    await dbSetNode('notifications', notifId, {
+      userId, title: '✅ تم اعتماد حسابك كمدرس', body: 'مرحباً! تم اعتماد حسابك.', createdAt: Date.now(), read: false
+    });
+    await logActivity('اعتماد مدرس', teacher.name);
     launchConfetti(30);
-    alert('تم');
+    alert('✅ تم الاعتماد');
     closeModal();
     renderAdminDashboard();
   } finally { hideLoading(); }
 }
+
 async function deleteUser(userId) {
   if (!confirm('حذف نهائي؟')) return;
   showLoading();
@@ -3512,9 +3866,10 @@ async function deleteUser(userId) {
     renderAdminDashboard();
   } finally { hideLoading(); }
 }
+
 async function wipeQuizData() {
   if (!isAdmin(currentUser)) { alert('غير مصرح'); return; }
-  if (!confirm('⚠️ مسح الكل (اختبارات، محاولات، تحديات، إشعارات)؟')) return;
+  if (!confirm('⚠️ مسح الكل؟')) return;
   if (prompt('اكتب "حذف":') !== 'حذف') { alert('ألغي'); return; }
   showLoading();
   try {
@@ -3531,13 +3886,33 @@ async function wipeQuizData() {
     renderAdminDashboard();
   } finally { hideLoading(); }
 }
+
 function renderPendingTeacherDashboard() {
   const container = document.getElementById('dashboardContent');
-  container.innerHTML = `<div class="card" style="text-align:center; padding:60px 20px;">
-    <div style="font-size:80px; margin-bottom:16px;">⏳</div>
-    <h2 style="font-size:24px; font-weight:900; margin-bottom:12px;">حسابك بانتظار الاعتماد</h2>
-    <p style="color:var(--text-light);">مرحباً ${escapeHtml(currentUser.name)}!</p>
-  </div>`;
+  const isRejected = currentUser.rejected === true;
+  container.innerHTML = `
+    <div class="card" style="text-align:center; padding:60px 20px; ${isRejected ? 'border:3px solid var(--danger);' : 'border:3px solid var(--warning);'}">
+      <div style="font-size:80px; margin-bottom:16px;">${isRejected ? '❌' : '⏳'}</div>
+      <h2 style="font-size:24px; font-weight:900; margin-bottom:12px; color:${isRejected ? 'var(--danger)' : 'var(--warning)'};">
+        ${isRejected ? 'تم رفض طلبك' : 'حسابك بانتظار الاعتماد'}
+      </h2>
+      <p style="color:var(--text-light); margin-bottom:16px;">مرحباً ${escapeHtml(currentUser.name)}!</p>
+      ${isRejected ? `
+        <div class="alert alert-error" style="text-align:right;">
+          <strong>📋 سبب الرفض:</strong><br>${escapeHtml(currentUser.rejectionReason || 'لم يُذكر')}
+        </div>
+      ` : `
+        <div class="alert alert-info" style="text-align:right;">
+          <strong>📋 بياناتك:</strong><br>
+          📚 المادة: ${getSubjectName(currentUser.subject)}<br>
+          🏫 المدرسة: ${escapeHtml(currentUser.teacherSchool || '—')}<br>
+          🆔 رقم البطاقة: ${escapeHtml(currentUser.teacherId || '—')}<br>
+          📸 بطاقة مرفوعة: ${(currentUser.documents || []).some(d => d.type === 'teacher_card') ? '✅' : '❌'}
+        </div>
+      `}
+      <button class="btn btn-outline btn-lg" onclick="logout()" style="margin-top:20px;">🚪 تسجيل الخروج</button>
+    </div>
+  `;
 }
 /* ═══════════════════════════════════════════════════════════
    ✅ TEACHER DASHBOARD
@@ -3638,7 +4013,11 @@ function renderQuizCard(quiz) {
 
 function renderStudentsList(students, allAttempts) {
   const bySchool = {};
-  students.forEach(s => { const k = s.school || 'غير محدد'; if (!bySchool[k]) bySchool[k] = []; bySchool[k].push(s); });
+  students.forEach(s => { 
+    const k = s.school ? `${s.governorateName || ''} - ${s.school}` : (s.governorateName || 'غير محدد'); 
+    if (!bySchool[k]) bySchool[k] = []; 
+    bySchool[k].push(s); 
+  });
   return `<div class="card">${Object.entries(bySchool).map(([school, list]) => `<div style="margin-bottom:16px;">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
       <span class="badge badge-info">🏫 ${escapeHtml(school)}</span>
@@ -3692,7 +4071,6 @@ function openBroadcastModal() {
     <div class="form-group"><label class="form-label">الرسالة</label><textarea class="form-textarea auto-dir" id="bBody" dir="rtl"></textarea></div>
     <button class="btn btn-primary btn-full" onclick="sendBroadcast()">📤 إرسال</button>`);
 }
-
 async function sendBroadcast() {
   const target = document.querySelector('input[name="bTarget"]:checked').value;
   const grade = document.getElementById('bGradeValue').value;
@@ -3708,13 +4086,7 @@ async function sendBroadcast() {
     if (recipients.length === 0) { alert('لا طلاب'); return; }
     for (const r of recipients) {
       const notifId = uid();
-      await dbSetNode('notifications', notifId, { 
-        userId: r.id, 
-        title: `📢 ${title}`, 
-        body, 
-        createdAt: Date.now(), 
-        read: false 
-      });
+      await dbSetNode('notifications', notifId, { userId: r.id, title: `📢 ${title}`, body, createdAt: Date.now(), read: false });
     }
     await logActivity('إشعار مدرس', title);
     launchConfetti(30);
@@ -3762,23 +4134,23 @@ function openTeacherProfileEdit() {
     <button class="btn btn-success btn-full" onclick="saveTeacherProfile()">💾 حفظ</button>`);
 }
 async function handleAvatarUpload(e) {
-  const originalFile = e.target.files[0]; if (!originalFile) return;
-  if (!originalFile.type.startsWith('image/')) { alert('صورة فقط'); e.target.value = ''; return; }
-  const sizeCheck = validateFileSize(originalFile, MAX_AVATAR_SIZE_MB, 'الصورة');
+  const file = e.target.files[0]; if (!file) return;
+  if (!file.type.startsWith('image/')) { alert('صورة فقط'); e.target.value = ''; return; }
+  const sizeCheck = validateFileSize(file, MAX_AVATAR_SIZE_MB, 'الصورة');
   if (!sizeCheck.ok) { alert(sizeCheck.msg); e.target.value = ''; return; }
   showLoading();
   try {
-    let file;
-    try { file = await compressImage(originalFile, 600, 0.75); }
-    catch (err) { file = originalFile; }
-    if (file.size > 600 * 1024) { alert(`الصورة كبيرة (${(file.size/1024).toFixed(0)}KB). الحد: 600KB`); e.target.value = ''; return; }
+    let compressed;
+    try { compressed = await compressImage(file, 600, 0.75); }
+    catch { compressed = file; }
+    if (compressed.size > 600 * 1024) { alert(`الصورة كبيرة (${(compressed.size/1024).toFixed(0)}KB). الحد: 600KB`); e.target.value = ''; return; }
     const r = new FileReader();
     r.onload = (ev) => {
       _tempAvatar = ev.target.result;
       document.getElementById('avatarPreview').innerHTML = `<img src="${ev.target.result}">`;
       alert(`✅ تم التجهيز`);
     };
-    r.readAsDataURL(file);
+    r.readAsDataURL(compressed);
   } catch (err) { alert('فشل: ' + err.message); }
   finally { hideLoading(); }
 }
@@ -4054,20 +4426,20 @@ function renderAddQuestionForm() {
 function changeQType(t) { selectedQuestionType = t; const txt = document.getElementById('qText')?.value || ''; renderAddQuestionForm(); const ta = document.getElementById('qText'); if (ta) ta.value = txt; }
 function pickTFAnswer(v, btn) { tfAnswer = v; document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); }
 async function handleImageUpload(e) {
-  const originalFile = e.target.files[0]; if (!originalFile) return;
-  if (!originalFile.type.startsWith('image/')) { alert('صورة فقط'); e.target.value = ''; return; }
+  const file = e.target.files[0]; if (!file) return;
+  if (!file.type.startsWith('image/')) { alert('صورة فقط'); e.target.value = ''; return; }
   showLoading();
   try {
-    let file;
-    try { file = await compressImage(originalFile, 800, 0.7); }
-    catch (err) { file = originalFile; }
-    if (file.size > MAX_QUESTION_IMAGE_KB * 1024) { alert(`كبيرة (${(file.size/1024).toFixed(0)}KB). الحد: ${MAX_QUESTION_IMAGE_KB}KB`); e.target.value = ''; return; }
+    let compressed;
+    try { compressed = await compressImage(file, 800, 0.7); }
+    catch { compressed = file; }
+    if (compressed.size > MAX_QUESTION_IMAGE_KB * 1024) { alert(`كبيرة (${(compressed.size/1024).toFixed(0)}KB). الحد: ${MAX_QUESTION_IMAGE_KB}KB`); e.target.value = ''; return; }
     const r = new FileReader();
     r.onload = (ev) => {
       uploadedImageData = ev.target.result;
       document.getElementById('imagePreview').innerHTML = `<img src="${uploadedImageData}" style="max-width:100%;max-height:160px;border-radius:10px;"><button class="btn btn-sm btn-danger" onclick="clearImage()" style="margin-top:6px;">🗑</button>`;
     };
-    r.readAsDataURL(file);
+    r.readAsDataURL(compressed);
   } catch (err) { alert('فشل: ' + err.message); }
   finally { hideLoading(); }
 }
@@ -4094,8 +4466,6 @@ function addQuestion() {
 function removeQuestion(i) { newQuizData.questions.splice(i, 1); showQuestionsEditor(); }
 async function saveQuiz() {
   if (!newQuizData.questions.length) return;
-  if (newQuizData.questions.length < platformSettings.minQuizQuestions) { alert(`أدنى: ${platformSettings.minQuizQuestions}`); return; }
-  if (newQuizData.questions.length > platformSettings.maxQuizQuestions) { alert(`أقصى: ${platformSettings.maxQuizQuestions}`); return; }
   showLoading();
   try {
     if (editingQuizId) {
@@ -4106,12 +4476,14 @@ async function saveQuiz() {
       const quizId = uid();
       const quiz = { 
         teacherId: currentUser.id, 
+        teacherName: currentUser.name,
         title: newQuizData.title, 
         subject: newQuizData.subject, 
         grade: newQuizData.grade, 
         timePerQuestion: newQuizData.timePerQuestion, 
         questions: newQuizData.questions, 
-        createdAt: Date.now() 
+        createdAt: Date.now(),
+        approved: true
       };
       const saved = await dbSetNode('quizzes', quizId, quiz);
       if (!saved) { alert('فشل الحفظ'); return; }
@@ -4154,7 +4526,8 @@ async function editQuiz(quizId) {
   try {
     const quizzes = await DB.get('quizzes');
     const quiz = quizzes.find(q => q.id === quizId);
-    if (!quiz || quiz.teacherId !== currentUser.id) return;
+    if (!quiz) return;
+    if (quiz.teacherId !== currentUser.id && !isAdmin(currentUser)) return;
     editingQuizId = quizId;
     newQuizData = { title: quiz.title, grade: quiz.grade, subject: quiz.subject, timePerQuestion: quiz.timePerQuestion || 30, questions: [...quiz.questions] };
     showQuestionsEditor();
@@ -4253,23 +4626,12 @@ async function finalizeGrading(attemptId) {
     const bonus = Object.values(attempt.essayGrades || {}).reduce((a, b) => a + Number(b || 0), 0);
     const finalScore = autoScore + bonus;
     await dbUpdateNode('attempts', attemptId, { 
-      score: finalScore, 
-      essayBonusPrev: bonus, 
-      needsGrading: false, 
-      graded: true, 
-      gradedAt: Date.now(),
-      autoScore
+      score: finalScore, essayBonusPrev: bonus, needsGrading: false, graded: true, gradedAt: Date.now(), autoScore
     });
     const xpGain = Math.round(bonus * 10);
     if (xpGain > 0) await awardXP(attempt.studentId, xpGain, 'مكافأة تصحيح');
     const notifId = uid();
-    await dbSetNode('notifications', notifId, { 
-      userId: attempt.studentId, 
-      title: '✅ تم التصحيح', 
-      body: `"${quiz.title}": ${finalScore}/${attempt.total}`, 
-      createdAt: Date.now(), 
-      read: false 
-    });
+    await dbSetNode('notifications', notifId, { userId: attempt.studentId, title: '✅ تم التصحيح', body: `"${quiz.title}": ${finalScore}/${attempt.total}`, createdAt: Date.now(), read: false });
     launchConfetti(20);
     closeModal();
     renderTeacherDashboard();
@@ -4289,7 +4651,7 @@ async function exportResults() {
     const quiz = quizzes.find(q => q.id === a.quizId);
     const student = users.find(u => u.id === a.studentId);
     return {
-      'الطالب': student?.name || '', 'المدرسة': student?.school || '', 'السنة': student?.grade || '',
+      'الطالب': student?.name || '', 'المحافظة': student?.governorateName || '', 'المدرسة': student?.school || '', 'السنة': student?.grade || '',
       'الاختبار': quiz?.title || '', 'المادة': getSubjectName(quiz?.subject),
       'الدرجة': a.score, 'الإجمالي': a.total, 'النسبة %': a.total > 0 ? Math.round((a.score / a.total) * 100) : 0,
       'XP': student?.xp || 0, 'التاريخ': new Date(a.createdAt).toLocaleDateString('ar-EG')
@@ -4304,7 +4666,8 @@ async function exportStudents() {
   const users = (await DB.get('users')).filter(u => u.role === 'student');
   if (!users.length) { alert('لا طلاب'); return; }
   const rows = users.map(u => ({
-    'الاسم': u.name, 'البريد': u.email, 'المدرسة': u.school || '', 'السنة': u.grade,
+    'الاسم': u.name, 'البريد': u.email, 'المحافظة': u.governorateName || '', 'المدرسة': u.school || '', 'السنة': u.grade,
+    'ولي الأمر': u.parentName || '', 'هاتف': u.parentPhone || '',
     'XP': u.xp || 0, 'الشارات': (u.badges || []).length, 'السلسلة': u.streak || 0,
     'تاريخ التسجيل': new Date(u.createdAt).toLocaleDateString('ar-EG')
   }));
@@ -4321,7 +4684,10 @@ async function renderStudentDashboard() {
   showLoading();
   try {
     const allQuizzes = await DB.get('quizzes');
-    const myQuizzes = allQuizzes.filter(q => q.grade === currentUser.grade);
+    const myQuizzes = allQuizzes.filter(q => 
+      q.grade === currentUser.grade && 
+      (q.approved !== false || q.isPublic || q.isDemo)
+    );
     const allAttempts = await DB.get('attempts');
     const myAttempts = allAttempts.filter(a => a.studentId === currentUser.id);
     const solvedIds = new Set(myAttempts.map(a => a.quizId));
@@ -4408,7 +4774,7 @@ function renderStudentQuizCard(quiz, myAttempts) {
   return `<div class="subject-card" onclick="startQuiz('${quiz.id}')">
     <div class="subject-emoji">${getSubjectEmoji(quiz.subject)}</div>
     <div class="subject-name">${escapeHtml(quiz.title)}</div>
-    <div class="subject-meta">${getSubjectName(quiz.subject)} • ${quiz.questions.length} سؤال</div>
+    <div class="subject-meta">${getSubjectName(quiz.subject)} • ${quiz.questions.length} سؤال ${quiz.isDemo ? '• 🎯 تجريبي' : ''}</div>
     <div class="subject-footer"><span class="badge badge-primary">ابدأ</span></div>
   </div>`;
 }
@@ -4462,7 +4828,7 @@ async function renderAnsweredScreen(filterTab = 'all') {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ✅ PARENT DASHBOARD
+   ✅ PARENT DASHBOARD - مع ربط الأبناء عبر الهاتف
    ═══════════════════════════════════════════════════════════ */
 async function renderParentDashboard() {
   showLoading();
@@ -4470,18 +4836,40 @@ async function renderParentDashboard() {
     const allUsers = await DB.get('users');
     const allAttempts = await DB.get('attempts');
     const allChallenges = await DB.get('challenges');
-    const children = allUsers.filter(u => u.role === 'student' && (currentUser.children || []).includes(u.id));
+    
+    const myPhone = (currentUser.phone || '').trim();
+    const linkedChildrenIds = currentUser.children || [];
+    
+    // ✅ البحث عن جميع الأبناء عبر:
+    // 1. children المربوطين يدوياً
+    // 2. رقم هاتف ولي الأمر
+    const children = allUsers.filter(u => {
+      if (u.role !== 'student') return false;
+      if (linkedChildrenIds.includes(u.id)) return true;
+      if (myPhone && u.parentPhone && u.parentPhone.trim() === myPhone) return true;
+      return false;
+    });
+    
+    // مزامنة تلقائية
+    const autoIds = children.map(c => c.id);
+    if (autoIds.length > linkedChildrenIds.length) {
+      const merged = [...new Set([...linkedChildrenIds, ...autoIds])];
+      currentUser.children = merged;
+      await dbUpdateNode('users', currentUser.id, { children: merged });
+    }
+    
     const totalAttempts = children.reduce((sum, c) => sum + allAttempts.filter(a => a.studentId === c.id).length, 0);
     const avgAll = children.length > 0 ? Math.round(children.reduce((sum, c) => {
       const ca = allAttempts.filter(a => a.studentId === c.id);
       return sum + (ca.length ? calculateAvg(ca) : 0);
     }, 0) / children.length) : 0;
+    
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
       <div class="card" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); color:#fff;">
         <div style="display:flex; align-items:center; gap:12px;">
           <span style="font-size:48px;">👨‍👩‍👦</span>
-          <div><h2 style="font-size:24px; font-weight:900;">لوحة ولي الأمر</h2></div>
+          <div><h2 style="font-size:24px; font-weight:900;">لوحة ولي الأمر</h2><p style="opacity:0.9;">${escapeHtml(currentUser.name)}</p></div>
         </div>
       </div>
       <div class="stats-grid">
@@ -4489,39 +4877,55 @@ async function renderParentDashboard() {
         <div class="stat-card"><div class="stat-icon success">✅</div><div class="stat-info"><h4>${totalAttempts}</h4><p>محاولات</p></div></div>
         <div class="stat-card"><div class="stat-icon warning">📊</div><div class="stat-info"><h4>${avgAll}%</h4><p>متوسط</p></div></div>
       </div>
+      
       <div class="add-child-box">
-        <h4>➕ إضافة ابن</h4>
+        <h4>➕ إضافة ابن/ابنة</h4>
+        <p style="font-size:13px;color:var(--text-light);margin-bottom:12px;">
+          ⚡ <strong>مهم:</strong> إذا كان رقم هاتفك مسجلاً عند أبنائك، سيظهرون تلقائياً.<br>
+          أو أدخل بريد الطالب/رقم هاتفه لربطه يدوياً.
+        </p>
         <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
-          <input type="text" class="form-input auto-dir" id="childSearchInput" placeholder="البريد أو الهاتف" style="max-width:400px;" dir="rtl">
-          <button class="btn btn-primary" onclick="searchChild()">🔍 بحث</button>
+          <input type="text" class="form-input auto-dir" id="childSearchInput" placeholder="البريد أو رقم الهاتف" style="max-width:400px;" dir="rtl">
+          <button class="btn btn-primary" onclick="searchChild()">🔍 بحث وإضافة</button>
         </div>
+        <p style="font-size:12px;color:var(--text-light);margin-top:12px;">
+          📱 <strong>رقم هاتفك المسجل:</strong> ${escapeHtml(myPhone || 'غير مسجل')}
+        </p>
       </div>
-      <div class="section-header" style="margin-top:32px;"><div><h2 class="section-title">👨‍🎓 أبنائي</h2></div></div>
-      ${children.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا أبناء</h3></div></div>` :
+      
+      <div class="section-header" style="margin-top:32px;">
+        <div><h2 class="section-title">👨‍🎓 أبنائي (${children.length})</h2><p class="section-subtitle">متابعة كاملة</p></div>
+      </div>
+      
+      ${children.length === 0 ? `<div class="card"><div class="empty-state">
+        <div class="empty-state-icon">👨‍👩‍👦</div>
+        <h3>لا أبناء مرتبطون بعد</h3>
+        <p style="margin-top:8px;color:var(--text-light);font-size:13px;">
+          💡 تأكد أن رقم هاتفك مسجل عند أبنائك (في خانة "هاتف ولي الأمر" أثناء تسجيلهم)
+        </p>
+      </div></div>` :
         children.map(child => {
           const ca = allAttempts.filter(a => a.studentId === child.id);
           const cAvg = ca.length ? calculateAvg(ca) : 0;
           const lvl = getLevel(child.xp || 0);
-          const childChallenges = allChallenges.filter(c => (c.fromId === child.id || c.toId === child.id) && c.status === 'completed');
           return `<div class="parent-child-card">
             <div class="parent-child-header">
-              <div class="parent-child-avatar">${child.photoURL ? `<img data-src="${child.photoURL}" class="lazy-img" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="">` : '👨‍🎓'}</div>
-              <div class="parent-child-info"><h4>${escapeHtml(child.name)} <span class="badge badge-purple">${lvl.emoji}</span></h4><p>${escapeHtml(child.grade || '')} • ${child.xp || 0} XP</p></div>
-              <button class="btn btn-sm btn-danger" onclick="removeChild('${child.id}')">🗑</button>
+              <div class="parent-child-avatar">${child.photoURL ? `<img src="${child.photoURL}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : '👨‍🎓'}</div>
+              <div class="parent-child-info">
+                <h4>${escapeHtml(child.name)} <span class="badge badge-purple">${lvl.emoji} ${lvl.name}</span></h4>
+                <p>${escapeHtml(child.grade || '')} • ${escapeHtml(child.school || '')} • ${child.xp || 0} XP</p>
+              </div>
+              ${linkedChildrenIds.includes(child.id) ? `<button class="btn btn-sm btn-danger" onclick="removeChild('${child.id}')" title="إلغاء الربط">🗑</button>` : `<span class="badge badge-success">🔗 تلقائي</span>`}
             </div>
             <div class="parent-child-stats">
               <div class="parent-child-stat"><h5>${ca.length}</h5><p>محلول</p></div>
               <div class="parent-child-stat"><h5>${cAvg}%</h5><p>المتوسط</p></div>
               <div class="parent-child-stat"><h5>${(child.badges || []).length}</h5><p>شارات</p></div>
             </div>
-            ${childChallenges.length > 0 ? `<div style="padding:8px;background:var(--warning-light);border-radius:8px;margin-bottom:8px;font-size:12px;">
-              ⚔️ شارك في <strong>${childChallenges.length}</strong> تحدي مكتمل
-            </div>` : ''}
             <button class="btn btn-outline btn-full btn-sm" onclick="openChildDetails('${child.id}')">👁️ التفاصيل</button>
           </div>`;
         }).join('')}
     `;
-    setTimeout(observeLazyImages, 100);
   } finally { hideLoading(); }
 }
 
@@ -4531,21 +4935,35 @@ async function searchChild() {
   showLoading();
   try {
     const users = await DB.get('users');
-    const student = users.find(u => u.role === 'student' && (u.email?.toLowerCase() === query || u.parentPhone === query));
-    if (!student) { alert('❌ لم يتم العثور'); return; }
-    if ((currentUser.children || []).includes(student.id)) { alert('⚠️ مرتبط'); return; }
-    const children = [...(currentUser.children || []), student.id];
-    const saved = await dbUpdateNode('users', currentUser.id, { children });
-    if (!saved) { alert('فشل'); return; }
-    currentUser = { ...currentUser, children };
+    // ✅ البحث عن جميع الطلاب المطابقين
+    const matched = users.filter(u => 
+      u.role === 'student' && 
+      (u.email?.toLowerCase() === query || u.parentPhone === query)
+    );
+    
+    if (matched.length === 0) { alert('❌ لم يتم العثور على طالب'); return; }
+    
+    let added = 0;
+    const children = [...(currentUser.children || [])];
+    for (const student of matched) {
+      if (!children.includes(student.id)) {
+        children.push(student.id);
+        added++;
+      }
+    }
+    
+    if (added === 0) { alert('⚠️ جميع الطلاب المطابقين مرتبطون بالفعل'); return; }
+    
+    currentUser.children = children;
+    await dbUpdateNode('users', currentUser.id, { children });
     launchConfetti(30);
-    alert(`✅ تم ربط ${student.name}`);
+    alert(`✅ تم ربط ${added} طالب${added > 1 ? 'ين' : ''}`);
     renderParentDashboard();
   } finally { hideLoading(); }
 }
 
 async function removeChild(childId) {
-  if (!confirm('إلغاء؟')) return;
+  if (!confirm('إلغاء الربط؟')) return;
   showLoading();
   try {
     const children = (currentUser.children || []).filter(id => id !== childId);
@@ -4571,7 +4989,7 @@ async function openChildDetails(childId) {
     const avg = ca.length ? calculateAvg(ca) : 0;
     const lvl = getLevel(child.xp || 0);
     openModal(`<div class="modal-header"><h3 class="modal-title">👨‍🎓 ${escapeHtml(child.name)}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-      <div class="alert alert-info">📚 ${escapeHtml(child.grade || '')}<br>${lvl.emoji} ${lvl.name} • ${child.xp || 0} XP • 🔥 ${child.streak || 0}<br>📊 المتوسط: ${avg}% • ${ca.length} اختبار</div>
+      <div class="alert alert-info">📚 ${escapeHtml(child.grade || '')} • ${escapeHtml(child.school || '')}<br>${lvl.emoji} ${lvl.name} • ${child.xp || 0} XP • 🔥 ${child.streak || 0}<br>📊 المتوسط: ${avg}% • ${ca.length} اختبار</div>
       
       ${childChallenges.length > 0 ? `<h4 style="margin:16px 0 12px;">⚔️ التحديات (${childChallenges.length})</h4>
         ${childChallenges.slice(0, 5).map(c => {
@@ -4744,13 +5162,11 @@ function checkAnswer(q, a) {
   return false;
 }
 
-/* ✅ إنهاء الاختبار - مع تحديث التحدي */
 async function finishQuiz() {
   clearInterval(timerInterval);
   showLoading();
   try {
     const existing = await DB.get('attempts');
-    // منع الحل المكرر (فقط للاختبارات العادية)
     if (!window._currentChallenge && existing.some(a => a.quizId === currentQuiz.id && a.studentId === currentUser.id)) { 
       hideLoading(); 
       alert('حللت بالفعل.'); 
@@ -4786,25 +5202,20 @@ async function finishQuiz() {
       isChallenge: !!window._currentChallenge
     };
     
-    // ✅ حفظ مباشر
     const attemptSaved = await dbSetNode('attempts', attemptId, attempt);
     if (!attemptSaved) { alert('فشل حفظ المحاولة'); return; }
     
-    // ✅ منح XP
     const xpGain = calculateXPForAttempt(attempt);
     await awardXP(currentUser.id, xpGain, `حل اختبار: ${currentQuiz.title}`);
     await updateStreak(currentUser.id);
     const newBadges = await checkAndAwardBadges(currentUser.id);
     
-    // ✅ إذا كان تحدياً، حدّث حالة التحدي
     let challengeResult = null;
     if (window._currentChallenge) {
       const challenges = await DB.get('challenges');
       const challenge = challenges.find(c => c.id === window._currentChallenge.id);
       if (challenge) {
         const pct = autoGraded > 0 ? Math.round((score / autoGraded) * 100) : 0;
-        
-        // تحقق من محاولة المرسل السابقة (إن وجدت)
         const senderAttempt = existing.find(a => a.studentId === challenge.fromId && a.quizId === challenge.quizId && !a.isChallenge);
         const fromScore = senderAttempt ? (senderAttempt.total > 0 ? Math.round((senderAttempt.score / senderAttempt.total) * 100) : 0) : null;
         
@@ -4825,7 +5236,6 @@ async function finishQuiz() {
         
         challengeResult = { ...challenge, toScore: pct, fromScore, winnerId };
         
-        // إشعار للمرسل
         const notifId = uid();
         await dbSetNode('notifications', notifId, { 
           userId: challenge.fromId, 
@@ -4837,7 +5247,6 @@ async function finishQuiz() {
       }
     }
     
-    // تحديث currentUser من DB
     const freshUsers = await DB.get('users');
     const freshMe = freshUsers.find(u => u.id === currentUser.id);
     if (freshMe) currentUser = freshMe;
@@ -4850,7 +5259,6 @@ async function finishQuiz() {
     else if (pct >= 50) { emoji = '👍'; title = 'جيد جداً'; color = 'var(--primary)'; }
     else { emoji = '💪'; title = 'حاول مرة أخرى'; color = 'var(--danger)'; }
     
-    // ✅ عرض نتيجة التحدي
     let challengeHtml = '';
     if (challengeResult) {
       const myScore = challengeResult.toScore;
@@ -4942,7 +5350,7 @@ document.addEventListener('click', (e) => {
 const globalFns = [
   // Auth
   switchAuthTab, pickRole, handleRegister, handleLogin, handleGoogleSignIn, handleForgotPassword, logout, toggleDarkMode,
-  pickGoogleRole, completeGoogleProfile, cancelGoogleProfile, saveExistingProfile,
+  pickGoogleRole, completeGoogleProfile, cancelGoogleProfile, saveExistingProfile, handleTeacherCardUpload,
   // UI
   openNotifications, closeModal, openGlobalSearch, performGlobalSearch, openThemePicker, applyTheme,
   // Quiz
@@ -4962,9 +5370,10 @@ const globalFns = [
   renderAdminAnnouncements, openAnnouncementEditor, saveAnnouncement, toggleAnnouncement, deleteAnnouncement,
   renderAdminSettings, savePlatformSettingsForm, dismissAnnouncement,
   renderAdminChallenges, adminDeleteChallenge,
+  renderAdminPublicQuizzes, seedDemoQuizzes,
   pickAnnType, handleAnnImageUpload, removeAnnImage,
-  openPendingTeachers, approveTeacher, deleteUser, wipeQuizData, switchUserTab, applyAdminFilters,
-  selectAdminTheme, refreshAdminUsersList,
+  openPendingTeachers, approveTeacher, rejectTeacher, deleteUser, wipeQuizData, switchUserTab, applyAdminFilters,
+  selectAdminTheme, refreshAdminUsersList, openImagePreview,
   // Teacher
   openTeacherProfileEdit, saveTeacherProfile, openTeacherContent, renderContentModal,
   addVideoLink, removeVideoLink, handleMaterialUpload, removeMaterial, downloadMaterial, downloadTeacherMaterial,
@@ -4980,15 +5389,21 @@ const globalFns = [
   startNotificationsListener, stopNotificationsListener,
   startRealtimeAnalytics, stopRealtimeAnalytics,
   // DB Direct Write
-  dbSetNode, dbUpdateNode, dbRemoveNode
+  dbSetNode, dbUpdateNode, dbRemoveNode,
+  // Helpers
+  getGovernorateName, getLevel, getNextLevel
 ];
 globalFns.forEach(fn => { 
   try { window[fn.name] = fn; } catch(e) { console.warn('Could not export:', fn.name); } 
 });
 
-console.log('✅ EduPlatform Pro loaded successfully');
-console.log('📝 Registration: Direct write to users/{uid} - no more PERMISSION_DENIED');
-console.log('🎯 All write operations use dbSetNode/dbUpdateNode/dbRemoveNode');
+console.log('✅ عِلْم - EduPlatform Pro loaded successfully');
+console.log('📝 Registration: Direct write to users/{uid}');
+console.log('🎯 Governorates: 27 Egyptian governorates supported');
+console.log('📚 Demo Quizzes: 13 curriculum 2026/2027 tests ready');
+console.log('👨‍🏫 Teacher Verification: ID + School + Card image');
+console.log('👨‍👩‍👦 Parent Linking: Via phone number OR manual search');
+console.log('⚔️ Challenges: Full scenario with results');
 </script>
 </body>
 </html>
