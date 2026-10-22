@@ -1568,23 +1568,58 @@ async function handleLogin(e) {
 }
 
 async function handleGoogleSignIn() {
-  if (!firebaseAuthEnabled) { showAlert('غير متاح', 'warning'); return; }
+  console.log('🔵 Google Sign-In: بدء المحاولة');
+  if (!firebaseAuthEnabled) { 
+    showAlert('Firebase Auth غير متاح. تحقق من الاتصال.', 'error'); 
+    console.error('❌ firebaseAuthEnabled = false');
+    return; 
+  }
   const btn = document.getElementById('googleBtn');
   const orig = btn.innerHTML;
   btn.disabled = true;
+  btn.innerHTML = '<span>⏳ جارٍ الاتصال بـ Google...</span>';
+  
   try {
     const provider = new fbAuth.GoogleAuthProvider();
     provider.addScope('email'); 
     provider.addScope('profile');
+    
+    console.log('📱 isMobileDevice:', isMobileDevice());
+    
     if (isMobileDevice()) {
+      console.log('📱 استخدام Redirect (جوال)');
       sessionStorage.setItem('edu_google_redirect', '1');
       await fbAuth.signInWithRedirect(fbAuth.auth, provider);
-      return;
+      return; // لن يصل هنا لأن الصفحة ستُعاد توجيهها
     }
+    
+    console.log('💻 استخدام Popup (كمبيوتر)');
     const result = await fbAuth.signInWithPopup(fbAuth.auth, provider);
+    console.log('✅ نجح Popup، المستخدم:', result.user?.email);
+    
+    if (!result || !result.user) {
+      throw new Error('لم يتم استلام بيانات المستخدم من Google');
+    }
+    
     await processGoogleUser(result.user);
+    
   } catch (err) { 
-    showAlert('تعذر تسجيل الدخول: ' + (err.message || 'خطأ')); 
+    console.error('❌ Google Sign-In Error:', err);
+    console.error('Error code:', err.code);
+    console.error('Error message:', err.message);
+    
+    const msgs = {
+      'auth/popup-closed-by-user': 'أغلقت النافذة قبل إكمال التسجيل. أعد المحاولة.',
+      'auth/popup-blocked': 'المتصفح يمنع النوافذ المنبثقة. اسمح بها لهذا الموقع.',
+      'auth/cancelled-popup-request': 'تم إلغاء الطلب. حاول مرة أخرى.',
+      'auth/unauthorized-domain': 'الدومين غير مصرح به في Firebase. أضفه من Authentication → Settings.',
+      'auth/operation-not-allowed': 'Google غير مفعّل في Firebase. فعّله من Authentication → Sign-in method.',
+      'auth/network-request-failed': 'فشل الاتصال بالشبكة. تحقق من الإنترنت.',
+      'auth/internal-error': 'خطأ داخلي من Firebase. أعد المحاولة.'
+    };
+    
+    showAlert(msgs[err.code] || 'فشل تسجيل الدخول: ' + (err.message || 'خطأ غير معروف'), 'error');
+    
   }
   finally { 
     btn.disabled = false; 
