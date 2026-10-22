@@ -433,13 +433,37 @@
   .daily-quest-progress { height: 10px; background: rgba(255,255,255,0.3); border-radius: 999px; overflow: hidden; margin-bottom: 6px; }
   .daily-quest-fill { height: 100%; background: #fff; border-radius: 999px; transition: width 0.5s; }
   .daily-quest-reward { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; background: rgba(255,255,255,0.25); border-radius: 999px; font-size: 12px; font-weight: 800; }
+  
+  /* ═══════════════════════════════════════════════════════════
+     ✅ نظام الإعلانات المبسط - نافذة واحدة كبيرة متحركة فقط
+     ═══════════════════════════════════════════════════════════ */
+  .announcements-carousel { position: relative; overflow: hidden; border-radius: 0; margin-bottom: 0; }
+  .announcement-slide { display: none; animation: slideFadeIn 0.6s ease; }
+  .announcement-slide.active { display: block; }
+  @keyframes slideFadeIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+  .announcement-banner.with-image { position: relative; min-height: 320px; background-size: cover; background-position: center; background-repeat: no-repeat; color: #fff; display: flex; align-items: center; justify-content: center; padding: 40px 20px; overflow: hidden; }
+  .announcement-banner.with-image::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0,0,0,0.55), rgba(0,0,0,0.35)); z-index: 1; }
+  .announcement-banner.with-image .announcement-banner-inner { position: relative; z-index: 2; }
+  .announcement-banner.close-btn-visible { padding-top: 40px; }
+  .ann-image-preview { max-width: 100%; max-height: 150px; border-radius: 10px; margin-top: 10px; border: 2px solid var(--border); }
+  
+  /* حاوية الإعلانات الموحدة في كل الشاشات - مخفية افتراضياً، تظهر فقط عند وجود إعلانات */
+  .global-announcement-container { 
+    position: relative;
+    z-index: 999;
+    width: 100%;
+  }
+  .global-announcement-container:empty {
+    display: none;
+  }
+  
   @media (max-width: 600px) {
     .card { padding: 20px; } .auth-wrapper { margin: 20px auto; }
     .stats-grid { grid-template-columns: repeat(2, 1fr); } .stat-card { flex-direction: column; text-align: center; }
     .section-title { font-size: 18px; } .modal { padding: 20px; }
     .user-tab { padding: 10px 16px; font-size: 13px; }
     .badges-grid { grid-template-columns: repeat(3, 1fr); }
-    .announcement-banner { min-height: 140px; }
+    .announcement-banner { min-height: 220px; }
     .announcement-banner-title { font-size: 20px; }
     .announcement-banner-text { font-size: 14px; }
     .theme-grid { grid-template-columns: repeat(2, 1fr); }
@@ -453,8 +477,11 @@
 <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
 <div class="confetti-container" id="confettiContainer"></div>
 
+<!-- ✅ حاوية الإعلانات الموحدة - تظهر في كل الشاشات -->
+<div id="globalAnnouncementContainer" class="global-announcement-container"></div>
+
 <section id="authScreen" class="screen active">
-  <div class="auth-wrapper">
+  <div class="auth-wrapper" style="padding-top: 20px;">
     <div class="card">
       <div class="auth-header">
         <div class="auth-logo">📖</div>
@@ -590,7 +617,6 @@
 </section>
 
 <section id="dashboardScreen" class="screen">
-  <div id="announcementContainer"></div>
   <div class="dashboard-header">
     <div class="header-content">
       <div class="header-user">
@@ -615,7 +641,6 @@
 </section>
 
 <section id="quizScreen" class="screen">
-  <div id="announcementContainerQuiz"></div>
   <div class="container" style="max-width:700px; padding-top: 30px;">
     <div class="card">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; gap:12px;">
@@ -1392,11 +1417,13 @@ function applyThemeColors(key) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   الإعلانات
+   ✅ الإعلانات - نافذة واحدة كبيرة متحركة على كل الشاشات
    ═══════════════════════════════════════════════════════════ */
 let _cachedAnnouncements = [];
 let _announcementUnsubscribe = null;
 let _lastAnnouncementId = null;
+let _announcementTimer = null;
+let _currentAnnouncementIndex = 0;
 
 async function loadActiveAnnouncement() {
   try {
@@ -1417,57 +1444,73 @@ function startAnnouncementsListener() {
 function stopAnnouncementsListener() {
   if (_announcementUnsubscribe) { try { _announcementUnsubscribe(); } catch {} _announcementUnsubscribe = null; }
 }
-function getActiveAnnouncement() {
+function stopAllAnnouncementTimers() {
+  if (_announcementTimer) { clearInterval(_announcementTimer); _announcementTimer = null; }
+}
+function getActiveAnnouncementsList() {
   const now = Date.now();
-  const active = _cachedAnnouncements.find(a => {
+  return _cachedAnnouncements.filter(a => {
     if (!a.enabled) return false;
     if (a.startDate && a.startDate > now) return false;
     if (a.endDate && a.endDate < now) return false;
+    const dismissed = localStorage.getItem('edu_announcement_dismissed_' + a.id);
+    if (dismissed) return false;
     return true;
-  });
-  if (!active) return null;
-  if (_lastAnnouncementId !== active.id) {
-    const dismissed = localStorage.getItem('edu_announcement_dismissed');
-    if (dismissed && dismissed !== active.id) localStorage.removeItem('edu_announcement_dismissed');
-    _lastAnnouncementId = active.id;
-  }
-  const dismissed = localStorage.getItem('edu_announcement_dismissed');
-  if (dismissed === active.id) return null;
-  return active;
+  }).sort((a, b) => (a.order || 0) - (b.order || 0) || (b.createdAt || 0) - (a.createdAt || 0));
 }
 function renderAnnouncementEverywhere() {
-  const active = getActiveAnnouncement();
-  const containers = [document.getElementById('announcementContainer'), document.getElementById('announcementContainerQuiz')];
-  containers.forEach(container => {
-    if (!container) return;
-    if (!active) { container.innerHTML = ''; return; }
-    if (active.type === 'banner' || active.imageUrl) {
-      const bg = active.imageUrl ? `background-image: url('${active.imageUrl}');` : `background: linear-gradient(135deg, ${active.bgColor || '#4f46e5'}, ${active.bgColorEnd || '#8b5cf6'});`;
-      const textDir = detectDirection(active.text || '');
-      const titleDir = detectDirection(active.title || '');
-      container.innerHTML = `<div class="announcement-banner" style="${bg}">
-        <button class="announcement-banner-close" onclick="dismissAnnouncement('${active.id}')" title="إغلاق">✕</button>
-        <div class="announcement-banner-inner">
-          ${active.emoji ? `<span class="announcement-banner-emoji">${active.emoji}</span>` : ''}
-          ${active.title ? `<h2 class="announcement-banner-title" dir="${titleDir}" style="text-align:${titleDir === 'ltr' ? 'left' : 'right'};">${escapeHtml(active.title)}</h2>` : ''}
-          ${active.text ? `<p class="announcement-banner-text" dir="${textDir}" style="text-align:${textDir === 'ltr' ? 'left' : 'right'};">${escapeHtml(active.text)}</p>` : ''}
-          ${active.link ? `<a href="${escapeHtml(active.link)}" target="_blank" rel="noopener" class="announcement-banner-cta">${escapeHtml(active.linkText || 'اعرف أكثر')} ←</a>` : ''}
+  stopAllAnnouncementTimers();
+  const activeAnnouncements = getActiveAnnouncementsList();
+  const container = document.getElementById('globalAnnouncementContainer');
+  if (!container) return;
+  if (activeAnnouncements.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+  // نعرض فقط البانر الكبير المتحرك
+  container.innerHTML = `<div class="announcements-carousel" data-key="global">
+    ${activeAnnouncements.map((a, i) => {
+      const hasImage = a.imageUrl || a.imageData;
+      const imgSrc = a.imageUrl || a.imageData;
+      const bg = hasImage ? `background-image: url('${imgSrc}');` : `background: linear-gradient(135deg, ${a.bgColor || '#4f46e5'}, ${a.bgColorEnd || '#8b5cf6'});`;
+      const textDir = detectDirection(a.text || '');
+      const titleDir = detectDirection(a.title || '');
+      return `<div class="announcement-slide ${i === 0 ? 'active' : ''}" data-index="${i}">
+        <div class="announcement-banner ${hasImage ? 'with-image' : ''} close-btn-visible" style="${bg}">
+          <button class="announcement-banner-close" onclick="dismissAnnouncement('${a.id}', 'global')" title="إغلاق">✕</button>
+          <div class="announcement-banner-inner">
+            ${a.emoji ? `<span class="announcement-banner-emoji">${a.emoji}</span>` : ''}
+            ${a.title ? `<h2 class="announcement-banner-title" dir="${titleDir}" style="text-align:${titleDir === 'ltr' ? 'left' : 'right'};">${escapeHtml(a.title)}</h2>` : ''}
+            ${a.text ? `<p class="announcement-banner-text" dir="${textDir}" style="text-align:${textDir === 'ltr' ? 'left' : 'right'};">${escapeHtml(a.text)}</p>` : ''}
+            ${a.link ? `<a href="${escapeHtml(a.link)}" target="_blank" rel="noopener" class="announcement-banner-cta">${escapeHtml(a.linkText || 'اعرف أكثر')} ←</a>` : ''}
+          </div>
         </div>
       </div>`;
-    } else {
-      const textDir = detectDirection(active.text || '');
-      container.innerHTML = `<div class="announcement-bar" style="background: linear-gradient(135deg, ${active.bgColor || 'var(--primary)'}, ${active.bgColorEnd || 'var(--purple)'});">
-        <span class="announcement-bar-emoji">${active.emoji || '📢'}</span>
-        <div class="announcement-bar-content" dir="${textDir}" style="text-align:${textDir === 'ltr' ? 'left' : 'right'};">
-          ${active.title ? `<strong>${escapeHtml(active.title)}:</strong> ` : ''}${escapeHtml(active.text)}
-          ${active.link ? ` <a href="${escapeHtml(active.link)}" target="_blank" rel="noopener">${escapeHtml(active.linkText || 'اعرف أكثر')}</a>` : ''}
-        </div>
-        <button class="announcement-bar-close" onclick="dismissAnnouncement('${active.id}')" title="إغلاق">✕</button>
-      </div>`;
-    }
-  });
+    }).join('')}
+  </div>`;
+  _currentAnnouncementIndex = 0;
+  if (activeAnnouncements.length > 1) {
+    _announcementTimer = setInterval(() => {
+      nextAnnouncement('global', 1);
+    }, 10000);
+  }
 }
-function dismissAnnouncement(id) { localStorage.setItem('edu_announcement_dismissed', id); renderAnnouncementEverywhere(); }
+function nextAnnouncement(key, direction) {
+  const container = document.querySelector(`.announcements-carousel[data-key="${key}"]`);
+  if (!container) return;
+  const slides = container.querySelectorAll('.announcement-slide');
+  if (slides.length <= 1) return;
+  let currentIndex = Array.from(slides).findIndex(s => s.classList.contains('active'));
+  if (currentIndex === -1) currentIndex = 0;
+  let newIndex = (currentIndex + direction + slides.length) % slides.length;
+  slides.forEach(s => s.classList.remove('active'));
+  slides[newIndex].classList.add('active');
+  _currentAnnouncementIndex = newIndex;
+}
+function dismissAnnouncement(id, key) {
+  localStorage.setItem('edu_announcement_dismissed_' + id, '1');
+  renderAnnouncementEverywhere();
+}
 
 async function logActivity(action, details = '') {
   try {
@@ -1569,28 +1612,23 @@ async function handleRegister(e) {
         const cred = await fbAuth.createUserWithEmailAndPassword(fbAuth.auth, email, password);
         const uid = cred.user.uid;
         profile.id = uid;
-        
         if (!fbAuth.auth.currentUser || fbAuth.auth.currentUser.uid !== uid) {
           showAlert('⚠️ فشل تسجيل الدخول التلقائي. حاول تسجيل الدخول يدوياً.', 'warning');
         }
-        
         const users = await DB.get('users');
         if (users.find(u => u.email === email)) {
           try { await cred.user.delete(); } catch {}
           showAlert('هذا البريد مسجل بالفعل');
           return;
         }
-        
         const profileForDB = { ...profile };
         delete profileForDB.id;
         const saved = await dbSetNode('users', uid, profileForDB);
-        
         if (!saved) {
           try { await cred.user.delete(); } catch {}
           showAlert('⚠️ فشل حفظ البيانات. تحقق من قواعد الأمان (Rules).', 'error');
           return;
         }
-        
         _tempTeacherCard = null;
         currentUser = profile;
         saveSession(uid, true);
@@ -1708,7 +1746,6 @@ async function handleGoogleSignIn() {
     const provider = new fbAuth.GoogleAuthProvider();
     provider.addScope('email'); 
     provider.addScope('profile');
-    
     try {
       const result = await fbAuth.signInWithPopup(fbAuth.auth, provider);
       if (!result || !result.user) throw new Error('لم يتم استلام بيانات المستخدم من Google');
@@ -1766,16 +1803,13 @@ async function ensureUserProfile(fbUser, existingProfile) {
 async function processGoogleUser(g) {
   if (!g || !g.email) { showAlert('تعذر الحصول على البيانات'); return; }
   console.log('🔄 processGoogleUser:', g.email, g.uid);
-  
   const users = await DB.get('users');
   let existing = users.find(u => u.id === g.uid) 
     || users.find(u => u.email && g.email && u.email.toLowerCase() === g.email.toLowerCase());
-  
   if (!existing && !platformSettings.registrationEnabled) { 
     showAlert('التسجيل متوقف مؤقتاً', 'warning'); 
     return; 
   }
-  
   if (existing && existing.id !== g.uid) {
     const oldId = existing.id;
     existing.id = g.uid;
@@ -1786,12 +1820,10 @@ async function processGoogleUser(g) {
       await dbRemoveNode('users', oldId);
     }
   }
-  
   if (g.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() && existing) {
     existing.role = 'admin'; existing.approved = true;
     await dbUpdateNode('users', existing.id, { role: 'admin', approved: true });
   }
-  
   if (existing) {
     const np = (existing.name || '').split(/\s+/).filter(p => p.length > 0);
     if (np.length < 3 && !isAdmin(existing) && existing.needsProfileCompletion !== false) {
@@ -1952,14 +1984,11 @@ async function completeGoogleProfile() {
   try {
     const uid = pendingGoogleUser.id;
     console.log('💾 Saving Google profile:', uid, profile.email);
-    
     const saved = await dbSetNode('users', uid, profile);
     if (!saved) { 
-      alert('⚠️ فشل حفظ البيانات. تحقق من قواعد الأمان (Rules) في Firebase Console.'); 
-      console.error('❌ Failed to save Google user profile');
+      alert('⚠️ فشل حفظ البيانات. تحقق من قواعد الأمان (Rules).'); 
       return; 
     }
-    
     const verifyUsers = await DB.get('users');
     const verified = verifyUsers.find(u => u.id === uid || u.email === profile.email);
     if (!verified) {
@@ -1967,7 +1996,6 @@ async function completeGoogleProfile() {
     } else {
       console.log('✅ Google user profile verified in DB');
     }
-    
     profile.id = uid;
     currentUser = profile;
     saveSession(uid, true);
@@ -2076,6 +2104,7 @@ async function logout() {
   stopRealtimeAnalytics();
   stopAnnouncementsListener();
   stopChallengesListener();
+  stopAllAnnouncementTimers();
   if (_adminUsersUnsub) { try { _adminUsersUnsub(); } catch {} _adminUsersUnsub = null; }
   if (firebaseAuthEnabled && fbAuth) { try { await fbAuth.signOut(fbAuth.auth); } catch {} }
   currentUser = null;
@@ -2104,7 +2133,6 @@ async function checkSession() {
             const users = await DB.get('users');
             let p = users.find(u => u.id === user.uid);
             if (!p) p = users.find(u => u.email && user.email && u.email.toLowerCase() === user.email.toLowerCase());
-            
             if (!p) {
               console.log('⚠️ No profile for Firebase user, opening completion modal');
               pendingGoogleUser = {
@@ -2118,7 +2146,6 @@ async function checkSession() {
               resolve(false);
               return;
             }
-            
             if (p.id !== user.uid) {
               const oldId = p.id;
               p.id = user.uid;
@@ -2169,13 +2196,11 @@ function enterDashboard() {
   updateNotifBadge();
   startNotificationsListener();
   startRealtimeAnalytics();
-  
   const nameParts = (currentUser.name || '').split(/\s+/).filter(x => x.length > 0);
   if (currentUser.needsProfileCompletion === true && nameParts.length < 3 && !isAdmin(currentUser)) {
     setTimeout(() => openProfileCompletionForExisting(), 500); 
     return;
   }
-  
   if (isAdmin(currentUser)) renderAdminDashboard();
   else if (currentUser.role === 'teacher') {
     if (currentUser.approved === false) renderPendingTeacherDashboard();
@@ -2188,21 +2213,18 @@ function updateHeader() {
   const av = document.getElementById('userAvatar');
   if (currentUser.photoURL) av.innerHTML = `<img src="${currentUser.photoURL}" alt="avatar" referrerpolicy="no-referrer">`;
   else av.textContent = isAdmin(currentUser) ? '👑' : (currentUser.role === 'teacher' ? '👨‍🏫' : currentUser.role === 'parent' ? '👨‍👩‍👦' : '👨‍🎓');
-  
   if (currentUser.activeFrame) {
     const frameItem = SHOP_ITEMS.find(i => i.id === currentUser.activeFrame);
     if (frameItem && frameItem.cssClass) av.className = 'user-avatar ' + frameItem.cssClass;
   } else {
     av.className = 'user-avatar';
   }
-  
   let nameText = currentUser.name;
   if (currentUser.activeTitle) {
     const titleItem = SHOP_ITEMS.find(i => i.id === currentUser.activeTitle);
     if (titleItem) nameText += ` ${titleItem.emoji}`;
   }
   document.getElementById('userName').textContent = nameText;
-  
   let meta = '';
   if (isAdmin(currentUser)) meta = '👑 مدير المنصة';
   else if (currentUser.role === 'teacher') meta = `مدرس • ${getSubjectName(currentUser.subject)}${currentUser.approved === false ? ' • ⏳ بانتظار الاعتماد' : ''}`;
@@ -2592,7 +2614,6 @@ async function startQuizWithChallenge(challenge, quiz) {
     window._currentChallenge = challenge;
     window._currentTournament = null;
     showScreen('quiz');
-    loadActiveAnnouncement();
     renderCurrentQuestion();
   } finally { hideLoading(); }
 }
@@ -2751,7 +2772,6 @@ function renderUsersListForTab(allUsers, allAttempts, tab) {
   else if (tab === 'teachers') { filtered = allUsers.filter(u => u.role === 'teacher'); emptyMsg = 'لا يوجد مدرسون'; }
   else { filtered = allUsers.filter(u => u.role === 'parent'); emptyMsg = 'لا يوجد أولياء'; }
   if (filtered.length === 0) return `<div class="empty-state"><h3>${emptyMsg}</h3></div>`;
-  
   const searchId = `search_${tab}`;
   const filterId = `filter_${tab}`;
   let filterOptions = '';
@@ -2819,6 +2839,7 @@ function renderUsersBody(filtered, allAttempts, tab) {
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
           <span class="badge badge-${avg>=80?'success':avg>=50?'warning':'danger'}">${avg}%</span>
+          <button class="btn btn-sm btn-outline" onclick="openStudentGamificationDetails('${u.id}')">👁️</button>
           <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')">🗑</button>
         </div>
       </div>`;
@@ -2889,7 +2910,7 @@ async function wipeQuizData() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ADMIN: الاختبارات العامة
+   ADMIN: الاختبارات العامة + الأدوات
    ═══════════════════════════════════════════════════════════ */
 async function renderAdminPublicQuizzes() {
   showLoading();
@@ -2897,7 +2918,6 @@ async function renderAdminPublicQuizzes() {
     const allQuizzes = await DB.get('quizzes');
     const publicQuizzes = allQuizzes.filter(q => q.isPublic || q.isDemo);
     const demoCount = publicQuizzes.filter(q => q.isDemo).length;
-    
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
       <div class="card" style="background: linear-gradient(135deg, #10b981, #059669); color:#fff;">
@@ -3068,9 +3088,7 @@ async function seedDemoQuizzes() {
   const subjects = SUBJECTS.map(s => s.id);
   const testsPerSubject = 3;
   const totalQuizzes = grades.length * subjects.length * testsPerSubject;
-  
   if (!confirm(`⚠️ سيتم إضافة ${totalQuizzes} اختبار تجريبي.\n\nهل تريد المتابعة؟`)) return;
-  
   showLoading();
   try {
     let added = 0;
@@ -3132,6 +3150,7 @@ async function renderAdminStats() {
   try {
     const allUsers = await DB.get('users');
     const allAttempts = await DB.get('attempts');
+    const allQuizzes = await DB.get('quizzes');
     const students = allUsers.filter(u => u.role === 'student');
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
@@ -3151,6 +3170,10 @@ async function renderAdminStats() {
       <div class="chart-container" style="height:340px;"><canvas id="usersGrowthChart"></canvas></div>
       <div class="chart-container" style="height:340px;"><canvas id="attemptsChart"></canvas></div>
       <div class="chart-container" style="height:340px;"><canvas id="gradeDistChart"></canvas></div>
+      <div class="chart-container" style="height:340px;"><canvas id="subjectPerformanceChart"></canvas></div>
+      <div class="chart-container" style="height:340px;"><canvas id="gradeDistributionChart"></canvas></div>
+      <div class="chart-container" style="height:340px;"><canvas id="govDistributionChart"></canvas></div>
+      <div class="chart-container" style="height:340px;"><canvas id="coinsDistributionChart"></canvas></div>
     `;
     const labels7 = [], users7 = [], attempts7 = [];
     for (let i = 6; i >= 0; i--) {
@@ -3175,6 +3198,33 @@ async function renderAdminStats() {
     });
     const c3 = document.getElementById('gradeDistChart')?.getContext('2d');
     if (c3) new Chart(c3, { type: 'doughnut', data: { labels: Object.keys(dist), datasets: [{ data: Object.values(dist), backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#64748b'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'توزيع الدرجات', font: { size: 16, weight: 'bold' } } } } });
+    const subjPerf = {};
+    SUBJECTS.forEach(s => { subjPerf[s.id] = { name: s.name, total: 0, score: 0, count: 0 }; });
+    allAttempts.forEach(a => {
+      const q = allQuizzes.find(x => x.id === a.quizId);
+      if (q && subjPerf[q.subject]) { subjPerf[q.subject].total += a.total; subjPerf[q.subject].score += a.score; subjPerf[q.subject].count++; }
+    });
+    const c4 = document.getElementById('subjectPerformanceChart')?.getContext('2d');
+    if (c4) new Chart(c4, { type: 'bar', data: { labels: Object.values(subjPerf).map(s => s.name), datasets: [{ label: 'متوسط %', data: Object.values(subjPerf).map(s => s.total > 0 ? Math.round((s.score / s.total) * 100) : 0), backgroundColor: 'rgba(139,92,246,0.7)', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'أداء الطلاب حسب المادة', font: { size: 16, weight: 'bold' } }, legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100 } } } });
+    const gradeDist = {};
+    students.forEach(s => { const g = s.grade || 'غير محدد'; gradeDist[g] = (gradeDist[g] || 0) + 1; });
+    const c5 = document.getElementById('gradeDistributionChart')?.getContext('2d');
+    if (c5) new Chart(c5, { type: 'pie', data: { labels: Object.keys(gradeDist), datasets: [{ data: Object.values(gradeDist), backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1', '#14b8a6', '#a855f7', '#eab308'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'توزيع الطلاب حسب الصف', font: { size: 16, weight: 'bold' } } } } });
+    const govDist = {};
+    students.forEach(s => { const g = s.governorateName || 'غير محدد'; govDist[g] = (govDist[g] || 0) + 1; });
+    const topGovs = Object.entries(govDist).sort((a, b) => b[1] - a[1]).slice(0, 10);
+    const c6 = document.getElementById('govDistributionChart')?.getContext('2d');
+    if (c6) new Chart(c6, { type: 'bar', data: { labels: topGovs.map(g => g[0]), datasets: [{ label: 'عدد الطلاب', data: topGovs.map(g => g[1]), backgroundColor: 'rgba(6,182,212,0.7)', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { title: { display: true, text: 'توزيع الطلاب حسب المحافظة', font: { size: 16, weight: 'bold' } }, legend: { display: false } } } });
+    const coinsDist = { '0-99': 0, '100-499': 0, '500-999': 0, '1000+': 0 };
+    students.forEach(s => {
+      const c = s.coins || 0;
+      if (c < 100) coinsDist['0-99']++;
+      else if (c < 500) coinsDist['100-499']++;
+      else if (c < 1000) coinsDist['500-999']++;
+      else coinsDist['1000+']++;
+    });
+    const c7 = document.getElementById('coinsDistributionChart')?.getContext('2d');
+    if (c7) new Chart(c7, { type: 'doughnut', data: { labels: Object.keys(coinsDist), datasets: [{ data: Object.values(coinsDist), backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#10b981'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'توزيع العملات', font: { size: 16, weight: 'bold' } } } } });
   } finally { hideLoading(); }
 }
 
@@ -3197,6 +3247,15 @@ async function renderAdminGamification() {
         <div class="stat-card"><div class="stat-icon purple">⭐</div><div class="stat-info"><h4>${students.reduce((s, u) => s + (u.xp || 0), 0)}</h4><p>XP</p></div></div>
         <div class="stat-card"><div class="stat-icon warning">🪙</div><div class="stat-info"><h4>${students.reduce((s, u) => s + (u.coins || 0), 0).toLocaleString()}</h4><p>عملات</p></div></div>
         <div class="stat-card"><div class="stat-icon success">🏆</div><div class="stat-info"><h4>${students.reduce((s, u) => s + (u.badges || []).length, 0)}</h4><p>شارات</p></div></div>
+      </div>
+      <div class="card" style="border-right:4px solid var(--danger); background: var(--danger-light); margin-top:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div>
+            <h3 style="font-size:16px; font-weight:900; color:var(--danger);">🗑 مسح جميع المكافآت</h3>
+            <p style="font-size:12px;margin-top:4px;">مسح XP + عملات + شارات لجميع الطلاب</p>
+          </div>
+          <button class="btn btn-danger" onclick="wipeAllRewards()">🗑 مسح جميع المكافآت</button>
+        </div>
       </div>
       <div class="section-header" style="margin-top:24px;"><div><h2 class="section-title">🏅 الشارات</h2></div></div>
       <div class="card">
@@ -3221,6 +3280,7 @@ async function renderAdminGamification() {
               <button class="btn btn-sm btn-success" onclick="openGrantXPModal('${u.id}')">➕ XP</button>
               <button class="btn btn-sm btn-warning" onclick="openGrantCoinsModal('${u.id}')">🪙</button>
               <button class="btn btn-sm btn-outline" onclick="openStudentGamificationDetails('${u.id}')">👁️</button>
+              <button class="btn btn-sm btn-danger" onclick="wipeStudentRewards('${u.id}')" title="مسح مكافآت هذا الطالب">🗑</button>
             </div>
           </div>`;
         }).join('')}
@@ -3230,6 +3290,61 @@ async function renderAdminGamification() {
   } finally { hideLoading(); }
 }
 window.changeGamifyPage = (p) => { paginationState.students = p; renderAdminGamification(); };
+
+/* ✅ جديد: مسح مكافآت طالب واحد (XP + عملات + شارات) */
+async function wipeStudentRewards(studentId) {
+  if (!confirm('⚠️ سيتم مسح XP والعملات والشارات لهذا الطالب. هل أنت متأكد؟')) return;
+  showLoading();
+  try {
+    await dbUpdateNode('users', studentId, {
+      xp: 0,
+      coins: 0,
+      badges: [],
+      streak: 0,
+      lastQuizDate: null,
+      ownedItems: [],
+      activeFrame: null,
+      activeTitle: null,
+      lastXpAt: null,
+      lastCoinAt: null
+    });
+    await logActivity('مسح مكافآت طالب', studentId);
+    launchConfetti(20);
+    alert('✅ تم مسح جميع المكافآت لهذا الطالب');
+    renderAdminGamification();
+  } finally { hideLoading(); }
+}
+
+/* ✅ جديد: مسح مكافآت جميع الطلاب (XP + عملات + شارات) */
+async function wipeAllRewards() {
+  if (!confirm('⚠️ سيتم مسح XP والعملات والشارات لجميع الطلاب!\n\nهل أنت متأكد؟')) return;
+  if (prompt('اكتب "حذف" للتأكيد:') !== 'حذف') { alert('ألغي'); return; }
+  showLoading();
+  try {
+    const allUsers = await DB.get('users');
+    const students = allUsers.filter(u => u.role === 'student');
+    let count = 0;
+    for (const s of students) {
+      await dbUpdateNode('users', s.id, {
+        xp: 0,
+        coins: 0,
+        badges: [],
+        streak: 0,
+        lastQuizDate: null,
+        ownedItems: [],
+        activeFrame: null,
+        activeTitle: null,
+        lastXpAt: null,
+        lastCoinAt: null
+      });
+      count++;
+    }
+    await logActivity('مسح مكافآت جميع الطلاب', `${count} طالب`);
+    launchConfetti(50);
+    alert(`✅ تم مسح جميع المكافآت لـ ${count} طالب`);
+    renderAdminGamification();
+  } finally { hideLoading(); }
+}
 
 function openGrantXPModal(studentId) {
   openModal(`<div class="modal-header"><h3 class="modal-title">➕ منح XP</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
@@ -3282,6 +3397,11 @@ async function openStudentGamificationDetails(studentId) {
   const ownedItems = u.ownedItems || [];
   openModal(`<div class="modal-header"><h3 class="modal-title">${escapeHtml(u.name)}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
     <div class="alert alert-info">${lvl.emoji} <strong>${lvl.name}</strong> • ${u.xp || 0} XP • 🪙 ${u.coins || 0}<br>🔥 ${u.streak || 0} • 🏆 ${badges.length}${next ? `<br>⏭️ ${next.emoji} ${next.name} (${next.minXP} XP)` : '<br>👑 وصل للأعلى!'}</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button class="btn btn-sm btn-success" onclick="closeModal();openGrantXPModal('${u.id}')">➕ XP</button>
+      <button class="btn btn-sm btn-warning" onclick="closeModal();openGrantCoinsModal('${u.id}')">🪙 عملات</button>
+      <button class="btn btn-sm btn-danger" onclick="closeModal();wipeStudentRewards('${u.id}')">🗑 مسح المكافآت</button>
+    </div>
     <h4 style="margin:16px 0 12px;">🏅 الشارات</h4>
     <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px;">
       ${allBadges.map(key => {
@@ -3306,22 +3426,27 @@ async function renderAdminShop() {
     const users = await DB.get('users');
     const students = users.filter(u => u.role === 'student');
     const totalCoins = students.reduce((s, u) => s + (u.coins || 0), 0);
+    const totalPurchases = students.reduce((s, u) => s + (u.ownedItems || []).length, 0);
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
       <div class="card" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color:#fff;">
         <div style="display:flex; align-items:center; gap:12px;">
           <span style="font-size:48px;">🛒</span>
-          <div><h2 style="font-size:24px; font-weight:900;">إدارة المتجر</h2><p style="opacity:0.9;">${SHOP_ITEMS.length} عنصر</p></div>
+          <div><h2 style="font-size:24px; font-weight:900;">إدارة المتجر</h2><p style="opacity:0.9;">${SHOP_ITEMS.length} عنصر • ${totalPurchases} عملية شراء</p></div>
         </div>
       </div>
       <button class="btn btn-outline" onclick="renderAdminDashboard()" style="margin-bottom:16px;">← العودة</button>
       <div class="stats-grid">
         <div class="stat-card"><div class="stat-icon warning">🪙</div><div class="stat-info"><h4>${totalCoins.toLocaleString()}</h4><p>إجمالي العملات</p></div></div>
+        <div class="stat-card"><div class="stat-icon purple">🛍️</div><div class="stat-info"><h4>${totalPurchases}</h4><p>مشتريات</p></div></div>
+        <div class="stat-card"><div class="stat-icon success">👥</div><div class="stat-info"><h4>${students.filter(s => (s.coins||0) > 0).length}</h4><p>طلاب نشطون</p></div></div>
       </div>
       <div class="section-header"><div><h2 class="section-title">🎁 عناصر المتجر</h2></div></div>
       <div class="shop-grid">
         ${SHOP_ITEMS.map(item => `
           <div class="shop-item">
+            ${item.rarity === 'legendary' ? '<span class="shop-item-badge legendary">أسطوري</span>' : ''}
+            ${item.rarity === 'rare' ? '<span class="shop-item-badge rare">نادر</span>' : ''}
             <div class="shop-item-preview">${item.emoji}</div>
             <div class="shop-item-name">${escapeHtml(item.name)}</div>
             <div class="shop-item-desc">${escapeHtml(item.desc)}</div>
@@ -3347,6 +3472,7 @@ async function renderAdminTournaments() {
   showLoading();
   try {
     const tournaments = await DB.get('tournaments');
+    const users = await DB.get('users');
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
       <div class="card" style="background: linear-gradient(135deg, #dc2626, #f97316); color:#fff;">
@@ -3356,25 +3482,42 @@ async function renderAdminTournaments() {
         </div>
       </div>
       <button class="btn btn-outline" onclick="renderAdminDashboard()" style="margin-bottom:16px;">← العودة</button>
-      <button class="btn btn-success btn-lg btn-full" onclick="startNewTournament()" style="margin-bottom:16px;">🏆 بدء مسابقة جديدة</button>
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        <button class="btn btn-success btn-lg" onclick="startNewTournament()" style="flex:1;">🏆 بدء مسابقة جديدة</button>
+      </div>
       ${tournaments.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا مسابقات</h3></div></div>` :
-        tournaments.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).map(t => `
-          <div class="card" style="border-right:4px solid ${t.status === 'active' ? 'var(--success)' : 'var(--border)'};">
-            <h3 style="font-size:18px;font-weight:800;margin-bottom:4px;">${t.emoji || '🏆'} ${escapeHtml(t.name)}</h3>
-            <p style="font-size:13px;color:var(--text-light);">${getSubjectName(t.subject)} • ${escapeHtml(t.grade || 'كل الصفوف')} • ${(t.participants || []).length} مشارك</p>
-            <button class="btn btn-sm btn-danger" onclick="deleteTournament('${t.id}')" style="margin-top:8px;">🗑</button>
-          </div>
-        `).join('')}
+        tournaments.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).map(t => {
+          const participants = (t.participants || []).length;
+          const isActive = t.status === 'active' && t.endDate > Date.now();
+          const daysLeft = Math.max(0, Math.ceil((t.endDate - Date.now()) / (1000 * 60 * 60 * 24)));
+          return `<div class="card" style="border-right:4px solid ${isActive ? 'var(--success)' : 'var(--border)'};">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:200px;">
+                <h3 style="font-size:18px;font-weight:800;margin-bottom:4px;">${t.emoji || '🏆'} ${escapeHtml(t.name)}</h3>
+                <p style="font-size:13px;color:var(--text-light);">${getSubjectName(t.subject)} • ${escapeHtml(t.grade || 'كل الصفوف')} • ${participants} مشارك</p>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
+                  <span class="badge badge-${isActive ? 'success' : 'warning'}">${isActive ? '🔥 نشط' : '⏸️ منتهي'}</span>
+                  ${isActive ? `<span class="badge badge-info">⏰ ${daysLeft} يوم</span>` : ''}
+                  <span class="badge badge-primary">🥇 ${t.prizes[0]} 🪙</span>
+                </div>
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <button class="btn btn-sm btn-outline" onclick="viewTournamentDetails('${t.id}')">👁️</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteTournament('${t.id}')">🗑</button>
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
     `;
   } finally { hideLoading(); }
 }
 
 async function startNewTournament() {
   openModal(`<div class="modal-header"><h3 class="modal-title">🏆 مسابقة جديدة</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-    <div class="form-group"><label class="form-label">الاسم</label><input type="text" class="form-input auto-dir" id="tournName" dir="rtl"></div>
+    <div class="form-group"><label class="form-label">الاسم</label><input type="text" class="form-input auto-dir" id="tournName" placeholder="مثال: مسابقة الرياضيات الأسبوعية" dir="rtl"></div>
     <div class="form-group"><label class="form-label">الصف</label><select class="form-select" id="tournGrade"><option value="">كل الصفوف</option>${Object.values(STAGES).flat().map(g => `<option value="${g}">${g}</option>`).join('')}</select></div>
     <div class="form-group"><label class="form-label">المادة</label><select class="form-select" id="tournSubject"><option value="">كل المواد</option>${SUBJECTS.map(s => `<option value="${s.id}">${s.emoji} ${s.name}</option>`).join('')}</select></div>
-    <div class="form-group"><label class="form-label">عدد الأيام</label><select class="form-select" id="tournDays"><option value="3">3 أيام</option><option value="7" selected>7 أيام</option></select></div>
+    <div class="form-group"><label class="form-label">عدد الأيام</label><select class="form-select" id="tournDays"><option value="3">3 أيام</option><option value="7" selected>7 أيام</option><option value="14">14 يوم</option></select></div>
     <div class="form-group"><label class="form-label">الجوائز (عملات)</label>
       <input type="number" class="form-input" id="tournPrize1" placeholder="المركز الأول" value="1000" style="margin-bottom:6px;">
       <input type="number" class="form-input" id="tournPrize2" placeholder="المركز الثاني" value="500" style="margin-bottom:6px;">
@@ -3402,11 +3545,36 @@ async function createTournament() {
     };
     await dbSetNode('tournaments', tournId, tournament);
     await logActivity('إنشاء مسابقة', name);
+    const users = await DB.get('users');
+    const targets = users.filter(u => u.role === 'student' && (!grade || u.grade === grade));
+    for (const t of targets) {
+      const nid = uid();
+      await dbSetNode('notifications', nid, { userId: t.id, title: `🏆 مسابقة جديدة: ${name}`, body: `جوائز: ${prize1} 🪙 للمركز الأول`, createdAt: Date.now(), read: false });
+    }
     launchConfetti(50);
-    alert(`✅ تم بدء المسابقة!`);
+    alert(`✅ تم بدء المسابقة! (${targets.length} طالب)`);
     closeModal();
     renderAdminTournaments();
   } finally { hideLoading(); }
+}
+
+async function viewTournamentDetails(tournId) {
+  const tournaments = await DB.get('tournaments');
+  const t = tournaments.find(x => x.id === tournId);
+  if (!t) return;
+  const users = await DB.get('users');
+  const sorted = Object.entries(t.scores || {}).sort((a, b) => b[1] - a[1]).slice(0, 20);
+  openModal(`<div class="modal-header"><h3 class="modal-title">🏆 ${escapeHtml(t.name)}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="alert alert-info">${getSubjectName(t.subject)} • ${escapeHtml(t.grade || 'كل الصفوف')} • ${(t.participants || []).length} مشارك</div>
+    <h4 style="margin:16px 0 12px;">🏅 لوحة الشرف</h4>
+    ${sorted.length === 0 ? '<div class="empty-state"><h3>لا مشاركين بعد</h3></div>' : sorted.map(([userId, score], i) => {
+      const u = users.find(x => x.id === userId);
+      return `<div class="leaderboard-item ${i < 3 ? 'rank-' + (i+1) : ''}">
+        <div class="leaderboard-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i+1}</div>
+        <div class="leaderboard-info"><h4>${escapeHtml(u?.name || 'طالب محذوف')}</h4><p>${escapeHtml(u?.grade || '')}</p></div>
+        <div class="leaderboard-score">${score} نقطة</div>
+      </div>`;
+    }).join('')}`);
 }
 
 async function deleteTournament(tournId) {
@@ -3429,7 +3597,7 @@ async function renderQuestionBank() {
       </div>
       <button class="btn btn-outline" onclick="renderAdminDashboard()" style="margin-bottom:16px;">← العودة</button>
       <div class="card">
-        <div class="alert alert-info">📌 بنك الأسئلة يعرض جميع الأسئلة من الاختبارات المُنشأة</div>
+        <div class="alert alert-info">📌 بنك الأسئلة يعرض جميع الأسئلة من الاختبارات المُنشأة. يمكنك البحث في صفحة الاختبارات.</div>
         <div id="qbResults"><div class="empty-state"><h3>استخدم البحث في صفحة الاختبارات</h3></div></div>
       </div>
     `;
@@ -3469,7 +3637,12 @@ async function renderSubjectStats() {
           </div>`;
         }).join('')}
       </div>
+      <div class="chart-container" style="height:340px;"><canvas id="subjectChart"></canvas></div>
     `;
+    const ctx = document.getElementById('subjectChart')?.getContext('2d');
+    if (ctx) {
+      new Chart(ctx, { type: 'radar', data: { labels: Object.values(stats).map(s => s.name), datasets: [{ label: 'متوسط %', data: Object.values(stats).map(s => s.totalQ > 0 ? Math.round((s.totalScore / s.totalQ) * 100) : 0), borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.2)', pointBackgroundColor: '#8b5cf6' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { r: { beginAtZero: true, max: 100 } } } });
+    }
   } finally { hideLoading(); }
 }
 
@@ -3486,23 +3659,30 @@ async function renderAdminAnnouncements() {
       <div class="card" style="background: linear-gradient(135deg, #ec4899, #8b5cf6); color:#fff;">
         <div style="display:flex; align-items:center; gap:12px;">
           <span style="font-size:48px;">📢</span>
-          <div><h2 style="font-size:24px; font-weight:900;">الإعلانات</h2></div>
+          <div><h2 style="font-size:24px; font-weight:900;">الإعلانات</h2><p style="opacity:0.9;">${announcements.length} إعلان</p></div>
         </div>
       </div>
       <button class="btn btn-outline" onclick="renderAdminDashboard()" style="margin-bottom:16px;">← العودة</button>
       <button class="btn btn-primary btn-full" onclick="openAnnouncementEditor()" style="margin-bottom:16px;">➕ إعلان جديد</button>
-      ${announcements.length === 0 ? `<div class="card"><div class="empty-state"><h3>لا إعلانات</h3></div></div>` :
-        announcements.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).map(a => `
-          <div class="card" style="border-right:4px solid ${a.enabled ? 'var(--success)' : 'var(--border)'};">
-            <h4 style="font-size:16px; font-weight:800; margin-bottom:6px;">${a.emoji || '📢'} ${escapeHtml(a.title || '')}</h4>
-            <p style="font-size:14px; color:var(--text-light);">${escapeHtml(a.text)}</p>
-            <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
-              <button class="btn btn-sm btn-${a.enabled ? 'warning' : 'success'}" onclick="toggleAnnouncement('${a.id}')">${a.enabled ? '⏸️' : '▶️'}</button>
-              <button class="btn btn-sm btn-outline" onclick="openAnnouncementEditor('${a.id}')">✏️</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteAnnouncement('${a.id}')">🗑</button>
+      ${announcements.length === 0 ? `<div class="card"><div class="empty-state"><div class="empty-state-icon">📢</div><h3>لا إعلانات</h3></div></div>` :
+        announcements.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).map(a => {
+          const now = Date.now();
+          const isActive = a.enabled && (!a.startDate || a.startDate <= now) && (!a.endDate || a.endDate >= now);
+          return `<div class="card" style="border-right:4px solid ${isActive ? 'var(--success)' : 'var(--border)'};">
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
+              <span class="badge badge-${isActive ? 'success' : 'warning'}">${isActive ? '✅ نشط' : '⏸️ غير نشط'}</span>
+              <span class="badge badge-info">${a.type === 'banner' ? '🎨 بانر' : '📢 شريط'}</span>
+              ${(a.imageUrl || a.imageData) ? '<span class="badge badge-purple">🖼️ صورة</span>' : ''}
             </div>
-          </div>
-        `).join('')}
+            <h4 style="font-size:16px; font-weight:800; margin-bottom:6px;">${a.emoji || '📢'} ${escapeHtml(a.title || '')}</h4>
+            <p style="font-size:14px; color:var(--text-light); line-height:1.6;">${escapeHtml(a.text)}</p>
+            <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+              <button class="btn btn-sm btn-${a.enabled ? 'warning' : 'success'}" onclick="toggleAnnouncement('${a.id}')">${a.enabled ? '⏸️ تعطيل' : '▶️ تفعيل'}</button>
+              <button class="btn btn-sm btn-outline" onclick="openAnnouncementEditor('${a.id}')">✏️ تعديل</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteAnnouncement('${a.id}')">🗑 حذف</button>
+            </div>
+          </div>`;
+        }).join('')}
     `;
   } finally { hideLoading(); }
 }
@@ -3510,12 +3690,76 @@ async function renderAdminAnnouncements() {
 async function openAnnouncementEditor(id = null) {
   const announcements = await DB.get('announcements');
   const a = id ? announcements.find(x => x.id === id) : null;
+  _tempAnnImage = a?.imageData || null;
   openModal(`<div class="modal-header"><h3 class="modal-title">${a ? '✏️ تعديل' : '➕ إعلان جديد'}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="alert alert-info">📌 يمكنك إضافة صورة للإعلان (ستظهر كخلفية للبانر) أو استخدام رابط صورة.</div>
     <div class="form-group"><label class="form-label">الإيموجي</label><input type="text" class="form-input" id="annEmoji" value="${escapeHtml(a?.emoji || '📢')}" maxlength="4" style="text-align:center;font-size:24px;"></div>
     <div class="form-group"><label class="form-label">العنوان</label><input type="text" class="form-input auto-dir" id="annTitle" value="${escapeHtml(a?.title || '')}" dir="rtl"></div>
     <div class="form-group"><label class="form-label">النص *</label><textarea class="form-textarea auto-dir" id="annText" dir="rtl">${escapeHtml(a?.text || '')}</textarea></div>
+    <div class="form-group"><label class="form-label">نص الرابط</label><input type="text" class="form-input auto-dir" id="annLinkText" value="${escapeHtml(a?.linkText || 'اعرف أكثر')}" dir="rtl"></div>
     <div class="form-group"><label class="form-label">الرابط</label><input type="url" class="form-input" id="annLink" value="${escapeHtml(a?.link || '')}" dir="ltr"></div>
-    <button class="btn btn-success btn-full" onclick="saveAnnouncement('${id || ''}')">💾 حفظ</button>`);
+    <div class="form-group">
+      <label class="form-label">🖼️ صورة الإعلان (اختياري - للبانر)</label>
+      <input type="file" class="form-input" id="annImageFile" accept="image/*" onchange="handleAnnouncementImage(event)">
+      <p style="font-size:11px;color:var(--text-light);margin-top:4px;">💡 الحد الأقصى: 2MB • الأبعاد المثالية: 1200×400</p>
+      <div id="annImagePreview" style="margin-top:10px;">
+        ${(_tempAnnImage || a?.imageUrl) ? `<img src="${_tempAnnImage || a?.imageUrl}" class="ann-image-preview"><button class="btn btn-sm btn-danger" onclick="clearAnnouncementImage()" style="margin-top:8px;">🗑 حذف الصورة</button>` : ''}
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">أو رابط صورة مباشر</label>
+      <input type="url" class="form-input" id="annImageUrl" value="${escapeHtml(a?.imageUrl || '')}" placeholder="https://example.com/image.jpg" dir="ltr">
+    </div>
+    <div class="form-group">
+      <label class="form-label">ترتيب العرض (الأصغر أولاً)</label>
+      <input type="number" class="form-input" id="annOrder" value="${a?.order || 0}" min="0" max="100">
+    </div>
+    <div class="form-group">
+      <label class="form-label">نوع العرض</label>
+      <select class="form-select" id="annType">
+        <option value="bar" ${a?.type === 'bar' ? 'selected' : ''}>📢 شريط (بار)</option>
+        <option value="banner" ${a?.type === 'banner' ? 'selected' : ''}>🎨 بانر (مع صورة)</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">لون البداية (بدون صورة)</label>
+      <input type="color" class="form-input" id="annBgColor" value="${a?.bgColor || '#4f46e5'}" style="height:50px;padding:4px;">
+    </div>
+    <div class="form-group">
+      <label class="form-label">لون النهاية (بدون صورة)</label>
+      <input type="color" class="form-input" id="annBgColorEnd" value="${a?.bgColorEnd || '#8b5cf6'}" style="height:50px;padding:4px;">
+    </div>
+    <button class="btn btn-success btn-full btn-lg" onclick="saveAnnouncement('${id || ''}')">💾 حفظ</button>`);
+}
+
+async function handleAnnouncementImage(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { alert('صورة فقط'); e.target.value = ''; return; }
+  const sizeCheck = validateFileSize(file, 2, 'الصورة');
+  if (!sizeCheck.ok) { alert(sizeCheck.msg); e.target.value = ''; return; }
+  showLoading();
+  try {
+    let compressed;
+    try { compressed = await compressImage(file, 1200, 0.8); }
+    catch { compressed = file; }
+    if (compressed.size > 1.5 * 1024 * 1024) { alert('الصورة كبيرة بعد الضغط'); e.target.value = ''; return; }
+    const r = new FileReader();
+    r.onload = (ev) => {
+      _tempAnnImage = ev.target.result;
+      document.getElementById('annImagePreview').innerHTML = `
+        <img src="${ev.target.result}" class="ann-image-preview">
+        <button class="btn btn-sm btn-danger" onclick="clearAnnouncementImage()" style="margin-top:8px;">🗑 حذف الصورة</button>
+      `;
+    };
+    r.readAsDataURL(compressed);
+  } finally { hideLoading(); }
+}
+function clearAnnouncementImage() {
+  _tempAnnImage = null;
+  const fileInput = document.getElementById('annImageFile');
+  if (fileInput) fileInput.value = '';
+  document.getElementById('annImagePreview').innerHTML = '';
 }
 
 async function saveAnnouncement(id) {
@@ -3523,24 +3767,49 @@ async function saveAnnouncement(id) {
   const title = document.getElementById('annTitle').value.trim();
   const text = document.getElementById('annText').value.trim();
   const link = document.getElementById('annLink').value.trim();
+  const linkText = document.getElementById('annLinkText').value.trim();
+  const imageUrl = document.getElementById('annImageUrl').value.trim();
+  const order = parseInt(document.getElementById('annOrder').value) || 0;
+  const type = document.getElementById('annType').value;
+  const bgColor = document.getElementById('annBgColor').value;
+  const bgColorEnd = document.getElementById('annBgColorEnd').value;
   if (!text) { alert('أدخل نص الإعلان'); return; }
+  const imageData = _tempAnnImage;
+  const useUploadedImage = !!imageData;
+  const hasAnyImage = useUploadedImage || !!imageUrl;
   showLoading();
   try {
+    const dataToSave = {
+      emoji, title, text, link, linkText, order, type,
+      bgColor, bgColorEnd,
+      imageData: useUploadedImage ? imageData : null,
+      imageUrl: imageUrl || null,
+      hasImage: hasAnyImage,
+      updatedAt: Date.now()
+    };
     if (id) {
-      await dbUpdateNode('announcements', id, { emoji, title, text, link, updatedAt: Date.now() });
+      await dbUpdateNode('announcements', id, dataToSave);
     } else {
       const annId = uid();
-      await dbSetNode('announcements', annId, { emoji, title, text, link, enabled: true, createdAt: Date.now(), type: 'bar' });
+      await dbSetNode('announcements', annId, {
+        ...dataToSave, enabled: true, createdAt: Date.now()
+      });
     }
     _cachedAnnouncements = await DB.get('announcements');
-    localStorage.removeItem('edu_announcement_dismissed');
+    localStorage.removeItem('edu_announcement_dismissed_' + (id || ''));
     _lastAnnouncementId = null;
+    _tempAnnImage = null;
+    await logActivity(id ? 'تعديل إعلان' : 'إنشاء إعلان', title || text.slice(0, 30));
     launchConfetti(20);
-    alert('✅ تم');
+    alert('✅ تم حفظ الإعلان');
     closeModal();
     renderAnnouncementEverywhere();
     renderAdminAnnouncements();
-  } finally { hideLoading(); }
+  } catch (e) {
+    console.error('Save announcement error:', e);
+    alert('❌ فشل الحفظ: ' + e.message);
+  }
+  finally { hideLoading(); }
 }
 
 async function toggleAnnouncement(id) {
@@ -3551,6 +3820,7 @@ async function toggleAnnouncement(id) {
     if (idx >= 0) {
       await dbUpdateNode('announcements', id, { enabled: !announcements[idx].enabled });
       _cachedAnnouncements = await DB.get('announcements');
+      stopAllAnnouncementTimers();
       renderAnnouncementEverywhere();
       renderAdminAnnouncements();
     }
@@ -3558,11 +3828,12 @@ async function toggleAnnouncement(id) {
 }
 
 async function deleteAnnouncement(id) {
-  if (!confirm('حذف؟')) return;
+  if (!confirm('حذف الإعلان؟')) return;
   showLoading();
   try {
     await dbRemoveNode('announcements', id);
     _cachedAnnouncements = await DB.get('announcements');
+    stopAllAnnouncementTimers();
     alert('تم');
     renderAnnouncementEverywhere();
     renderAdminAnnouncements();
@@ -3700,14 +3971,24 @@ async function openPendingTeachers() {
     return;
   }
   openModal(`<div class="modal-header"><h3 class="modal-title">⏳ مراجعة المدرسين (${pending.length})</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-    ${pending.map(t => `<div class="card" style="border-right:4px solid var(--warning);margin-bottom:12px;">
-      <h4 style="font-size:16px;font-weight:800;margin-bottom:4px;">${escapeHtml(t.name)}</h4>
-      <p style="font-size:12px;color:var(--text-light);margin-bottom:8px;">${escapeHtml(t.email)} • ${getSubjectName(t.subject)}</p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-success btn-sm" onclick="approveTeacher('${t.id}')" style="flex:1;">✅ اعتماد</button>
-        <button class="btn btn-danger btn-sm" onclick="rejectTeacher('${t.id}')" style="flex:1;">❌ رفض</button>
-      </div>
-    </div>`).join('')}`);
+    ${pending.map(t => {
+      const docs = t.documents || [];
+      const cardDoc = docs.find(d => d.type === 'teacher_card');
+      return `<div class="card" style="border-right:4px solid var(--warning);margin-bottom:12px;">
+        <h4 style="font-size:16px;font-weight:800;margin-bottom:4px;">${escapeHtml(t.name)}</h4>
+        <p style="font-size:12px;color:var(--text-light);margin-bottom:8px;">${escapeHtml(t.email)} • ${getSubjectName(t.subject)}</p>
+        <div style="background:var(--bg);padding:12px;border-radius:8px;margin-bottom:12px;font-size:13px;">
+          <div><strong>رقم البطاقة:</strong> ${escapeHtml(t.teacherId || '—')}</div>
+          <div><strong>المدرسة:</strong> ${escapeHtml(t.teacherSchool || '—')}</div>
+          <div><strong>سنوات الخبرة:</strong> ${t.teacherYears || 0}</div>
+        </div>
+        ${cardDoc ? `<img src="${cardDoc.data}" style="max-width:100%;max-height:180px;border-radius:10px;margin-bottom:12px;">` : ''}
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-success btn-sm" onclick="approveTeacher('${t.id}')" style="flex:1;">✅ اعتماد</button>
+          <button class="btn btn-danger btn-sm" onclick="rejectTeacher('${t.id}')" style="flex:1;">❌ رفض</button>
+        </div>
+      </div>`;
+    }).join('')}`);
 }
 
 async function rejectTeacher(userId) {
@@ -3770,7 +4051,7 @@ async function renderAdminChallenges() {
       <div class="card" style="background: linear-gradient(135deg, #f43f5e, #e11d48); color:#fff;">
         <div style="display:flex; align-items:center; gap:12px;">
           <span style="font-size:48px;">⚔️</span>
-          <div><h2 style="font-size:24px; font-weight:900;">إدارة التحديات</h2></div>
+          <div><h2 style="font-size:24px; font-weight:900;">إدارة التحديات</h2><p style="opacity:0.9;">${challenges.length} تحدي</p></div>
         </div>
       </div>
       <button class="btn btn-outline" onclick="renderAdminDashboard()" style="margin-bottom:16px;">← العودة</button>
@@ -3786,7 +4067,7 @@ async function renderAdminChallenges() {
               <div class="challenge-avatar">${c.status === 'completed' ? '🏁' : c.status === 'accepted' ? '✅' : '⏳'}</div>
               <div class="challenge-info"><h4>${escapeHtml(c.fromName)} ⚔️ ${escapeHtml(c.toName)}</h4><p>📝 ${escapeHtml(c.quizTitle)}</p></div>
             </div>
-            ${c.status !== 'completed' ? `<button class="btn btn-sm btn-danger" onclick="adminDeleteChallenge('${c.id}')" style="margin-top:8px;">🗑</button>` : ''}
+            ${c.status !== 'completed' ? `<button class="btn btn-sm btn-danger" onclick="adminDeleteChallenge('${c.id}')" style="margin-top:8px;">🗑 حذف</button>` : ''}
           </div>`).join('')}
       </div>
     `;
@@ -3898,9 +4179,6 @@ function renderStudentsList(students, allAttempts) {
   }).join('')}</div>`;
 }
 
-/* ═══════════════════════════════════════════════════════════
-   TEACHER: الملف والمحتوى
-   ═══════════════════════════════════════════════════════════ */
 function openTeacherProfileEdit() {
   if (currentUser.role !== 'teacher') { alert('للمدرسين فقط'); return; }
   const u = currentUser;
@@ -4075,10 +4353,6 @@ async function downloadTeacherMaterial(teacherId, index) {
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
   }
 }
-
-/* ═══════════════════════════════════════════════════════════
-   TEACHER: التصدير
-   ═══════════════════════════════════════════════════════════ */
 async function exportResults() {
   const quizzes = (await DB.get('quizzes')).filter(q => q.teacherId === currentUser.id);
   const allAttempts = await DB.get('attempts');
@@ -4136,7 +4410,6 @@ async function exportResultsPDF() {
   } catch (err) { alert('فشل: ' + err.message); }
   finally { hideLoading(); }
 }
-
 async function openGradingCenter() {
   showLoading();
   try {
@@ -4216,7 +4489,6 @@ async function finalizeGrading(attemptId) {
     renderTeacherDashboard();
   } finally { hideLoading(); }
 }
-
 function openBroadcastModal() {
   openModal(`<div class="modal-header"><h3 class="modal-title">📢 إشعار</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
     <div class="form-group"><label class="form-label">العنوان</label><input type="text" class="form-input auto-dir" id="bTitle" dir="rtl"></div>
@@ -4240,7 +4512,6 @@ async function sendBroadcast() {
     closeModal();
   } finally { hideLoading(); }
 }
-
 async function rateTeacher(teacherId, stars) {
   if (!platformSettings.ratingsEnabled) { alert('معطّل'); return; }
   if (!currentUser || currentUser.role !== 'student') { alert('للطلاب'); return; }
@@ -4268,7 +4539,6 @@ async function openTeacherFullProfile(teacherId) {
     const users = await DB.get('users');
     const teacher = users.find(u => u.id === teacherId);
     if (!teacher || teacher.role !== 'teacher') { alert('المدرس غير موجود'); return; }
-    
     const allQuizzes = await DB.get('quizzes');
     const teacherQuizzes = allQuizzes.filter(q => q.teacherId === teacherId && q.approved !== false);
     const videos = teacher.videoLinks || [];
@@ -4276,15 +4546,12 @@ async function openTeacherFullProfile(teacherId) {
     const ratings = teacher.ratings || [];
     const avgRating = ratings.length ? (ratings.reduce((a, r) => a + r.stars, 0) / ratings.length).toFixed(1) : '0';
     const fullStars = Math.round(parseFloat(avgRating));
-    
     const myRating = ratings.find(r => r.studentId === currentUser?.id);
     const canRate = currentUser && currentUser.role === 'student' && platformSettings.ratingsEnabled;
-    
     openModal(`<div class="modal-header">
       <h3 class="modal-title">👨‍🏫 ${escapeHtml(teacher.name)}</h3>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
-    
     <div style="text-align:center;margin-bottom:20px;">
       <div style="width:100px;height:100px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:48px;margin:0 auto 12px;overflow:hidden;">
         ${teacher.photoURL ? `<img src="${teacher.photoURL}" style="width:100%;height:100%;object-fit:cover;" referrerpolicy="no-referrer">` : '👨‍🏫'}
@@ -4296,12 +4563,10 @@ async function openTeacherFullProfile(teacherId) {
       </div>
       ${teacher.bio ? `<div class="teacher-card-bio" style="margin-top:12px;text-align:right;" dir="${detectDirection(teacher.bio)}">${escapeHtml(teacher.bio)}</div>` : ''}
     </div>
-    
     ${canRate ? `<div class="teacher-rating-row" style="justify-content:center;margin-bottom:20px;">
       <span style="font-size:13px;color:var(--text-light);">قيّم المدرس:</span>
       <div class="stars-input">${[1,2,3,4,5].map(i => `<span class="star ${myRating && i <= myRating.stars ? 'active' : ''}" onclick="rateTeacher('${teacher.id}', ${i})">★</span>`).join('')}</div>
     </div>` : ''}
-    
     <h4 style="font-size:16px;font-weight:900;margin:16px 0 12px;border-bottom:2px solid var(--border);padding-bottom:8px;">📝 الاختبارات (${teacherQuizzes.length})</h4>
     ${teacherQuizzes.length === 0 ? '<p style="color:var(--text-light);text-align:center;padding:16px;">لا توجد اختبارات منشورة بعد</p>' : 
       teacherQuizzes.slice(0, 15).map(q => {
@@ -4314,14 +4579,12 @@ async function openTeacherFullProfile(teacherId) {
           ${canSolve ? '<span class="badge badge-primary">ابدأ</span>' : '<span class="badge badge-info">لصف آخر</span>'}
         </div>`;
       }).join('')}
-    
     <h4 style="font-size:16px;font-weight:900;margin:20px 0 12px;border-bottom:2px solid var(--border);padding-bottom:8px;">🎥 الفيديوهات (${videos.length})</h4>
     ${videos.length === 0 ? '<p style="color:var(--text-light);text-align:center;padding:16px;">لا توجد فيديوهات مرفوعة بعد</p>' : 
       videos.map(v => `<div class="video-link-item">
         <div class="info"><h4>${escapeHtml(v.title || 'فيديو')}</h4><p dir="ltr">${escapeHtml(v.url)}</p></div>
         <a href="${escapeHtml(v.url)}" target="_blank" class="btn btn-sm" style="background:#fee2e2;color:#dc2626;">▶️</a>
       </div>`).join('')}
-    
     <h4 style="font-size:16px;font-weight:900;margin:20px 0 12px;border-bottom:2px solid var(--border);padding-bottom:8px;">📄 الملازم (${materials.length})</h4>
     ${materials.length === 0 ? '<p style="color:var(--text-light);text-align:center;padding:16px;">لا توجد ملازم مرفوعة بعد</p>' : 
       materials.map((m, i) => `<div class="material-file-item">
@@ -4353,7 +4616,6 @@ async function renderTeacherCard(teacher, showRateButton = true) {
   const canRate = showRateButton && currentUser && currentUser.role === 'student' && platformSettings.ratingsEnabled;
   const allQuizzes = await DB.get('quizzes');
   const quizCount = allQuizzes.filter(q => q.teacherId === teacher.id && q.approved !== false).length;
-  
   return `<div class="teacher-card">
     <div class="teacher-card-header" style="cursor:pointer;" onclick="openTeacherFullProfile('${teacher.id}')">
       <div class="teacher-card-avatar">${teacher.photoURL ? `<img data-src="${teacher.photoURL}" class="lazy-img" referrerpolicy="no-referrer" alt="">` : '👨‍🏫'}</div>
@@ -4408,22 +4670,17 @@ async function renderStudentDashboard() {
     const xpNeeded = lvl.maxXP === Infinity ? 1 : (lvl.maxXP - lvl.minXP);
     const xpPct = Math.min(100, (xpInLevel / xpNeeded) * 100);
     const myBadges = currentUser.badges || [];
-    
     let dailyQuests = [];
     if (platformSettings.dailyQuestsEnabled) {
       dailyQuests = await generateDailyQuestsForUser(currentUser.id);
     }
-    
     const allChallenges = await DB.get('challenges');
     const pendingChallenges = allChallenges.filter(c => c.toId === currentUser.id && c.status === 'pending').length;
     const acceptedChallenges = allChallenges.filter(c => c.toId === currentUser.id && c.status === 'accepted').length;
     const totalActiveChallenges = pendingChallenges + acceptedChallenges;
-    
     const tournaments = await DB.get('tournaments');
     const activeTournaments = tournaments.filter(t => t.status === 'active' && t.endDate > Date.now() && (!t.grade || t.grade === currentUser.grade));
-    
     const teachersHtml = await renderTeachersForStudents();
-    
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
       <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
@@ -4592,10 +4849,6 @@ async function renderAnsweredScreen(filterTab = 'all') {
     `;
   } finally { hideLoading(); }
 }
-
-/* ═══════════════════════════════════════════════════════════
-   المتجر + الشهادات + التحليلات + المسابقات
-   ═══════════════════════════════════════════════════════════ */
 async function openShop() {
   if (!currentUser || currentUser.role !== 'student') { alert('للطلاب فقط'); return; }
   if (!platformSettings.shopEnabled) { alert('المتجر معطل'); return; }
@@ -4631,7 +4884,6 @@ async function openShop() {
     </div>`);
   } finally { hideLoading(); }
 }
-
 async function buyShopItem(itemId) {
   const item = SHOP_ITEMS.find(i => i.id === itemId);
   if (!item) return;
@@ -4660,7 +4912,6 @@ async function buyShopItem(itemId) {
     openShop();
   } finally { hideLoading(); }
 }
-
 async function equipShopItem(itemId) {
   const item = SHOP_ITEMS.find(i => i.id === itemId);
   if (!item) return;
@@ -4674,7 +4925,6 @@ async function equipShopItem(itemId) {
   launchConfetti(20);
   alert(`✅ تم التفعيل`);
 }
-
 async function generateCertificate(attemptId) {
   if (!platformSettings.certificatesEnabled) { alert('معطّل'); return; }
   showLoading();
@@ -4697,7 +4947,6 @@ async function generateCertificate(attemptId) {
       <button class="btn btn-success btn-full btn-lg" onclick="downloadCertificatePDF('${attemptId}')">📥 تحميل PDF</button>`);
   } finally { hideLoading(); }
 }
-
 async function downloadCertificatePDF(attemptId) {
   showLoading();
   try {
@@ -4744,7 +4993,6 @@ async function downloadCertificatePDF(attemptId) {
   } catch (err) { alert('فشل: ' + err.message); }
   finally { hideLoading(); }
 }
-
 async function renderStudentAnalytics() {
   if (!currentUser || currentUser.role !== 'student') return;
   showLoading();
@@ -4793,7 +5041,6 @@ async function renderStudentAnalytics() {
     }
   } finally { hideLoading(); }
 }
-
 async function renderTournaments() {
   if (!platformSettings.tournamentsEnabled) { alert('معطّل'); return; }
   showLoading();
@@ -4838,7 +5085,6 @@ async function renderTournaments() {
     `;
   } finally { hideLoading(); }
 }
-
 async function joinTournament(tournId) {
   showLoading();
   try {
@@ -4855,7 +5101,6 @@ async function joinTournament(tournId) {
     renderTournaments();
   } finally { hideLoading(); }
 }
-
 async function playTournamentRound(tournId) {
   showLoading();
   try {
@@ -4870,7 +5115,6 @@ async function playTournamentRound(tournId) {
     startQuizWithTournament(quiz, t);
   } finally { hideLoading(); }
 }
-
 async function startQuizWithTournament(quiz, tournament) {
   showLoading();
   try {
@@ -4882,14 +5126,9 @@ async function startQuizWithTournament(quiz, tournament) {
     window._currentTournament = tournament;
     window._currentChallenge = null;
     showScreen('quiz');
-    loadActiveAnnouncement();
     renderCurrentQuestion();
   } finally { hideLoading(); }
 }
-
-/* ═══════════════════════════════════════════════════════════
-   PARENT DASHBOARD
-   ═══════════════════════════════════════════════════════════ */
 async function renderParentDashboard() {
   showLoading();
   try {
@@ -4949,7 +5188,6 @@ async function renderParentDashboard() {
     `;
   } finally { hideLoading(); }
 }
-
 async function searchChild() {
   const query = document.getElementById('childSearchInput').value.trim().toLowerCase();
   if (!query) { alert('أدخل البريد أو الهاتف'); return; }
@@ -4971,7 +5209,6 @@ async function searchChild() {
     renderParentDashboard();
   } finally { hideLoading(); }
 }
-
 async function removeChild(childId) {
   if (!confirm('إلغاء الربط؟')) return;
   showLoading();
@@ -4983,7 +5220,6 @@ async function removeChild(childId) {
     renderParentDashboard();
   } finally { hideLoading(); }
 }
-
 async function openChildDetails(childId) {
   showLoading();
   try {
@@ -5011,9 +5247,6 @@ async function openChildDetails(childId) {
   } finally { hideLoading(); }
 }
 
-/* ═══════════════════════════════════════════════════════════
-   QUIZ CREATION + TAKING
-   ═══════════════════════════════════════════════════════════ */
 function openNewQuizModal() {
   editingQuizId = null;
   newQuizData = { title: '', grade: '', subject: currentUser.subject, timePerQuestion: 30, questions: [] };
@@ -5023,7 +5256,6 @@ function openNewQuizModal() {
     <div class="form-group"><label class="form-label">⏱️ وقت كل سؤال (ث)</label><input type="number" class="form-input" id="quizTime" value="30" min="5" max="600"></div>
     <button class="btn btn-primary btn-full" onclick="continueToQuestions()">التالي</button>`);
 }
-
 function continueToQuestions() {
   const title = document.getElementById('quizTitle').value.trim();
   const grade = document.getElementById('quizGrade').value;
@@ -5032,7 +5264,6 @@ function continueToQuestions() {
   newQuizData.title = title; newQuizData.grade = grade; newQuizData.timePerQuestion = time;
   showQuestionsEditor();
 }
-
 function showQuestionsEditor() {
   const qHtml = newQuizData.questions.map((q, i) => {
     const ti = QUESTION_TYPES[q.type] || QUESTION_TYPES.mcq;
@@ -5060,7 +5291,6 @@ function showQuestionsEditor() {
       <button class="btn btn-success" onclick="saveQuiz()" style="flex:2;" ${newQuizData.questions.length === 0 ? 'disabled' : ''}>💾 حفظ</button>
     </div>`);
 }
-
 function openAddQuestionForm() { selectedQuestionType = 'mcq'; tfAnswer = true; uploadedImageData = null; renderAddQuestionForm(); }
 function renderAddQuestionForm() {
   let fieldsHtml = '';
@@ -5196,7 +5426,6 @@ async function deleteQuiz(quizId) {
     renderTeacherDashboard();
   } finally { hideLoading(); }
 }
-
 async function startQuiz(quizId) {
   showLoading();
   try {
@@ -5215,11 +5444,9 @@ async function startQuiz(quizId) {
     window._currentChallenge = null;
     window._currentTournament = null;
     showScreen('quiz');
-    loadActiveAnnouncement();
     renderCurrentQuestion();
   } finally { hideLoading(); }
 }
-
 function renderCurrentQuestion() {
   const q = currentQuiz.questions[currentQuestionIndex];
   const ti = QUESTION_TYPES[q.type] || QUESTION_TYPES.mcq;
@@ -5249,7 +5476,6 @@ function renderCurrentQuestion() {
   startTimer();
   bindAutoDirToInputs();
 }
-
 function startTimer() {
   clearInterval(timerInterval);
   timeLeft = currentQuiz.timePerQuestion || 30;
@@ -5263,7 +5489,6 @@ function startTimer() {
     }
   }, 1000);
 }
-
 function updateTimerUI() {
   const d = document.getElementById('timerDisplay'), b = document.getElementById('timerBox');
   if (!d || !b) return;
@@ -5272,7 +5497,6 @@ function updateTimerUI() {
   if (timeLeft <= 5) b.classList.add('danger');
   else if (timeLeft <= 10) b.classList.add('warning');
 }
-
 function handleTimeout() {
   if (selectedAnswerIndex === null) {
     const q = currentQuiz.questions[currentQuestionIndex];
@@ -5286,7 +5510,6 @@ function handleTimeout() {
   if (currentQuestionIndex >= currentQuiz.questions.length) finishQuiz();
   else renderCurrentQuestion();
 }
-
 function selectMcqAnswer(i, btn) { 
   selectedAnswerIndex = i; 
   document.querySelectorAll('#quizOptions .option-btn').forEach(b => b.classList.remove('selected')); 
@@ -5302,7 +5525,6 @@ function selectTfAnswer(v, btn) {
 }
 function onFillInput() { document.getElementById('quizNextBtn').disabled = !document.getElementById('fillInput').value.trim(); }
 function onEssayInput() { document.getElementById('quizNextBtn').disabled = !document.getElementById('essayInput').value.trim(); }
-
 function nextQuizQuestion() {
   const q = currentQuiz.questions[currentQuestionIndex];
   let a;
@@ -5318,7 +5540,6 @@ function nextQuizQuestion() {
   if (currentQuestionIndex >= currentQuiz.questions.length) finishQuiz();
   else renderCurrentQuestion();
 }
-
 function checkAnswer(q, a) {
   if (q.type === 'mcq') return a === q.answer;
   if (q.type === 'tf') return a === q.answer;
@@ -5329,7 +5550,6 @@ function checkAnswer(q, a) {
   if (q.type === 'essay') return null;
   return false;
 }
-
 async function finishQuiz() {
   clearInterval(timerInterval);
   showLoading();
@@ -5338,7 +5558,6 @@ async function finishQuiz() {
     if (!window._currentChallenge && !window._currentTournament && existing.some(a => a.quizId === currentQuiz.id && a.studentId === currentUser.id)) { 
       hideLoading(); alert('حللت بالفعل.'); exitQuiz(); return;
     }
-    
     let score = 0, autoGraded = 0, hasEssay = false;
     const results = currentQuiz.questions.map((q, i) => {
       const a = currentAnswers[i];
@@ -5348,7 +5567,6 @@ async function finishQuiz() {
       else if (c === null) hasEssay = true;
       return { questionIndex: i, answer: a, correct: c };
     });
-    
     const attemptId = uid();
     const attempt = { 
       quizId: currentQuiz.id, studentId: currentUser.id, score, total: currentQuiz.questions.length,
@@ -5356,10 +5574,8 @@ async function finishQuiz() {
       needsGrading: hasEssay, graded: !hasEssay, essayGrades: {}, essayBonusPrev: 0,
       isChallenge: !!window._currentChallenge, isTournament: !!window._currentTournament
     };
-    
     const attemptSaved = await dbSetNode('attempts', attemptId, attempt);
     if (!attemptSaved) { alert('فشل'); return; }
-    
     const xpGain = calculateXPForAttempt(attempt);
     const coinsGain = calculateCoinsForAttempt(attempt);
     await awardXP(currentUser.id, xpGain, `حل اختبار: ${currentQuiz.title}`);
@@ -5370,7 +5586,6 @@ async function finishQuiz() {
     if (pct >= 90) await updateDailyQuestProgress(currentUser.id, 'high_score');
     if (pct === 100) await updateDailyQuestProgress(currentUser.id, 'perfect');
     const newBadges = await checkAndAwardBadges(currentUser.id);
-    
     if (window._currentChallenge) {
       const challenges = await DB.get('challenges');
       const challenge = challenges.find(c => c.id === window._currentChallenge.id);
@@ -5391,7 +5606,6 @@ async function finishQuiz() {
         await dbSetNode('notifications', notifId, { userId: challenge.fromId, title: '⚔️ تم حل التحدي!', body: `${currentUser.name} حصل على ${pct}%`, createdAt: Date.now(), read: false });
       }
     }
-    
     if (window._currentTournament) {
       const tournaments = await DB.get('tournaments');
       const t = tournaments.find(x => x.id === window._currentTournament.id);
@@ -5401,20 +5615,16 @@ async function finishQuiz() {
         await dbUpdateNode('tournaments', t.id, { scores });
       }
     }
-    
     const freshUsers = await DB.get('users');
     const freshMe = freshUsers.find(u => u.id === currentUser.id);
     if (freshMe) currentUser = freshMe;
     updateCoinsDisplay();
-    
     let emoji, title, color;
     if (pct === 0 && hasEssay) { emoji = '⏳'; title = 'بانتظار التصحيح'; color = 'var(--warning)'; }
     else if (pct >= 80) { emoji = '🏆'; title = 'ممتاز! 🎉'; color = 'var(--success)'; launchConfetti(100); }
     else if (pct >= 50) { emoji = '👍'; title = 'جيد جداً'; color = 'var(--primary)'; }
     else { emoji = '💪'; title = 'حاول مرة أخرى'; color = 'var(--danger)'; }
-    
     const certificateBtn = (platformSettings.certificatesEnabled && !hasEssay && pct >= 50) ? `<button class="btn btn-success btn-lg" onclick="generateCertificate('${attemptId}')" style="margin-top:16px;">🎓 شهادة</button>` : '';
-    
     document.getElementById('quizContent').innerHTML = `
       <div style="text-align:center;padding:20px 0;">
         <div style="font-size:80px;margin-bottom:16px;">${emoji}</div>
@@ -5430,12 +5640,10 @@ async function finishQuiz() {
       </div>`;
     document.getElementById('quizProgressFill').style.width = '100%';
     document.getElementById('quizProgressText').textContent = 'تم';
-    
     window._currentChallenge = null;
     window._currentTournament = null;
   } finally { hideLoading(); }
 }
-
 function exitQuiz() {
   clearInterval(timerInterval);
   currentQuiz = null; 
@@ -5462,8 +5670,12 @@ window.addEventListener('DOMContentLoaded', async () => {
   try { await loadPlatformSettings(); } catch (e) { console.error('Platform settings load error:', e); }
   let sessionOk = false;
   try { sessionOk = await checkSession(); } catch (e) { console.error('Session check error:', e); }
-  try { startAnnouncementsListener(); startChallengesListener(); } catch (e) { console.error('Listeners start error:', e); }
-  if (!sessionOk) { loadActiveAnnouncement(); showScreen('auth'); }
+  try { 
+    startAnnouncementsListener(); 
+    startChallengesListener();
+    loadActiveAnnouncement();
+  } catch (e) { console.error('Listeners start error:', e); }
+  if (!sessionOk) { showScreen('auth'); }
   console.log('✅ عِلْم جاهز');
 });
 
@@ -5493,6 +5705,9 @@ document.addEventListener('keydown', (e) => {
 
 window.addEventListener('error', (e) => { console.error('❌ Global error:', e.error); });
 window.addEventListener('unhandledrejection', (e) => { console.error('❌ Unhandled promise rejection:', e.reason); });
+window.addEventListener('beforeunload', () => {
+  stopAllAnnouncementTimers();
+});
 
 /* ═══════════════════════════════════════════════════════════
    GLOBAL EXPORTS
@@ -5522,7 +5737,7 @@ const globalFns = [
   openPendingTeachers, approveTeacher, rejectTeacher, deleteUser, wipeQuizData, 
   switchUserTab, applyAdminFilters, refreshAdminUsersList,
   renderAdminShop, renderAdminTournaments, startNewTournament, 
-  createTournament, deleteTournament,
+  createTournament, viewTournamentDetails, deleteTournament,
   renderQuestionBank, renderSubjectStats,
   openTeacherProfileEdit, saveTeacherProfile, openTeacherContent, renderContentModal,
   addVideoLink, removeVideoLink, handleMaterialUpload, removeMaterial, 
@@ -5547,7 +5762,9 @@ const globalFns = [
   getGovernorateName, getLevel, getNextLevel,
   calculateCoinsForAttempt, calculateXPForAttempt,
   launchConfetti, showLoading, hideLoading,
-  getTodayKey
+  getTodayKey,
+  handleAnnouncementImage, clearAnnouncementImage, nextAnnouncement, stopAllAnnouncementTimers,
+  wipeStudentRewards, wipeAllRewards
 ];
 
 globalFns.forEach(fn => { 
