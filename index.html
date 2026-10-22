@@ -1709,6 +1709,11 @@ async function handleGoogleSignIn() {
       sessionStorage.setItem('edu_google_redirect', '1');
       await fbAuth.signInWithRedirect(fbAuth.auth, provider);
       return;
+      // جرب استخدام popup حتى على الهاتف
+      const result = await fbAuth.signInWithPopup(fbAuth.auth, provider);
+      if (!result || !result.user) throw new Error('لم يتم استلام بيانات المستخدم');
+      await processGoogleUser(result.user);
+      return;
     }
     const result = await fbAuth.signInWithPopup(fbAuth.auth, provider);
     if (!result || !result.user) throw new Error('لم يتم استلام بيانات المستخدم من Google');
