@@ -433,10 +433,8 @@
   .daily-quest-progress { height: 10px; background: rgba(255,255,255,0.3); border-radius: 999px; overflow: hidden; margin-bottom: 6px; }
   .daily-quest-fill { height: 100%; background: #fff; border-radius: 999px; transition: width 0.5s; }
   .daily-quest-reward { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; background: rgba(255,255,255,0.25); border-radius: 999px; font-size: 12px; font-weight: 800; }
-  
-  /* ═══════════════════════════════════════════════════════════
-     ✅ جديد: لوحة الطالب المعرض للخطر
-     ═══════════════════════════════════════════════════════════ */
+
+  /* ✅ لوحة الطالب المعرض للخطر */
   .at-risk-card {
     background: linear-gradient(135deg, #fef2f2, #fee2e2);
     border: 2px solid var(--danger);
@@ -458,10 +456,8 @@
   .at-risk-reason.declining { background: var(--danger-light); color: var(--danger); }
   .at-risk-reason.inactive { background: var(--warning-light); color: var(--warning); }
   .at-risk-reason.struggling { background: var(--info-light); color: var(--info); }
-  
-  /* ═══════════════════════════════════════════════════════════
-     ✅ جديد: الحيوان الأليف
-     ═══════════════════════════════════════════════════════════ */
+
+  /* ✅ الحيوان الأليف */
   .pet-card {
     background: linear-gradient(135deg, #ecfdf5, #d1fae5);
     border: 2px solid var(--success);
@@ -480,10 +476,8 @@
   .pet-health { font-size: 12px; color: var(--text-light); font-weight: 600; }
   .pet-sad { animation: petSad 2s infinite; }
   @keyframes petSad { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
-  
-  /* ═══════════════════════════════════════════════════════════
-     ✅ جديد: مسارات التعلم الذكية
-     ═══════════════════════════════════════════════════════════ */
+
+  /* ✅ مسارات التعلم الذكية */
   .learning-path-card {
     background: linear-gradient(135deg, #eff6ff, #dbeafe);
     border: 2px solid var(--info);
@@ -506,10 +500,8 @@
   .learning-path-content { flex: 1; }
   .learning-path-content h4 { font-size: 14px; font-weight: 800; margin-bottom: 2px; }
   .learning-path-content p { font-size: 12px; color: var(--text-light); }
-  
-  /* ═══════════════════════════════════════════════════════════
-     ✅ جديد: إشعارات سلوكية
-     ═══════════════════════════════════════════════════════════ */
+
+  /* ✅ إشعارات سلوكية */
   .behavioral-notif {
     background: linear-gradient(135deg, #fef3c7, #fde68a);
     border-right: 4px solid var(--warning);
@@ -523,7 +515,87 @@
   body.dark-mode .behavioral-notif { background: linear-gradient(135deg, #78350f, #92400e); }
   .behavioral-notif-icon { font-size: 32px; flex-shrink: 0; }
   .behavioral-notif-text { flex: 1; font-size: 14px; font-weight: 700; }
-  
+
+  /* ═══════════════════════════════════════════════════════════
+     ✅ كاروسيل الإعلانات (مكان واحد + حركة + تحكم بالمدة)
+     ═══════════════════════════════════════════════════════════ */
+  .announcements-carousel {
+    position: relative;
+    margin-bottom: 20px;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .announcement-slide { display: none; animation: slideInAnn 0.5s ease; }
+  .announcement-slide.active { display: block; }
+  @keyframes slideInAnn {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .announcements-carousel .announcement-banner { border-radius: 18px; min-height: 200px; }
+  .ann-carousel-controls {
+    position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 8px; z-index: 5;
+  }
+  .ann-nav-btn {
+    width: 34px; height: 34px; border-radius: 50%; border: none;
+    background: rgba(255,255,255,0.3); color: #fff; font-size: 16px;
+    cursor: pointer; transition: all 0.2s; backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center; font-weight: 900;
+  }
+  .ann-nav-btn:hover { background: rgba(255,255,255,0.5); transform: scale(1.1); }
+  .ann-dots { display: flex; gap: 6px; align-items: center; }
+  .ann-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: rgba(255,255,255,0.4); cursor: pointer;
+    transition: all 0.3s; border: none; padding: 0;
+  }
+  .ann-dot.active { background: #fff; width: 26px; border-radius: 999px; }
+  .ann-counter {
+    position: absolute; top: 14px; right: 14px;
+    background: rgba(0,0,0,0.4); color: #fff;
+    padding: 4px 12px; border-radius: 999px;
+    font-size: 12px; font-weight: 800; z-index: 3; backdrop-filter: blur(4px);
+  }
+  .ann-progress-bar {
+    position: absolute; bottom: 0; right: 0;
+    height: 4px; background: rgba(255,255,255,0.9);
+    z-index: 4; transition: width linear; border-radius: 0 0 18px 0;
+  }
+
+  /* ✅ محرر الإعلانات */
+  .ann-schedule-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .ann-schedule-grid .form-group { margin-bottom: 0; }
+  .ann-duration-note {
+    padding: 10px 14px; background: var(--info-light); color: var(--info);
+    border-radius: 10px; font-size: 12px; font-weight: 700;
+    margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .ann-section-title {
+    font-size: 15px; font-weight: 900; color: var(--text);
+    margin: 20px 0 12px; padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .ann-image-preview { max-width: 100%; max-height: 160px; border-radius: 10px; margin-top: 8px; object-fit: cover; }
+  .ann-status-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 800;
+  }
+  .ann-status-active { background: var(--success-light); color: var(--success); }
+  .ann-status-scheduled { background: var(--info-light); color: var(--info); }
+  .ann-status-expired { background: var(--danger-light); color: var(--danger); }
+  .ann-status-disabled { background: var(--warning-light); color: var(--warning); }
+  .duration-preset-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .duration-preset {
+    padding: 6px 12px; border: 2px solid var(--border);
+    background: var(--card); border-radius: 8px;
+    font-family: inherit; font-size: 12px; font-weight: 700;
+    cursor: pointer; color: var(--text); transition: all 0.2s;
+  }
+  .duration-preset:hover { border-color: var(--primary); color: var(--primary); }
+  .duration-preset.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
   @media (max-width: 600px) {
     .card { padding: 20px; } .auth-wrapper { margin: 20px auto; }
     .stats-grid { grid-template-columns: repeat(2, 1fr); } .stat-card { flex-direction: column; text-align: center; }
@@ -536,6 +608,8 @@
     .theme-grid { grid-template-columns: repeat(2, 1fr); }
     .stat-breakdown-grid { grid-template-columns: repeat(2, 1fr); }
     .heatmap-grid { font-size: 9px; }
+    .ann-schedule-grid { grid-template-columns: 1fr; }
+    .ann-counter { font-size: 10px; padding: 3px 8px; }
   }
 </style>
 </head>
@@ -544,7 +618,8 @@
 <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
 <div class="confetti-container" id="confettiContainer"></div>
 
-<div id="globalAnnouncementContainer" class="global-announcement-container"></div>
+<!-- ✅ تم حذف globalAnnouncementContainer القديم — الإعلانات تظهر الآن داخل لوحة التحكم فقط -->
+<!-- سيتم عرض الإعلانات داخل <div id="announcementContainer"> في dashboardScreen -->
 
 <section id="authScreen" class="screen active">
   <div class="auth-wrapper" style="padding-top: 20px;">
@@ -700,6 +775,12 @@
       </div>
     </div>
   </div>
+
+  <!-- ✅ مكان الإعلانات الوحيد: أعلى محتوى لوحة التحكم -->
+  <div class="container">
+    <div id="announcementContainer"></div>
+  </div>
+
   <div class="container" id="dashboardContent"></div>
   <div class="dev-footer">
     <a class="dev-brand" href="#" onclick="event.preventDefault();"><span>💻</span><span>تطوير <strong>EMAA.Tech</strong></span></a>
@@ -722,9 +803,9 @@
 
 <div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox"></div></div>
 
-<script>
+<script></script>
 /* ═══════════════════════════════════════════════════════════
-   الجزء 1: الإعدادات والثوابت (المحدثة)
+   الجزء 1: الإعدادات والثوابت
    ═══════════════════════════════════════════════════════════ */
 
 const firebaseConfig = {
@@ -876,7 +957,6 @@ const BADGES = {
   high_scorer: { name: 'نجم', emoji: '💫', desc: 'حصل على 800 نقطة' }
 };
 
-/* ✅ جديد: مراحل الحيوان الأليف */
 const PET_STAGES = [
   { level: 0, emoji: '🥚', name: 'بيضة', minXP: 0 },
   { level: 1, emoji: '🐣', name: 'فرخ صغير', minXP: 50 },
@@ -922,7 +1002,9 @@ const DEFAULT_PLATFORM_SETTINGS = {
   coinsEnabled: true, shopEnabled: true, dailyQuestsEnabled: true,
   certificatesEnabled: true, tournamentsEnabled: true,
   petEnabled: true, atRiskEnabled: true, adaptiveEnabled: true,
-  footerText: 'EMAA.Tech', supportEmail: '', supportPhone: ''
+  footerText: 'EMAA.Tech', supportEmail: '', supportPhone: '',
+  announcementAutoRotate: true,
+  announcementRotateInterval: 8
 };
 let platformSettings = { ...DEFAULT_PLATFORM_SETTINGS };
 
@@ -1055,7 +1137,6 @@ function pickRole(role) {
   if (role === 'teacher') { populateSubjectSelects(); }
 }
 
-/* ✅ دوال المراحل والصفوف */
 function getStageFromGrade(grade) {
   if (!grade) return null;
   if (grade === 'KG1' || grade === 'KG2') return 'رياض أطفال';
@@ -1368,6 +1449,7 @@ async function verifyPassword(h, p) {
 }
 function safeBtoa(bytes) { let binary = ''; const arr = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes); for (let i = 0; i < arr.length; i++) binary += String.fromCharCode(arr[i]); return btoa(binary); }
 function safeAtob(str) { const binary = atob(str); const bytes = new Uint8Array(binary.length); for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i); return bytes; }
+
 /* ═══════════════════════════════════════════════════════════
    نظام العملات
    ═══════════════════════════════════════════════════════════ */
@@ -1483,7 +1565,6 @@ async function awardXP(studentId, amount, reason) {
     await dbUpdateNode('users', studentId, { xp: newXP, lastXpReason: reason, lastXpAt: Date.now() });
     const notifId = uid();
     await dbSetNode('notifications', notifId, { userId: studentId, title: `+${amount} نقطة XP`, body: reason, createdAt: Date.now(), read: false });
-    // ✅ تحديث الحيوان الأليف تلقائياً
     if (platformSettings.petEnabled) {
       await updatePetGrowth(studentId, amount);
     }
@@ -1558,7 +1639,7 @@ function calculateCoinsForAttempt(attempt) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ✅ جديد: نظام الحيوان الأليف (Pet System)
+   نظام الحيوان الأليف
    ═══════════════════════════════════════════════════════════ */
 async function updatePetGrowth(studentId, xpAmount) {
   try {
@@ -1609,7 +1690,7 @@ async function renderPetCard(studentId, xp) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ✅ جديد: تحليل نقاط الضعف (Weakness Analysis)
+   تحليل نقاط الضعف
    ═══════════════════════════════════════════════════════════ */
 function analyzeWeaknesses(attempts, quizzes) {
   const wrongByLesson = {};
@@ -1645,7 +1726,7 @@ function analyzeWeaknesses(attempts, quizzes) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ✅ جديد: الطلاب المعرضون للخطر (At-Risk Students)
+   الطلاب المعرضون للخطر
    ═══════════════════════════════════════════════════════════ */
 async function getAtRiskStudents() {
   const users = await DB.get('users');
@@ -1680,7 +1761,7 @@ async function getAtRiskStudents() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ✅ جديد: المسارات الذكية (Smart Learning Paths)
+   المسارات الذكية
    ═══════════════════════════════════════════════════════════ */
 async function getSmartLearningPath(studentId, subjectId, lowPct) {
   const users = await DB.get('users');
@@ -1709,10 +1790,10 @@ async function getSmartLearningPath(studentId, subjectId, lowPct) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ✅ جديد: الإشعارات السلوكية
+   الإشعارات السلوكية
    ═══════════════════════════════════════════════════════════ */
 async function generateBehavioralNotifications() {
-  if (!currentUser || currentUser.role !== 'student') return;
+  if (!currentUser || currentUser.role !== 'student') return [];
   try {
     const attempts = await DB.get('attempts');
     const myAttempts = attempts
@@ -1732,7 +1813,6 @@ async function generateBehavioralNotifications() {
         notifs.push({ icon: '🐾', text: 'حيوانك الأليف يحتاج للعناية! حل اختباراً لتعيد صحته' });
       }
     }
-    const users = await DB.get('users');
     const myCoins = currentUser.coins || 0;
     const cheapItems = SHOP_ITEMS.filter(i => i.price <= myCoins && !(currentUser.ownedItems || []).includes(i.id));
     if (cheapItems.length > 0) {
@@ -1795,21 +1875,54 @@ function applyThemeColors(key) {
   if (header) header.style.background = `linear-gradient(135deg, ${t.primary}, ${t.secondary})`;
 }
 
+async function logActivity(action, details = '') {
+  try {
+    const logId = uid();
+    const logEntry = { 
+      userId: currentUser?.id || 'unknown', userName: currentUser?.name || 'غير معروف',
+      userRole: currentUser?.role || 'unknown', action, details, timestamp: Date.now() 
+    };
+    await dbSetNode('auditLog', logId, logEntry);
+  } catch (e) { console.error('logActivity failed:', e); }
+}
+
 /* ═══════════════════════════════════════════════════════════
-   الإعلانات - نافذة واحدة كبيرة متحركة
+   ✅ نظام الإعلانات الجديد (مكان واحد + حركة + تحكم كامل بالمدة)
    ═══════════════════════════════════════════════════════════ */
 let _cachedAnnouncements = [];
 let _announcementUnsubscribe = null;
 let _lastAnnouncementId = null;
 let _announcementTimer = null;
+let _announcementProgressTimer = null;
 let _currentAnnouncementIndex = 0;
+let _annProgressStart = 0;
+let _annProgressDuration = 0;
+
+/* ✅ جلب الإعلانات النشطة فقط حسب المدة (startDate/endDate) */
+function getActiveAnnouncementsList() {
+  const now = Date.now();
+  return _cachedAnnouncements
+    .filter(a => {
+      if (a.enabled === false) return false;
+      if (a.startDate && a.startDate > now) return false;
+      if (a.endDate && a.endDate < now) return false;
+      const dismissedAt = localStorage.getItem('edu_announcement_dismissed_' + a.id);
+      if (dismissedAt) {
+        const dismissedTime = parseInt(dismissedAt, 10);
+        if (!isNaN(dismissedTime) && (now - dismissedTime) < 24 * 60 * 60 * 1000) return false;
+      }
+      return true;
+    })
+    .sort((a, b) => (a.order || 0) - (b.order || 0) || (b.createdAt || 0) - (a.createdAt || 0));
+}
 
 async function loadActiveAnnouncement() {
   try {
     _cachedAnnouncements = await DB.get('announcements');
     renderAnnouncementEverywhere();
-  } catch (e) {}
+  } catch (e) { console.error('loadActiveAnnouncement failed:', e); }
 }
+
 function startAnnouncementsListener() {
   stopAnnouncementsListener();
   if (!firebaseEnabled) return;
@@ -1823,30 +1936,28 @@ function startAnnouncementsListener() {
 function stopAnnouncementsListener() {
   if (_announcementUnsubscribe) { try { _announcementUnsubscribe(); } catch {} _announcementUnsubscribe = null; }
 }
+
 function stopAllAnnouncementTimers() {
   if (_announcementTimer) { clearInterval(_announcementTimer); _announcementTimer = null; }
+  if (_announcementProgressTimer) { clearInterval(_announcementProgressTimer); _announcementProgressTimer = null; }
 }
-function getActiveAnnouncementsList() {
-  const now = Date.now();
-  return _cachedAnnouncements.filter(a => {
-    if (!a.enabled) return false;
-    if (a.startDate && a.startDate > now) return false;
-    if (a.endDate && a.endDate < now) return false;
-    const dismissed = localStorage.getItem('edu_announcement_dismissed_' + a.id);
-    if (dismissed) return false;
-    return true;
-  }).sort((a, b) => (a.order || 0) - (b.order || 0) || (b.createdAt || 0) - (a.createdAt || 0));
-}
+
+/* ✅ رسم الإعلانات في مكان واحد فقط (داخل dashboardScreen) */
 function renderAnnouncementEverywhere() {
   stopAllAnnouncementTimers();
   const activeAnnouncements = getActiveAnnouncementsList();
-  const container = document.getElementById('globalAnnouncementContainer');
+  const container = document.getElementById('announcementContainer');
   if (!container) return;
+
   if (activeAnnouncements.length === 0) {
     container.innerHTML = '';
     return;
   }
-  container.innerHTML = `<div class="announcements-carousel" data-key="global">
+
+  const rotateInterval = Math.max(3, parseInt(platformSettings.announcementRotateInterval) || 8) * 1000;
+
+  container.innerHTML = `<div class="announcements-carousel" data-key="main">
+    ${activeAnnouncements.length > 1 ? `<span class="ann-counter" id="annCounter">1 / ${activeAnnouncements.length}</span>` : ''}
     ${activeAnnouncements.map((a, i) => {
       const hasImage = a.imageUrl || a.imageData;
       const imgSrc = a.imageUrl || a.imageData;
@@ -1854,53 +1965,111 @@ function renderAnnouncementEverywhere() {
       const textDir = detectDirection(a.text || '');
       const titleDir = detectDirection(a.title || '');
       return `<div class="announcement-slide ${i === 0 ? 'active' : ''}" data-index="${i}">
-        <div class="announcement-banner ${hasImage ? 'with-image' : ''} close-btn-visible" style="${bg}">
-          <button class="announcement-banner-close" onclick="dismissAnnouncement('${a.id}', 'global')" title="إغلاق">✕</button>
+        <div class="announcement-banner close-btn-visible" style="${bg}">
+          <button class="announcement-banner-close" onclick="event.stopPropagation(); dismissAnnouncement('${a.id}')" title="إغلاق">✕</button>
           <div class="announcement-banner-inner">
             ${a.emoji ? `<span class="announcement-banner-emoji">${a.emoji}</span>` : ''}
             ${a.title ? `<h2 class="announcement-banner-title" dir="${titleDir}" style="text-align:${titleDir === 'ltr' ? 'left' : 'right'};">${escapeHtml(a.title)}</h2>` : ''}
             ${a.text ? `<p class="announcement-banner-text" dir="${textDir}" style="text-align:${textDir === 'ltr' ? 'left' : 'right'};">${escapeHtml(a.text)}</p>` : ''}
             ${a.link ? `<a href="${escapeHtml(a.link)}" target="_blank" rel="noopener" class="announcement-banner-cta">${escapeHtml(a.linkText || 'اعرف أكثر')} ←</a>` : ''}
           </div>
+          <div class="ann-progress-bar" id="annProgressBar_${i}" style="width:0%;"></div>
         </div>
       </div>`;
     }).join('')}
+    ${activeAnnouncements.length > 1 ? `
+      <div class="ann-carousel-controls">
+        <button class="ann-nav-btn" onclick="nextAnnouncement('main', -1)" title="السابق">‹</button>
+        <div class="ann-dots" id="annDots">
+          ${activeAnnouncements.map((_, i) => `<button class="ann-dot ${i === 0 ? 'active' : ''}" onclick="goToAnnouncement(${i})" title="الإعلان ${i+1}"></button>`).join('')}
+        </div>
+        <button class="ann-nav-btn" onclick="nextAnnouncement('main', 1)" title="التالي">›</button>
+      </div>
+    ` : ''}
   </div>`;
+
   _currentAnnouncementIndex = 0;
-  if (activeAnnouncements.length > 1) {
-    _announcementTimer = setInterval(() => {
-      nextAnnouncement('global', 1);
-    }, 10000);
+
+  if (activeAnnouncements.length > 1 && platformSettings.announcementAutoRotate !== false) {
+    startAnnouncementAutoRotate(rotateInterval, activeAnnouncements.length);
+  } else {
+    startSingleAnnouncementProgress(0, rotateInterval);
   }
 }
-function nextAnnouncement(key, direction) {
-  const container = document.querySelector(`.announcements-carousel[data-key="${key}"]`);
+
+function startAnnouncementAutoRotate(intervalMs, total) {
+  stopAllAnnouncementTimers();
+  startAnnouncementProgress(0, intervalMs);
+  _announcementTimer = setInterval(() => {
+    nextAnnouncement('main', 1);
+  }, intervalMs);
+}
+
+function startSingleAnnouncementProgress(index, durationMs) {
+  startAnnouncementProgress(index, durationMs);
+}
+
+function startAnnouncementProgress(index, durationMs) {
+  if (_announcementProgressTimer) { clearInterval(_announcementProgressTimer); _announcementProgressTimer = null; }
+  _annProgressStart = Date.now();
+  _annProgressDuration = durationMs;
+  const bar = document.getElementById('annProgressBar_' + index);
+  if (!bar) return;
+  bar.style.width = '0%';
+  _announcementProgressTimer = setInterval(() => {
+    const elapsed = Date.now() - _annProgressStart;
+    const pct = Math.min(100, (elapsed / durationMs) * 100);
+    const currentBar = document.getElementById('annProgressBar_' + _currentAnnouncementIndex);
+    if (currentBar) currentBar.style.width = pct + '%';
+    if (pct >= 100) {
+      clearInterval(_announcementProgressTimer);
+      _announcementProgressTimer = null;
+    }
+  }, 50);
+}
+
+function goToAnnouncement(index) {
+  const container = document.querySelector('.announcements-carousel[data-key="main"]');
   if (!container) return;
   const slides = container.querySelectorAll('.announcement-slide');
   if (slides.length <= 1) return;
-  let currentIndex = Array.from(slides).findIndex(s => s.classList.contains('active'));
-  if (currentIndex === -1) currentIndex = 0;
-  let newIndex = (currentIndex + direction + slides.length) % slides.length;
-  slides.forEach(s => s.classList.remove('active'));
-  slides[newIndex].classList.add('active');
+  const total = slides.length;
+  const newIndex = ((index % total) + total) % total;
+
+  slides.forEach((s, i) => {
+    s.classList.toggle('active', i === newIndex);
+  });
   _currentAnnouncementIndex = newIndex;
+
+  const counter = document.getElementById('annCounter');
+  if (counter) counter.textContent = `${newIndex + 1} / ${total}`;
+  const dots = document.querySelectorAll('#annDots .ann-dot');
+  dots.forEach((d, i) => d.classList.toggle('active', i === newIndex));
+
+  const rotateInterval = Math.max(3, parseInt(platformSettings.announcementRotateInterval) || 8) * 1000;
+  startAnnouncementProgress(newIndex, rotateInterval);
+
+  if (platformSettings.announcementAutoRotate !== false) {
+    if (_announcementTimer) clearInterval(_announcementTimer);
+    _announcementTimer = setInterval(() => {
+      nextAnnouncement('main', 1);
+    }, rotateInterval);
+  }
 }
-function dismissAnnouncement(id, key) {
-  localStorage.setItem('edu_announcement_dismissed_' + id, '1');
+
+function nextAnnouncement(key, direction) {
+  const container = document.querySelector('.announcements-carousel[data-key="main"]');
+  if (!container) return;
+  const slides = container.querySelectorAll('.announcement-slide');
+  if (slides.length <= 1) return;
+  const newIndex = (_currentAnnouncementIndex + direction + slides.length) % slides.length;
+  goToAnnouncement(newIndex);
+}
+
+function dismissAnnouncement(id) {
+  localStorage.setItem('edu_announcement_dismissed_' + id, Date.now().toString());
   renderAnnouncementEverywhere();
 }
-
-async function logActivity(action, details = '') {
-  try {
-    const logId = uid();
-    const logEntry = { 
-      userId: currentUser?.id || 'unknown', userName: currentUser?.name || 'غير معروف',
-      userRole: currentUser?.role || 'unknown', action, details, timestamp: Date.now() 
-    };
-    await dbSetNode('auditLog', logId, logEntry);
-  } catch (e) { console.error('logActivity failed:', e); }
-}
-
 /* ═══════════════════════════════════════════════════════════
    AUTH
    ═══════════════════════════════════════════════════════════ */
@@ -2287,9 +2456,7 @@ function openProfileCompletionModal(isExisting = false) {
       ${!isExisting ? `<button class="btn btn-ghost" onclick="cancelGoogleProfile()" style="flex:1;">إلغاء</button>` : ''}
       <button class="btn btn-success" onclick="completeGoogleProfile()" style="flex:2;">✅ إكمال</button>
     </div>`);
-  setTimeout(() => {
-    initStageSelects();
-  }, 50);
+  setTimeout(() => { initStageSelects(); }, 50);
 }
 
 function pickGoogleRole(role) {
@@ -2361,17 +2528,8 @@ async function completeGoogleProfile() {
   showLoading();
   try {
     const uid = pendingGoogleUser.id;
-    console.log('💾 Saving Google profile:', uid, profile.email);
     const saved = await dbSetNode('users', uid, profile);
-    if (!saved) { 
-      alert('⚠️ فشل حفظ البيانات. تحقق من قواعد الأمان (Rules).'); 
-      return; 
-    }
-    const verifyUsers = await DB.get('users');
-    const verified = verifyUsers.find(u => u.id === uid || u.email === profile.email);
-    if (!verified) {
-      console.warn('⚠️ User not found after save');
-    }
+    if (!saved) { alert('⚠️ فشل حفظ البيانات. تحقق من قواعد الأمان (Rules).'); return; }
     profile.id = uid;
     currentUser = profile;
     saveSession(uid, true);
@@ -2483,6 +2641,8 @@ async function logout() {
   showScreen('auth');
   document.getElementById('loginForm').reset();
   document.getElementById('registerForm').reset();
+  const annContainer = document.getElementById('announcementContainer');
+  if (annContainer) annContainer.innerHTML = '';
 }
 
 async function checkSession() {
@@ -3055,6 +3215,7 @@ async function applyTheme(key) {
   const header = document.querySelector('.dashboard-header');
   if (header) header.style.background = `linear-gradient(135deg, ${t.primary}, ${t.secondary})`;
 }
+
 /* ═══════════════════════════════════════════════════════════
    ADMIN DASHBOARD
    ═══════════════════════════════════════════════════════════ */
@@ -3545,44 +3706,620 @@ async function adminDeleteQuiz(quizId) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   seedDemoQuizzes + wipeDemoQuizzesOnly
+   ✅ اختبارات جاهزة حقيقية (محتوى كامل)
+   ═══════════════════════════════════════════════════════════ */
+const REAL_DEMO_QUIZZES = [
+  /* ══════ الصف الثاني الابتدائي ══════ */
+  {
+    title: "اختبار الرياضيات - الصف الثاني الابتدائي (الترم الأول)",
+    subject: "math",
+    grade: "الصف الثاني الابتدائي",
+    timePerQuestion: 60,
+    questions: [
+      { type: 'mcq', difficulty: 'easy', text: 'In a graph, if the number of apples is 8 and the number of bananas is 5, how many more apples are there than bananas?', options: ['2', '3', '5', '13'], answer: 1, lesson: 'البيانات والرسوم البيانية' },
+      { type: 'mcq', difficulty: 'easy', text: 'What is the result of the vertical addition: 46 + 50?', options: ['86', '96', '106', '90'], answer: 1, lesson: 'الجمع' },
+      { type: 'mcq', difficulty: 'easy', text: 'What is the result of the vertical subtraction: 89 - 65?', options: ['24', '34', '14', '26'], answer: 0, lesson: 'الطرح' },
+      { type: 'mcq', difficulty: 'medium', text: 'If the time is 10:20 AM, what time will it be 40 minutes later?', options: ['10:60', '11:00', '11:20', '10:40'], answer: 1, lesson: 'الوقت' },
+      { type: 'mcq', difficulty: 'easy', text: 'Which unit of measurement do we use to measure the length of a pencil (which is short)?', options: ['Kilometer', 'Meter', 'Centimeter', 'Liter'], answer: 2, lesson: 'وحدات القياس' },
+      { type: 'mcq', difficulty: 'medium', text: 'The digit "7" in the number 711 represents the:', options: ['Ones place', 'Tens place', 'Hundreds place', 'Thousands place'], answer: 2, lesson: 'القيمة المكانية' },
+      { type: 'mcq', difficulty: 'easy', text: 'The number "Five Hundred Twenty-nine" is written in digits as:', options: ['529', '592', '5029', '925'], answer: 0, lesson: 'قراءة الأعداد' },
+      { type: 'mcq', difficulty: 'medium', text: 'Which comparison symbol makes this statement true: 104 (....) 98?', options: ['>', '<', '=', 'None of the above'], answer: 0, lesson: 'المقارنة' },
+      { type: 'mcq', difficulty: 'medium', text: 'How much is 5 Liters (L) in Deciliters (dL)?', options: ['5', '50', '500', '1000'], answer: 1, lesson: 'وحدات السعة' },
+      { type: 'mcq', difficulty: 'medium', text: 'What is the result of the vertical addition: 74 + 68?', options: ['132', '142', '152', '122'], answer: 1, lesson: 'الجمع' },
+      { type: 'mcq', difficulty: 'medium', text: 'What is the result of the vertical subtraction: 137 - 54?', options: ['83', '93', '73', '81'], answer: 0, lesson: 'الطرح' },
+      { type: 'mcq', difficulty: 'medium', text: 'To calculate 12 + 7 + 3 easily using mental math, which parentheses make it easier?', options: ['(12 + 7) + 3', '12 + (7 + 3)', '(12 + 3) + 7', 'No parentheses needed'], answer: 1, lesson: 'الحساب الذهني' },
+      { type: 'mcq', difficulty: 'medium', text: 'The number 607 is expressed in expanded form as:', options: ['60 + 7', '600 + 70', '600 + 7', '6 + 7'], answer: 2, lesson: 'الصورة التحليلية' },
+      { type: 'mcq', difficulty: 'easy', text: 'What is the result of: 200 + 800?', options: ['100', '1000', '600', '10000'], answer: 1, lesson: 'الجمع' },
+      { type: 'mcq', difficulty: 'easy', text: 'What is the result of: 430 - 30?', options: ['400', '460', '430', '300'], answer: 0, lesson: 'الطرح' },
+      { type: 'tf', difficulty: 'medium', text: 'In the vertical addition 16 + 24, the sum of the Ones place is 10, so we write 0 in the Ones place and carry over 1 to the Tens place.', answer: true, lesson: 'الجمع' },
+      { type: 'tf', difficulty: 'easy', text: 'In the vertical subtraction 25 - 15, the answer is 10, and we write a zero in the Ones place.', answer: true, lesson: 'الطرح' },
+      { type: 'tf', difficulty: 'medium', text: 'The time 7:30 in the evening is written using AM.', answer: false, lesson: 'الوقت' },
+      { type: 'tf', difficulty: 'easy', text: '1 Meter = 100 Centimeters.', answer: true, lesson: 'وحدات الطول' },
+      { type: 'tf', difficulty: 'medium', text: 'When comparing 573 and 578, we put the > sign between them, so 573 > 578.', answer: false, lesson: 'المقارنة' },
+      { type: 'tf', difficulty: 'easy', text: 'The number 359 has 3 hundreds, 5 tens, and 9 ones.', answer: true, lesson: 'القيمة المكانية' },
+      { type: 'tf', difficulty: 'medium', text: 'To calculate 500 - 200, we think of it as 5 groups of 100 - 2 groups of 100 = 3 groups of 100, which is 300.', answer: true, lesson: 'الحساب الذهني' },
+      { type: 'tf', difficulty: 'hard', text: '1 Liter (L) equals 100 Deciliters (dL).', answer: false, lesson: 'وحدات السعة' },
+      { type: 'tf', difficulty: 'medium', text: 'In the vertical subtraction 90 - 49, we borrow 1 from the Tens place because we cannot subtract 9 from 0.', answer: true, lesson: 'الطرح' },
+      { type: 'tf', difficulty: 'easy', text: '75 minutes is equal to 1 hour and 15 minutes.', answer: true, lesson: 'الوقت' },
+      { type: 'fill', difficulty: 'medium', text: 'In the vertical addition 75 + 15, the sum of the Ones place is 10, so we write .......... in the Ones place and carry over 1 to the .......... place.', answer: '0', lesson: 'الجمع' },
+      { type: 'fill', difficulty: 'easy', text: '1 hour and 20 minutes = .......... minutes.', answer: '80', lesson: 'الوقت' },
+      { type: 'fill', difficulty: 'medium', text: 'If the time is 3:25 PM, the time 30 minutes before was ..........', answer: '2:55 PM', lesson: 'الوقت' },
+      { type: 'fill', difficulty: 'easy', text: '9 cm = .......... mm.', answer: '90', lesson: 'وحدات الطول' },
+      { type: 'fill', difficulty: 'medium', text: 'When converting 29 mm, it equals .......... cm and .......... mm.', answer: '2', lesson: 'وحدات الطول' },
+      { type: 'fill', difficulty: 'easy', text: 'The number made of 5 hundreds, 7 tens, and 0 ones is ..........', answer: '570', lesson: 'القيمة المكانية' },
+      { type: 'fill', difficulty: 'medium', text: '403 = .......... + ..........', answer: '400 + 3', lesson: 'الصورة التحليلية' },
+      { type: 'fill', difficulty: 'hard', text: '820 is the number that is 80 less than ..........', answer: '900', lesson: 'الطرح' },
+      { type: 'fill', difficulty: 'easy', text: '1 Liter = .......... milliliters (mL).', answer: '1000', lesson: 'وحدات السعة' },
+      { type: 'fill', difficulty: 'hard', text: '2 L and 5 dL + 2 L = .......... L and .......... dL.', answer: '4 L and 5 dL', lesson: 'وحدات السعة' },
+      { type: 'fill', difficulty: 'hard', text: 'To calculate 73 - 8 using the splitting method, we think: 73 - 3 = 70, then 70 - .......... = ..........', answer: '5 / 65', lesson: 'الطرح' },
+      { type: 'fill', difficulty: 'medium', text: 'The result of the vertical addition: 658 + 24 = ..........', answer: '682', lesson: 'الجمع' },
+      { type: 'fill', difficulty: 'medium', text: 'The result of the vertical subtraction: 100 - 46 = ..........', answer: '54', lesson: 'الطرح' },
+      { type: 'fill', difficulty: 'easy', text: '700 + 60 = ..........', answer: '760', lesson: 'الجمع' },
+      { type: 'fill', difficulty: 'easy', text: '1000 - 200 = ..........', answer: '800', lesson: 'الطرح' }
+    ]
+  },
+  {
+    title: "اختبار التربية الدينية الإسلامية - الصف الثاني الابتدائي",
+    subject: "religion",
+    grade: "الصف الثاني الابتدائي",
+    timePerQuestion: 60,
+    questions: [
+      { type: 'mcq', difficulty: 'easy', text: 'معنى اسم الله تعالى (السَّمِيعُ) هو الذي:', options: ['يرى كل شيء', 'يسمع كل شيء', 'يعلم كل شيء', 'يخلق كل شيء'], answer: 1, lesson: 'أسماء الله الحسنى' },
+      { type: 'mcq', difficulty: 'easy', text: 'نزل القرآن الكريم في ليلة:', options: ['الإسراء والمعراج', 'عيد الأضحى', 'القدر', 'النصف من شعبان'], answer: 2, lesson: 'ليلة القدر' },
+      { type: 'mcq', difficulty: 'easy', text: 'ليلة القدر تأتي في شهر:', options: ['رجب', 'شعبان', 'رمضان', 'محرم'], answer: 2, lesson: 'ليلة القدر' },
+      { type: 'mcq', difficulty: 'easy', text: 'الأذان هو:', options: ['نداء إلى الصلاة', 'نهاية الصلاة', 'بداية الطعام', 'وقت النوم'], answer: 0, lesson: 'الأذان والإقامة' },
+      { type: 'mcq', difficulty: 'medium', text: 'أول من آمن بالنبي ﷺ من النساء هي السيدة:', options: ['عائشة', 'خديجة', 'حفصة', 'فاطمة'], answer: 1, lesson: 'السيرة النبوية' },
+      { type: 'mcq', difficulty: 'easy', text: 'نزل الوحي على النبي ﷺ في غار:', options: ['ثور', 'حراء', 'الكهف', 'عرفة'], answer: 1, lesson: 'السيرة النبوية' },
+      { type: 'mcq', difficulty: 'easy', text: 'معنى اسم الله تعالى (البَصِيرُ) هو الذي:', options: ['يسمع كل شيء', 'يرى كل شيء', 'يعلم كل شيء', 'يرزق كل شيء'], answer: 1, lesson: 'أسماء الله الحسنى' },
+      { type: 'mcq', difficulty: 'easy', text: 'أول كلمة نزلت من القرآن الكريم هي:', options: ['الحمد', 'اقرأ', 'سبح', 'كبر'], answer: 1, lesson: 'نزول الوحي' },
+      { type: 'mcq', difficulty: 'medium', text: 'الإقامة هي:', options: ['الإعلام بانتهاء الصلاة', 'الإعلام بالبدء في الصلاة', 'بداية الصوم', 'وقت النوم'], answer: 1, lesson: 'الأذان والإقامة' },
+      { type: 'mcq', difficulty: 'medium', text: 'نبي الله الذي أُعطي الزَّبُور هو:', options: ['موسى', 'داوود', 'شعيب', 'عيسى'], answer: 1, lesson: 'قصص الأنبياء' },
+      { type: 'mcq', difficulty: 'medium', text: 'قوم شعيب كانوا يعملون في:', options: ['الزراعة', 'التجارة', 'الصيد', 'الصناعة'], answer: 1, lesson: 'قصص الأنبياء' },
+      { type: 'mcq', difficulty: 'medium', text: 'عاقب الله قوم شعيب بـ:', options: ['مطر غزير', 'الصيحة', 'الطوفان', 'الفيضان'], answer: 1, lesson: 'قصص الأنبياء' },
+      { type: 'mcq', difficulty: 'medium', text: 'معنى اسم الله تعالى (الشَّكُورُ) هو الذي:', options: ['يرى كل شيء', 'يسمع كل شيء', 'يشكر ويجازي على العمل الصالح', 'يعاقب العاصين'], answer: 2, lesson: 'أسماء الله الحسنى' },
+      { type: 'mcq', difficulty: 'easy', text: 'عندما نريد أن نشكر الله تعالى نقول:', options: ['سبحان الله', 'الحمد لله', 'أستغفر الله', 'لا إله إلا الله'], answer: 1, lesson: 'الشكر' },
+      { type: 'mcq', difficulty: 'easy', text: 'صلاة الجماعة هي أن نصلي:', options: ['فرادى', 'اثنين أو أكثر خلف إمام', 'في المسجد فقط', 'في المنزل فقط'], answer: 1, lesson: 'الصلاة' },
+      { type: 'tf', difficulty: 'easy', text: 'الله تعالى يسمع دعاءنا في أي وقت وفي أي مكان.', answer: true, lesson: 'أسماء الله الحسنى' },
+      { type: 'tf', difficulty: 'medium', text: 'يجب أن نرفع أصواتنا بالدعاء ليسمعنا الله.', answer: false, lesson: 'الدعاء' },
+      { type: 'tf', difficulty: 'easy', text: 'ليلة القدر ليلة مليئة بالسلام والأمان.', answer: true, lesson: 'ليلة القدر' },
+      { type: 'tf', difficulty: 'easy', text: 'الأذان يُقال خمس مرات في اليوم.', answer: true, lesson: 'الأذان' },
+      { type: 'tf', difficulty: 'medium', text: 'بدأت الدعوة الإسلامية سرًّا لمدة ثلاث سنوات.', answer: true, lesson: 'السيرة النبوية' },
+      { type: 'tf', difficulty: 'hard', text: 'أول من آمن بالنبي ﷺ من الرجال هو عمر بن الخطاب.', answer: false, lesson: 'السيرة النبوية' },
+      { type: 'tf', difficulty: 'easy', text: 'الله تعالى يرى كل شيء، حتى ما نخفيه في قلوبنا.', answer: true, lesson: 'أسماء الله الحسنى' },
+      { type: 'tf', difficulty: 'medium', text: 'الإقامة تُقال قبل الأذان.', answer: false, lesson: 'الأذان والإقامة' },
+      { type: 'tf', difficulty: 'medium', text: 'نبي الله موسى كلمه الله تعالى عند جبل الطور.', answer: true, lesson: 'قصص الأنبياء' },
+      { type: 'tf', difficulty: 'hard', text: 'التوكّل يعني ترك العمل والاعتماد على الله فقط.', answer: false, lesson: 'التوكل' },
+      { type: 'tf', difficulty: 'easy', text: 'من أسماء الله تعالى (السَّمِيعُ) و(البَصِيرُ) و(الشَّكُورُ).', answer: true, lesson: 'أسماء الله الحسنى' },
+      { type: 'tf', difficulty: 'medium', text: 'قوم شعيب كانوا يغشون في الميزان.', answer: true, lesson: 'قصص الأنبياء' },
+      { type: 'tf', difficulty: 'easy', text: 'صلاة الجماعة أفضل من صلاة الفرد.', answer: true, lesson: 'الصلاة' },
+      { type: 'tf', difficulty: 'medium', text: 'من عادات النبي ﷺ أنه كان يصل الرحم ويحمل الكل.', answer: true, lesson: 'السيرة النبوية' },
+      { type: 'tf', difficulty: 'hard', text: 'شكر الله يكون باللسان فقط.', answer: false, lesson: 'الشكر' },
+      { type: 'fill', difficulty: 'medium', text: 'الله تعالى هو .......... و .......... ، يسمع كل شيء ويرى كل شيء.', answer: 'السَّمِيعُ / البَصِيرُ', lesson: 'أسماء الله الحسنى' },
+      { type: 'fill', difficulty: 'medium', text: 'سورة القدر مكية، وعدد آياتها .......... آيات.', answer: 'خمس', lesson: 'سورة القدر' },
+      { type: 'fill', difficulty: 'easy', text: 'ليلة القدر خير من .......... شهر.', answer: 'ألف', lesson: 'ليلة القدر' },
+      { type: 'fill', difficulty: 'easy', text: 'الأذان دعوة إلى ..........', answer: 'الصلاة', lesson: 'الأذان' },
+      { type: 'fill', difficulty: 'easy', text: 'نزل الوحي على النبي ﷺ وهو في غار ..........', answer: 'حراء', lesson: 'السيرة النبوية' },
+      { type: 'fill', difficulty: 'medium', text: 'أول من آمن بالنبي ﷺ من الصبيان هو ..........', answer: 'علي بن أبي طالب', lesson: 'السيرة النبوية' },
+      { type: 'fill', difficulty: 'medium', text: 'أرسل الله نبيه .......... إلى قوم مدين.', answer: 'شعيب', lesson: 'قصص الأنبياء' },
+      { type: 'fill', difficulty: 'medium', text: 'من أسماء الله تعالى .......... الذي يجازي عباده على العمل الصالح.', answer: 'الشَّكُورُ', lesson: 'أسماء الله الحسنى' },
+      { type: 'fill', difficulty: 'easy', text: 'عند إقامة الصلاة علينا أن ننتظم في ..........', answer: 'صفوف', lesson: 'الصلاة' },
+      { type: 'fill', difficulty: 'medium', text: 'صلاة الجماعة تفضل صلاة الفرد بـ .......... درجة.', answer: 'سبع وعشرين', lesson: 'الصلاة' },
+      { type: 'fill', difficulty: 'medium', text: 'من صفات النبي ﷺ أنه كان .......... و ..........', answer: 'صادقًا / أمينًا', lesson: 'السيرة النبوية' },
+      { type: 'fill', difficulty: 'medium', text: 'حفظ الله نبيه موسى عليه السلام عندما أُلقي في ..........', answer: 'النهر (نهر النيل)', lesson: 'قصص الأنبياء' },
+      { type: 'fill', difficulty: 'easy', text: 'إذا أردت أن تشكر الله على نعمة، فتقول: .......... لله.', answer: 'الحمد', lesson: 'الشكر' },
+      { type: 'fill', difficulty: 'medium', text: 'نبي الله داوود عليه السلام قتل .......... في المعركة.', answer: 'جالوت', lesson: 'قصص الأنبياء' },
+      { type: 'fill', difficulty: 'medium', text: 'في ليلة القدر تتنزل .......... بالرحمة والبركة بإذن الله.', answer: 'الملائكة', lesson: 'ليلة القدر' }
+    ]
+  },
+  {
+    title: "اختبار اللغة الإنجليزية - Primary 2 (Term 1)",
+    subject: "english",
+    grade: "الصف الثاني الابتدائي",
+    timePerQuestion: 60,
+    questions: [
+      { type: 'mcq', difficulty: 'easy', text: 'What is this? (Image of a desk)', options: ['This is a chair.', 'This is a desk.', 'This is a door.', 'This is a bag.'], answer: 1, lesson: 'Classroom Objects' },
+      { type: 'mcq', difficulty: 'easy', text: '"Hello, I\'m Ali. What\'s your name?"', options: ['Goodbye.', 'My name is Sara.', 'I am fine.', 'Thank you.'], answer: 1, lesson: 'Greetings' },
+      { type: 'mcq', difficulty: 'easy', text: 'What color is this? (Image of a red circle)', options: ['This is a blue square.', 'This is a green triangle.', 'This is a red circle.', 'This is a yellow circle.'], answer: 2, lesson: 'Colors & Shapes' },
+      { type: 'mcq', difficulty: 'easy', text: 'How many pencils do you have? (Image of 3 pencils)', options: ['I have two pencils.', 'I have three pencils.', 'I have five pencils.', 'I have one pencil.'], answer: 1, lesson: 'Numbers' },
+      { type: 'mcq', difficulty: 'easy', text: 'What do you do in the classroom? (Image of a boy reading a book)', options: ['I play.', 'I draw.', 'I read.', 'I clean.'], answer: 2, lesson: 'Actions' },
+      { type: 'mcq', difficulty: 'easy', text: '"Stand up." What is the opposite instruction?', options: ['Sit down.', 'Open your book.', 'Raise your hand.', 'Close your book.'], answer: 0, lesson: 'Instructions' },
+      { type: 'mcq', difficulty: 'easy', text: 'Who is this? (Image of a mother)', options: ['This is my father.', 'This is my sister.', 'This is my mother.', 'This is my brother.'], answer: 2, lesson: 'Family' },
+      { type: 'mcq', difficulty: 'easy', text: 'What do you do in the morning?', options: ['I sleep.', 'I brush my teeth.', 'I watch TV.', 'I read a book at night.'], answer: 1, lesson: 'Daily Routine' },
+      { type: 'mcq', difficulty: 'easy', text: 'Where is the bed? (Image of a bed in a bedroom)', options: ['It is in the kitchen.', 'It is in the bathroom.', 'It is in the bedroom.', 'It is in the garden.'], answer: 2, lesson: 'Rooms' },
+      { type: 'mcq', difficulty: 'medium', text: '"There is a lamp ______ the table."', options: ['under', 'on', 'next to', 'in'], answer: 1, lesson: 'Prepositions' },
+      { type: 'mcq', difficulty: 'medium', text: 'Which word has the short "a" sound?', options: ['pen', 'cat', 'zip', 'dog'], answer: 1, lesson: 'Phonics' },
+      { type: 'mcq', difficulty: 'medium', text: 'Which word has the "sh" sound?', options: ['chair', 'fish', 'math', 'this'], answer: 1, lesson: 'Phonics' },
+      { type: 'mcq', difficulty: 'medium', text: 'Which word has the "th" sound?', options: ['shop', 'three', 'sun', 'cake'], answer: 1, lesson: 'Phonics' },
+      { type: 'mcq', difficulty: 'easy', text: 'Where do we cook food?', options: ['In the bedroom.', 'In the bathroom.', 'In the kitchen.', 'In the living room.'], answer: 2, lesson: 'Rooms' },
+      { type: 'mcq', difficulty: 'medium', text: 'What is the plural of "chair"?', options: ['chairies', 'chairs', 'chair', 'chaires'], answer: 1, lesson: 'Plurals' },
+      { type: 'tf', difficulty: 'medium', text: '"Goodbye" is a greeting we say when we meet someone.', answer: false, lesson: 'Greetings' },
+      { type: 'tf', difficulty: 'easy', text: 'A triangle has three sides.', answer: true, lesson: 'Shapes' },
+      { type: 'tf', difficulty: 'easy', text: '"Sit down" means to take a seat.', answer: true, lesson: 'Instructions' },
+      { type: 'tf', difficulty: 'medium', text: 'We say "I have three book" for more than one book.', answer: false, lesson: 'Plurals' },
+      { type: 'tf', difficulty: 'medium', text: 'The word "mother" has the "th" sound.', answer: true, lesson: 'Phonics' },
+      { type: 'tf', difficulty: 'easy', text: 'We sleep in the bathroom.', answer: false, lesson: 'Rooms' },
+      { type: 'tf', difficulty: 'easy', text: '"There are two chairs" is used for plural.', answer: true, lesson: 'Plurals' },
+      { type: 'tf', difficulty: 'medium', text: 'We use the word "my" to talk about something that belongs to someone else.', answer: false, lesson: 'Possessives' },
+      { type: 'tf', difficulty: 'medium', text: 'The word "ship" starts with the "sh" sound.', answer: true, lesson: 'Phonics' },
+      { type: 'tf', difficulty: 'easy', text: '"I wake up at 7:00 am" is an example of a daily routine.', answer: true, lesson: 'Daily Routine' },
+      { type: 'fill', difficulty: 'easy', text: 'A: "Hello, what is your name?" B: "______ name is Ali."', answer: 'My', lesson: 'Possessives' },
+      { type: 'fill', difficulty: 'easy', text: 'This is a ______ square. (Color: Blue)', answer: 'blue', lesson: 'Colors' },
+      { type: 'fill', difficulty: 'easy', text: 'How many pens are there? There are ______ pens. (Image: 5 pens)', answer: 'five', lesson: 'Numbers' },
+      { type: 'fill', difficulty: 'easy', text: 'I ______ a picture in the classroom.', answer: 'draw', lesson: 'Actions' },
+      { type: 'fill', difficulty: 'easy', text: 'Please ______ your hand to speak.', answer: 'raise', lesson: 'Instructions' },
+      { type: 'fill', difficulty: 'easy', text: 'This is my ______. She is my mother\'s daughter.', answer: 'sister', lesson: 'Family' },
+      { type: 'fill', difficulty: 'easy', text: 'I ______ my teeth every morning.', answer: 'brush', lesson: 'Daily Routine' },
+      { type: 'fill', difficulty: 'easy', text: 'We watch TV in the ______ room.', answer: 'living', lesson: 'Rooms' },
+      { type: 'fill', difficulty: 'easy', text: 'The cat is ______ the table. (Preposition: under)', answer: 'under', lesson: 'Prepositions' },
+      { type: 'fill', difficulty: 'medium', text: 'There ______ a bed in the bedroom. (is / are)', answer: 'is', lesson: 'There is/are' },
+      { type: 'fill', difficulty: 'medium', text: 'There ______ three windows in the classroom. (is / are)', answer: 'are', lesson: 'There is/are' },
+      { type: 'fill', difficulty: 'medium', text: 'The word "______" has the long "a" sound (like in cake).', answer: 'lake', lesson: 'Phonics' },
+      { type: 'fill', difficulty: 'easy', text: 'I help my mother ______ dinner in the kitchen.', answer: 'cook', lesson: 'Actions' },
+      { type: 'fill', difficulty: 'easy', text: 'We eat lunch in the ______ room.', answer: 'dining', lesson: 'Rooms' },
+      { type: 'fill', difficulty: 'medium', text: 'The plural of "box" is ______.', answer: 'boxes', lesson: 'Plurals' }
+    ]
+  },
+  /* ══════ الصف الرابع الابتدائي ══════ */
+  {
+    title: "اختبار اللغة العربية - الصف الرابع الابتدائي",
+    subject: "arabic",
+    grade: "الصف الرابع الابتدائي",
+    timePerQuestion: 60,
+    questions: [
+      { type: 'mcq', difficulty: 'easy', text: 'في جملة "الطالبُ مجتهدٌ"، كلمة "الطالبُ" تُعرب:', options: ['خبراً مرفوعاً', 'مبتدأً مرفوعاً', 'فاعلاً مرفوعاً', 'مفعولاً به منصوباً'], answer: 1, lesson: 'المبتدأ والخبر' },
+      { type: 'mcq', difficulty: 'easy', text: '"الولدُ يلعبُ بالكرةِ". نوع الجملة:', options: ['اسمية', 'فعلية', 'شبه جملة', 'استفهامية'], answer: 1, lesson: 'الجملة الفعلية' },
+      { type: 'mcq', difficulty: 'easy', text: 'جمع كلمة "كتاب":', options: ['كاتب', 'مكتوب', 'كُتُب', 'كتابة'], answer: 2, lesson: 'الجموع' },
+      { type: 'mcq', difficulty: 'easy', text: 'مضاد كلمة "كبير":', options: ['ضخم', 'عظيم', 'صغير', 'طويل'], answer: 2, lesson: 'المفردات' },
+      { type: 'mcq', difficulty: 'easy', text: '"ذهبَ أحمدُ إلى المدرسةِ". الفاعل في الجملة هو:', options: ['ذهب', 'أحمدُ', 'المدرسة', 'إلى'], answer: 1, lesson: 'الفاعل' },
+      { type: 'mcq', difficulty: 'easy', text: 'المفعول به في جملة "قرأَ التلميذُ الدرسَ":', options: ['قرأ', 'التلميذُ', 'الدرسَ', 'لا يوجد مفعول به'], answer: 2, lesson: 'المفعول به' },
+      { type: 'mcq', difficulty: 'easy', text: '"هذا كتابٌ مفيدٌ". نوع "هذا":', options: ['اسم إشارة', 'اسم موصول', 'ضمير', 'فعل'], answer: 0, lesson: 'أسماء الإشارة' },
+      { type: 'mcq', difficulty: 'easy', text: '"الذي" و"التي" تُسمى:', options: ['أسماء إشارة', 'أسماء موصولة', 'ضمائر', 'أفعالاً'], answer: 1, lesson: 'الأسماء الموصولة' },
+      { type: 'mcq', difficulty: 'medium', text: 'الكلمة التي بها همزة متوسطة على الألف:', options: ['سأل', 'مؤمن', 'بئر', 'سماء'], answer: 0, lesson: 'الهمزة المتوسطة' },
+      { type: 'mcq', difficulty: 'medium', text: '"اللام" في كلمة "الشمس" هي:', options: ['لام قمرية', 'لام شمسية', 'لام أصلية', 'لا شيء مما سبق'], answer: 1, lesson: 'اللام الشمسية والقمرية' },
+      { type: 'mcq', difficulty: 'easy', text: 'المثنى من كلمة "معلم":', options: ['معلمون', 'معلمان', 'معالم', 'معلمة'], answer: 1, lesson: 'المثنى' },
+      { type: 'mcq', difficulty: 'easy', text: 'جمع المذكر السالم من كلمة "مسلم":', options: ['مسلمات', 'مسلمون', 'مسالم', 'إسلام'], answer: 1, lesson: 'جمع المذكر السالم' },
+      { type: 'mcq', difficulty: 'easy', text: 'جمع المؤنث السالم من كلمة "معلمة":', options: ['معلمون', 'معلمات', 'معالم', 'تعليم'], answer: 1, lesson: 'جمع المؤنث السالم' },
+      { type: 'mcq', difficulty: 'easy', text: 'الفعل الماضي من "يكتب":', options: ['يكتب', 'كتب', 'اكتب', 'كاتب'], answer: 1, lesson: 'الفعل الماضي' },
+      { type: 'mcq', difficulty: 'easy', text: 'الفعل الأمر من "يلعب":', options: ['يلعب', 'لعب', 'العب', 'لاعب'], answer: 2, lesson: 'فعل الأمر' },
+      { type: 'tf', difficulty: 'easy', text: 'الجملة الاسمية تبدأ باسم.', answer: true, lesson: 'الجملة الاسمية' },
+      { type: 'tf', difficulty: 'medium', text: 'الفاعل يكون دائماً منصوباً.', answer: false, lesson: 'الفاعل' },
+      { type: 'tf', difficulty: 'easy', text: 'المفعول به يكون منصوباً.', answer: true, lesson: 'المفعول به' },
+      { type: 'tf', difficulty: 'easy', text: '"هذا" اسم إشارة للمفرد المذكر.', answer: true, lesson: 'أسماء الإشارة' },
+      { type: 'tf', difficulty: 'easy', text: '"التي" اسم موصول للمفرد المؤنث.', answer: true, lesson: 'الأسماء الموصولة' },
+      { type: 'tf', difficulty: 'hard', text: 'اللام الشمسية تُكتب وتُنطق.', answer: false, lesson: 'اللام الشمسية والقمرية' },
+      { type: 'tf', difficulty: 'medium', text: 'جمع المذكر السالم يُرفع بالواو.', answer: true, lesson: 'جمع المذكر السالم' },
+      { type: 'tf', difficulty: 'medium', text: 'جمع المؤنث السالم يُنصب بالكسرة.', answer: true, lesson: 'جمع المؤنث السالم' },
+      { type: 'tf', difficulty: 'easy', text: 'الفعل الأمر يدل على طلب القيام بشيء.', answer: true, lesson: 'فعل الأمر' },
+      { type: 'tf', difficulty: 'hard', text: 'الهمزة المتوسطة تُكتب دائماً على الألف.', answer: false, lesson: 'الهمزة المتوسطة' },
+      { type: 'fill', difficulty: 'easy', text: 'الجملة الاسمية تتكون من .......... و ..........', answer: 'المبتدأ / الخبر', lesson: 'الجملة الاسمية' },
+      { type: 'fill', difficulty: 'easy', text: 'الفاعل يكون .......... دائماً.', answer: 'مرفوعاً', lesson: 'الفاعل' },
+      { type: 'fill', difficulty: 'easy', text: 'المفعول به يكون .......... دائماً.', answer: 'منصوباً', lesson: 'المفعول به' },
+      { type: 'fill', difficulty: 'easy', text: 'جمع كلمة "تلميذ" هو ..........', answer: 'تلاميذ', lesson: 'الجموع' },
+      { type: 'fill', difficulty: 'easy', text: 'مضاد كلمة "نظيف" هو ..........', answer: 'قذر', lesson: 'المفردات' },
+      { type: 'fill', difficulty: 'easy', text: '"هذه" اسم إشارة للمفرد ..........', answer: 'المؤنث', lesson: 'أسماء الإشارة' },
+      { type: 'fill', difficulty: 'easy', text: '"الذي" اسم موصول للمفرد ..........', answer: 'المذكر', lesson: 'الأسماء الموصولة' },
+      { type: 'fill', difficulty: 'medium', text: 'اللام القمرية تُكتب و ..........', answer: 'تُنطق', lesson: 'اللام الشمسية والقمرية' },
+      { type: 'fill', difficulty: 'easy', text: 'المثنى من كلمة "قلم" هو ..........', answer: 'قلمان', lesson: 'المثنى' },
+      { type: 'fill', difficulty: 'easy', text: 'الفعل الماضي من "يجري" هو ..........', answer: 'جرى', lesson: 'الفعل الماضي' },
+      { type: 'fill', difficulty: 'easy', text: 'الفعل الأمر من "يقرأ" هو ..........', answer: 'اقرأ', lesson: 'فعل الأمر' },
+      { type: 'fill', difficulty: 'medium', text: 'جمع المذكر السالم من "مهندس" هو ..........', answer: 'مهندسون', lesson: 'جمع المذكر السالم' },
+      { type: 'fill', difficulty: 'medium', text: 'جمع المؤنث السالم من "طالبة" هو ..........', answer: 'طالبات', lesson: 'جمع المؤنث السالم' },
+      { type: 'fill', difficulty: 'medium', text: 'الكلمة التي بها لام شمسية هي ..........', answer: 'الشمس', lesson: 'اللام الشمسية والقمرية' },
+      { type: 'fill', difficulty: 'easy', text: '"قرأَ" فعل ..........', answer: 'ماضٍ', lesson: 'الفعل الماضي' }
+    ]
+  },
+  {
+    title: "اختبار اللغة الإنجليزية - Primary 4 (Term 1)",
+    subject: "english",
+    grade: "الصف الرابع الابتدائي",
+    timePerQuestion: 60,
+    questions: [
+      { type: 'mcq', difficulty: 'easy', text: 'My father is a doctor. ______ works in a hospital.', options: ['He', 'She', 'It', 'They'], answer: 0, lesson: 'Pronouns' },
+      { type: 'mcq', difficulty: 'easy', text: 'I ______ a student.', options: ['is', 'am', 'are', 'be'], answer: 1, lesson: 'Verb to be' },
+      { type: 'mcq', difficulty: 'easy', text: 'There ______ two books on the desk.', options: ['is', 'am', 'are', 'be'], answer: 2, lesson: 'There is/are' },
+      { type: 'mcq', difficulty: 'easy', text: 'This is my sister. ______ name is Sara.', options: ['His', 'Her', 'Their', 'Its'], answer: 1, lesson: 'Possessive Adjectives' },
+      { type: 'mcq', difficulty: 'easy', text: 'I like apples. I ______ like bananas.', options: ["don't", "doesn't", "isn't", "aren't"], answer: 0, lesson: 'Present Simple' },
+      { type: 'mcq', difficulty: 'easy', text: '______ is your name? - My name is Ali.', options: ['What', 'Who', 'Where', 'When'], answer: 0, lesson: 'Question Words' },
+      { type: 'mcq', difficulty: 'easy', text: 'Look at the ______. It is very tall.', options: ['giraffe', 'elephant', 'lion', 'monkey'], answer: 0, lesson: 'Animals' },
+      { type: 'mcq', difficulty: 'medium', text: 'I go to school ______ bus.', options: ['in', 'on', 'by', 'at'], answer: 2, lesson: 'Prepositions' },
+      { type: 'mcq', difficulty: 'medium', text: 'We ______ English now.', options: ['study', 'studies', 'are studying', 'studied'], answer: 2, lesson: 'Present Continuous' },
+      { type: 'mcq', difficulty: 'medium', text: 'The plural of "box" is ______.', options: ['boxs', 'boxes', 'boxies', 'box'], answer: 1, lesson: 'Plurals' },
+      { type: 'mcq', difficulty: 'medium', text: 'My birthday is ______ May.', options: ['in', 'on', 'at', 'by'], answer: 0, lesson: 'Prepositions of Time' },
+      { type: 'mcq', difficulty: 'medium', text: 'She ______ her homework every day.', options: ['do', 'does', 'doing', 'did'], answer: 1, lesson: 'Present Simple' },
+      { type: 'mcq', difficulty: 'easy', text: 'Which word starts with the /sh/ sound?', options: ['ship', 'cat', 'dog', 'book'], answer: 0, lesson: 'Phonics' },
+      { type: 'mcq', difficulty: 'easy', text: 'Which word starts with the /ch/ sound?', options: ['chair', 'tree', 'fish', 'sun'], answer: 0, lesson: 'Phonics' },
+      { type: 'mcq', difficulty: 'easy', text: 'I have ______ orange.', options: ['a', 'an', 'the', 'no article'], answer: 1, lesson: 'Articles' },
+      { type: 'tf', difficulty: 'easy', text: '"He" is a pronoun for a boy.', answer: true, lesson: 'Pronouns' },
+      { type: 'tf', difficulty: 'medium', text: 'The plural of "child" is "childs".', answer: false, lesson: 'Plurals' },
+      { type: 'tf', difficulty: 'medium', text: 'We use "on" with days of the week.', answer: true, lesson: 'Prepositions of Time' },
+      { type: 'tf', difficulty: 'medium', text: '"She don\'t like fish" is a correct sentence.', answer: false, lesson: 'Present Simple' },
+      { type: 'tf', difficulty: 'easy', text: '"An" is used before words starting with a vowel sound.', answer: true, lesson: 'Articles' },
+      { type: 'tf', difficulty: 'easy', text: '"They" is a pronoun for a group of people.', answer: true, lesson: 'Pronouns' },
+      { type: 'tf', difficulty: 'easy', text: '"Bus" starts with the /b/ sound.', answer: true, lesson: 'Phonics' },
+      { type: 'tf', difficulty: 'medium', text: 'We use "are" with "I".', answer: false, lesson: 'Verb to be' },
+      { type: 'tf', difficulty: 'easy', text: 'The opposite of "big" is "small".', answer: true, lesson: 'Opposites' },
+      { type: 'tf', difficulty: 'easy', text: '"Fish" starts with the /f/ sound.', answer: true, lesson: 'Phonics' },
+      { type: 'fill', difficulty: 'easy', text: 'I ______ (be) a pupil. (Use the correct form of the verb)', answer: 'am', lesson: 'Verb to be' },
+      { type: 'fill', difficulty: 'easy', text: 'He ______ (like) ice cream. (Use the correct form of the verb)', answer: 'likes', lesson: 'Present Simple' },
+      { type: 'fill', difficulty: 'easy', text: 'This is ______ (I) book. (Use the correct possessive adjective)', answer: 'my', lesson: 'Possessive Adjectives' },
+      { type: 'fill', difficulty: 'easy', text: 'The plural of "cat" is ______.', answer: 'cats', lesson: 'Plurals' },
+      { type: 'fill', difficulty: 'easy', text: 'The opposite of "hot" is ______.', answer: 'cold', lesson: 'Opposites' },
+      { type: 'fill', difficulty: 'easy', text: 'I go to school ______ Monday. (Use the correct preposition)', answer: 'on', lesson: 'Prepositions of Time' },
+      { type: 'fill', difficulty: 'easy', text: '______ is your favourite colour? (Use the correct question word)', answer: 'What', lesson: 'Question Words' },
+      { type: 'fill', difficulty: 'medium', text: 'She ______ (not like) coffee. (Use the correct negative form)', answer: "doesn't like", lesson: 'Present Simple' },
+      { type: 'fill', difficulty: 'easy', text: 'There ______ (be) a cat on the chair. (Use the correct form of the verb)', answer: 'is', lesson: 'There is/are' },
+      { type: 'fill', difficulty: 'medium', text: 'We ______ (play) football now. (Use the present continuous)', answer: 'are playing', lesson: 'Present Continuous' },
+      { type: 'fill', difficulty: 'medium', text: 'The word "______" starts with the /sh/ sound.', answer: 'shoe', lesson: 'Phonics' },
+      { type: 'fill', difficulty: 'medium', text: 'The word "______" starts with the /ch/ sound.', answer: 'cheese', lesson: 'Phonics' },
+      { type: 'fill', difficulty: 'easy', text: 'I have ______ apple. (Use "a" or "an")', answer: 'an', lesson: 'Articles' },
+      { type: 'fill', difficulty: 'easy', text: 'My father ______ (work) in a bank. (Use the correct form of the verb)', answer: 'works', lesson: 'Present Simple' },
+      { type: 'fill', difficulty: 'easy', text: '______ are my friends. (Use the correct pronoun)', answer: 'They', lesson: 'Pronouns' }
+    ]
+  },
+  {
+    title: "اختبار الرياضيات - الصف الرابع الابتدائي",
+    subject: "math",
+    grade: "الصف الرابع الابتدائي",
+    timePerQuestion: 60,
+    questions: [
+      { type: 'mcq', difficulty: 'easy', text: 'القيمة المكانية للرقم 4 في العدد 5,432 هي:', options: ['4', '40', '400', '4000'], answer: 2, lesson: 'القيمة المكانية' },
+      { type: 'mcq', difficulty: 'easy', text: 'العدد 7,089 يُقرأ:', options: ['سبعة آلاف وتسعة وثمانون', 'سبعة آلاف وثمانمائة وتسعة', 'سبعمائة وثمانية وتسعون', 'سبعة آلاف وثمانون وتسعة'], answer: 0, lesson: 'قراءة الأعداد' },
+      { type: 'mcq', difficulty: 'easy', text: 'ناتج جمع 345 + 278 =', options: ['523', '613', '623', '633'], answer: 2, lesson: 'الجمع' },
+      { type: 'mcq', difficulty: 'medium', text: 'ناتج طرح 800 - 356 =', options: ['444', '454', '544', '554'], answer: 0, lesson: 'الطرح' },
+      { type: 'mcq', difficulty: 'easy', text: 'ناتج ضرب 25 × 4 =', options: ['80', '90', '100', '120'], answer: 2, lesson: 'الضرب' },
+      { type: 'mcq', difficulty: 'medium', text: 'ناتج قسمة 144 ÷ 12 =', options: ['10', '11', '12', '14'], answer: 2, lesson: 'القسمة' },
+      { type: 'mcq', difficulty: 'easy', text: 'الكسر الذي يمثل الجزء المظلل في الشكل (نصف مظلل) هو:', options: ['1/3', '1/2', '1/4', '2/3'], answer: 1, lesson: 'الكسور' },
+      { type: 'mcq', difficulty: 'easy', text: 'الكسر 3/4 يُقرأ:', options: ['ثلاثة أرباع', 'أربعة أثمان', 'ثلاثة أخماس', 'ربعان'], answer: 0, lesson: 'الكسور' },
+      { type: 'mcq', difficulty: 'medium', text: 'الكسر المكافئ للكسر 1/2 هو:', options: ['1/3', '2/4', '3/5', '2/5'], answer: 1, lesson: 'الكسور المتكافئة' },
+      { type: 'mcq', difficulty: 'easy', text: '1 متر = ______ سنتيمتر.', options: ['10', '100', '1000', '10000'], answer: 1, lesson: 'وحدات الطول' },
+      { type: 'mcq', difficulty: 'easy', text: 'محيط مربع طول ضلعه 5 سم =', options: ['10 سم', '15 سم', '20 سم', '25 سم'], answer: 2, lesson: 'المحيط' },
+      { type: 'mcq', difficulty: 'medium', text: 'مساحة مستطيل طوله 6 سم وعرضه 4 سم =', options: ['10 سم²', '20 سم²', '24 سم²', '30 سم²'], answer: 2, lesson: 'المساحة' },
+      { type: 'mcq', difficulty: 'easy', text: 'الساعة تشير إلى 3:30. هذا يعني:', options: ['الثالثة والربع', 'الثالثة والنصف', 'الثالثة إلا ربع', 'الرابعة والنصف'], answer: 1, lesson: 'الوقت' },
+      { type: 'mcq', difficulty: 'easy', text: '1 كيلوجرام = ______ جرام.', options: ['10', '100', '1000', '10000'], answer: 2, lesson: 'وحدات الكتلة' },
+      { type: 'mcq', difficulty: 'easy', text: 'العدد الزوجي من بين الأعداد التالية هو:', options: ['7', '13', '18', '21'], answer: 2, lesson: 'الأعداد الزوجية والفردية' },
+      { type: 'tf', difficulty: 'easy', text: '1 كيلومتر = 1000 متر.', answer: true, lesson: 'وحدات الطول' },
+      { type: 'tf', difficulty: 'easy', text: 'الكسر 1/2 أكبر من الكسر 1/3.', answer: true, lesson: 'مقارنة الكسور' },
+      { type: 'tf', difficulty: 'medium', text: 'محيط المربع يساوي طول الضلع × 2.', answer: false, lesson: 'المحيط' },
+      { type: 'tf', difficulty: 'easy', text: 'مساحة المستطيل = الطول × العرض.', answer: true, lesson: 'المساحة' },
+      { type: 'tf', difficulty: 'medium', text: '1 لتر = 100 ملليلتر.', answer: false, lesson: 'وحدات السعة' },
+      { type: 'tf', difficulty: 'easy', text: 'ناتج جمع 250 + 150 = 400.', answer: true, lesson: 'الجمع' },
+      { type: 'tf', difficulty: 'easy', text: 'العدد 15 عدد فردي.', answer: true, lesson: 'الأعداد الزوجية والفردية' },
+      { type: 'tf', difficulty: 'medium', text: '1/4 + 1/4 = 1/2.', answer: true, lesson: 'جمع الكسور' },
+      { type: 'tf', difficulty: 'easy', text: '10 × 10 = 100.', answer: true, lesson: 'الضرب' },
+      { type: 'tf', difficulty: 'hard', text: 'الساعة 12:00 تعني منتصف الليل دائماً.', answer: false, lesson: 'الوقت' },
+      { type: 'fill', difficulty: 'medium', text: 'القيمة المكانية للرقم 8 في العدد 4,852 هي ..........', answer: '800', lesson: 'القيمة المكانية' },
+      { type: 'fill', difficulty: 'easy', text: 'ناتج جمع 425 + 315 = ..........', answer: '740', lesson: 'الجمع' },
+      { type: 'fill', difficulty: 'medium', text: 'ناتج طرح 600 - 245 = ..........', answer: '355', lesson: 'الطرح' },
+      { type: 'fill', difficulty: 'easy', text: 'ناتج ضرب 15 × 6 = ..........', answer: '90', lesson: 'الضرب' },
+      { type: 'fill', difficulty: 'easy', text: 'ناتج قسمة 200 ÷ 4 = ..........', answer: '50', lesson: 'القسمة' },
+      { type: 'fill', difficulty: 'medium', text: 'الكسر المكافئ للكسر 2/4 هو ..........', answer: '1/2', lesson: 'الكسور المتكافئة' },
+      { type: 'fill', difficulty: 'easy', text: '1 متر = .......... سنتيمتر.', answer: '100', lesson: 'وحدات الطول' },
+      { type: 'fill', difficulty: 'easy', text: 'محيط مربع طول ضلعه 7 سم = .......... سم.', answer: '28', lesson: 'المحيط' },
+      { type: 'fill', difficulty: 'easy', text: 'مساحة مستطيل طوله 5 سم وعرضه 3 سم = .......... سم².', answer: '15', lesson: 'المساحة' },
+      { type: 'fill', difficulty: 'easy', text: '1 كيلوجرام = .......... جرام.', answer: '1000', lesson: 'وحدات الكتلة' },
+      { type: 'fill', difficulty: 'medium', text: 'العدد الزوجي الأكبر من 10 والأصغر من 14 هو ..........', answer: '12', lesson: 'الأعداد الزوجية والفردية' },
+      { type: 'fill', difficulty: 'medium', text: '1/3 + 1/3 = ..........', answer: '2/3', lesson: 'جمع الكسور' },
+      { type: 'fill', difficulty: 'easy', text: 'الساعة 6:00 تعني ..........', answer: 'السادسة تماماً', lesson: 'الوقت' },
+      { type: 'fill', difficulty: 'easy', text: '1 لتر = .......... ملليلتر.', answer: '1000', lesson: 'وحدات السعة' },
+      { type: 'fill', difficulty: 'easy', text: '25 × 4 = ..........', answer: '100', lesson: 'الضرب' }
+    ]
+  },
+  /* ══════ الصف السادس الابتدائي ══════ */
+  {
+    title: "اختبار مهارات إدارة الأسرة - الصف السادس الابتدائي",
+    subject: "agriculture",
+    grade: "الصف السادس الابتدائي",
+    timePerQuestion: 60,
+    questions: [
+      { type: 'mcq', difficulty: 'easy', text: 'من خطوات إعادة استخدام صندوق قديم من الكرتون لتجميل المسكن:', options: ['التخلص منه فورًا', 'فحص الصندوق وتحديد الأجزاء التالفة وإصلاحها', 'حرقه', 'تركه في الشارع'], answer: 1, lesson: 'إعادة الاستخدام' },
+      { type: 'mcq', difficulty: 'medium', text: 'تحقيق "صفر نفايات" في المطبخ يعني:', options: ['عدم طهي الطعام', 'الاستفادة القصوى من جميع أجزاء الطعام وتقليل الهدر', 'شراء أطعمة جاهزة', 'رمي كل بقايا الطعام'], answer: 1, lesson: 'إدارة المطبخ' },
+      { type: 'mcq', difficulty: 'medium', text: 'عند إعداد عصير القرع العسلي، من فوائد اللب:', options: ['لا فائدة منه', 'يمكن تجفيفه وتحميصه للاستمتاع به', 'يسبب الأمراض', 'يجب التخلص منه'], answer: 1, lesson: 'الاستفادة من الطعام' },
+      { type: 'mcq', difficulty: 'easy', text: 'من احتياطات السلامة عند استخدام السكاكين في المطبخ:', options: ['توجيه حد السكين لأعلى', 'توجيه حد السكين لأسفل وبعيدًا عن الأصابع', 'استخدام السكين بسرعة', 'ترك السكين على الأرض'], answer: 1, lesson: 'السلامة في المطبخ' },
+      { type: 'mcq', difficulty: 'easy', text: 'من المخاطر المنزلية التي يجب تجنبها:', options: ['الحروق', 'الصعق الكهربائي', 'الانزلاق', 'جميع ما سبق'], answer: 3, lesson: 'السلامة المنزلية' },
+      { type: 'mcq', difficulty: 'easy', text: 'العادات والتقاليد هي:', options: ['ممارسات ورثناها عن أجدادنا', 'عادات حديثة', 'أشياء لا قيمة لها', 'ممارسات مرفوضة'], answer: 0, lesson: 'العادات والتقاليد' },
+      { type: 'mcq', difficulty: 'easy', text: 'إدارة الوقت تعني:', options: ['إضاعة الوقت', 'تنظيم الوقت واستخدامه بطريقة جيدة', 'عدم إنجاز الأعمال', 'اللعب دائمًا'], answer: 1, lesson: 'إدارة الوقت' },
+      { type: 'mcq', difficulty: 'medium', text: 'من المهارات الشخصية التي يحتاجها رائد الأعمال:', options: ['الثقة بالنفس والتعاون', 'الكسل', 'التأجيل', 'عدم تحمل المسؤولية'], answer: 0, lesson: 'ريادة الأعمال' },
+      { type: 'mcq', difficulty: 'medium', text: 'غرزة التطريز التي تعتمد على تكرار الغرز المتوازية لتغطية مساحة تسمى:', options: ['غرزة الفرع', 'غرزة الحشو', 'غرزة السلسلة', 'غرزة السراجة'], answer: 1, lesson: 'التطريز' },
+      { type: 'mcq', difficulty: 'medium', text: '"الاستثمار الأخضر" يبدأ من:', options: ['المصانع فقط', 'سلوكياتنا اليومية البسيطة', 'الشركات فقط', 'الحكومات فقط'], answer: 1, lesson: 'الاستثمار الأخضر' },
+      { type: 'mcq', difficulty: 'easy', text: 'من طرق تجنب مخاطر الكهرباء:', options: ['تجفيف اليدين قبل لمس القابس', 'فصل الجهاز من القابس نفسه', 'استخدام القفازات العازلة', 'جميع ما سبق'], answer: 3, lesson: 'السلامة الكهربائية' },
+      { type: 'mcq', difficulty: 'easy', text: 'عند إعداد طبق "الفول المدمس بالسلطة الخضراء"، يجب أولاً:', options: ['تقطيع الخضروات', 'غسل اليدين جيدًا', 'إضافة الملح', 'إضافة الليمون'], answer: 1, lesson: 'إعداد الطعام' },
+      { type: 'mcq', difficulty: 'medium', text: 'من فوائد الاستفادة من قشر البرتقال:', options: ['تجفيفه وطحنه كنكهة طبيعية', 'استخدامه في عمل لوحات فنية', 'إضافته للمربى', 'جميع ما سبق'], answer: 3, lesson: 'الاستفادة من الطعام' },
+      { type: 'mcq', difficulty: 'easy', text: 'لتجنب الانزلاق والسقوط في المنزل:', options: ['نجفف أي سوائل تنسكب على الأرض فورًا', 'نترك الأشياء على الأرض', 'نمشي بسرعة', 'لا نفعل شيئًا'], answer: 0, lesson: 'السلامة المنزلية' },
+      { type: 'mcq', difficulty: 'medium', text: 'من سمات "رائد الأعمال" الناجح:', options: ['تنظيم الوقت وتحمل المسؤولية', 'الإبداع والتعاون', 'الثقة بالنفس', 'جميع ما سبق'], answer: 3, lesson: 'ريادة الأعمال' },
+      { type: 'tf', difficulty: 'easy', text: 'إعادة استخدام الأشياء القديمة وإصلاحها يحقق التوفير والمحافظة على الموارد.', answer: true, lesson: 'إعادة الاستخدام' },
+      { type: 'tf', difficulty: 'medium', text: '"مطبخ بلا نفايات" يعني التخلص من جميع بقايا الطعام في القمامة.', answer: false, lesson: 'إدارة المطبخ' },
+      { type: 'tf', difficulty: 'hard', text: 'يجب توجيه مقابض الأواني والمقالي إلى الخارج دائمًا.', answer: false, lesson: 'السلامة في المطبخ' },
+      { type: 'tf', difficulty: 'medium', text: 'العادات والتقاليد تسهم في تكوين شخصية متوازنة وتعزز الشعور بالانتماء للوطن.', answer: true, lesson: 'العادات والتقاليد' },
+      { type: 'tf', difficulty: 'easy', text: 'إدارة الوقت لا علاقة لها بالنجاح.', answer: false, lesson: 'إدارة الوقت' },
+      { type: 'tf', difficulty: 'easy', text: 'الوقت من الموارد الهامة التي لا يمكن استعادتها.', answer: true, lesson: 'إدارة الوقت' },
+      { type: 'tf', difficulty: 'hard', text: 'المهارات الفنية هي الصفات والسلوكيات الإيجابية التي تساعد على التعاون.', answer: false, lesson: 'المهارات' },
+      { type: 'tf', difficulty: 'medium', text: 'غرزة السلسلة من غرز التطريز التي يمكن استخدامها في إحياء التراث.', answer: true, lesson: 'التطريز' },
+      { type: 'tf', difficulty: 'medium', text: 'الاستثمار الأخضر يقتصر على الشركات والمصانع فقط.', answer: false, lesson: 'الاستثمار الأخضر' },
+      { type: 'tf', difficulty: 'easy', text: 'يجب استخدام القفازات العازلة عند الإمساك بالأواني الساخنة.', answer: true, lesson: 'السلامة في المطبخ' },
+      { type: 'tf', difficulty: 'easy', text: 'إدارة الوقت تساعد على إنجاز الأعمال بسرعة وإتقان.', answer: true, lesson: 'إدارة الوقت' },
+      { type: 'tf', difficulty: 'medium', text: 'المهارات الشخصية لا يمكن تعلمها أو تطويرها.', answer: false, lesson: 'المهارات' },
+      { type: 'tf', difficulty: 'medium', text: 'غرزة السراجة تستخدم لتثبيت التصميم على القماش.', answer: true, lesson: 'التطريز' },
+      { type: 'tf', difficulty: 'easy', text: 'من مخاطر المطبخ الحروق الناتجة عن ملامسة الأواني الساخنة.', answer: true, lesson: 'السلامة في المطبخ' },
+      { type: 'tf', difficulty: 'medium', text: '"يوم الحصاد" في الدرس الثالث يعني يوم المعرض المدرسي.', answer: true, lesson: 'يوم الحصاد' },
+      { type: 'fill', difficulty: 'medium', text: 'الإصلاحات البسيطة هي ..........', answer: 'صيانة الأشياء التالفة وإعادة استخدامها بدلاً من التخلص منها', lesson: 'إعادة الاستخدام' },
+      { type: 'fill', difficulty: 'hard', text: 'من طرق تحقيق "مطبخ بلا نفايات": .......... و ..........', answer: 'الاستفادة من قشر الفواكه / استخدام بقايا الطعام في أغراض مفيدة', lesson: 'إدارة المطبخ' },
+      { type: 'fill', difficulty: 'medium', text: 'من المخاطر المنزلية الشائعة: .......... و .......... و ..........', answer: 'الجروح / الحروق / الانزلاق والسقوط', lesson: 'السلامة المنزلية' },
+      { type: 'fill', difficulty: 'easy', text: 'لتجنب الحروق عند الطبخ نستخدم ..........', answer: 'القفازات العازلة', lesson: 'السلامة في المطبخ' },
+      { type: 'fill', difficulty: 'medium', text: 'العادات والتقاليد هي ..........', answer: 'ممارسات ورثناها عن أجدادنا ونحرص على الالتزام بها في المناسبات', lesson: 'العادات والتقاليد' },
+      { type: 'fill', difficulty: 'medium', text: 'إدارة الوقت تعني ..........', answer: 'تنظيم الوقت واستخدامه بطريقة جيدة لإنجاز الأعمال في الوقت المحدد', lesson: 'إدارة الوقت' },
+      { type: 'fill', difficulty: 'hard', text: 'من خطوات إدارة الوقت: تحديد .......... وتجهيز .......... وترتيب ..........', answer: 'الهدف / الأدوات / خطوات العمل', lesson: 'إدارة الوقت' },
+      { type: 'fill', difficulty: 'medium', text: 'المهارات الشخصية هي ..........', answer: 'الصفات والسلوكيات الإيجابية التي تساعد على التفكير والإبداع والتعاون', lesson: 'المهارات' },
+      { type: 'fill', difficulty: 'medium', text: 'المهارات الفنية هي ..........', answer: 'المهارات العملية التي تكتسب بالتعلم والتدريب والممارسة', lesson: 'المهارات' },
+      { type: 'fill', difficulty: 'medium', text: 'من غرز التطريز التي يمكن استخدامها في إحياء التراث: ..........', answer: 'غرزة الفرع / غرزة الحشو / غرزة السلسلة', lesson: 'التطريز' },
+      { type: 'fill', difficulty: 'medium', text: 'الاستثمار الأخضر يعني ..........', answer: 'الاستخدام الأمثل للموارد والمحافظة على البيئة وتقليل التلوث', lesson: 'الاستثمار الأخضر' },
+      { type: 'fill', difficulty: 'medium', text: 'من فوائد عصير القرع العسلي أنه غني بـ ..........', answer: 'فيتامين (أ) ومضادات الأكسدة', lesson: 'الاستفادة من الطعام' },
+      { type: 'fill', difficulty: 'easy', text: 'لتجنب مخاطر الكهرباء يجب تجفيف .......... قبل لمس القابس.', answer: 'اليدين', lesson: 'السلامة الكهربائية' },
+      { type: 'fill', difficulty: 'easy', text: 'عند تقطيع الخضروات يجب توجيه حد السكين ..........', answer: 'لأسفل وبعيدًا عن الأصابع', lesson: 'السلامة في المطبخ' },
+      { type: 'fill', difficulty: 'medium', text: 'من العادات الإيجابية التي تسهم في المحافظة على البيئة: .......... و ..........', answer: 'ترشيد الاستهلاك / إعادة التدوير', lesson: 'البيئة' }
+    ]
+  },
+  {
+    title: "اختبار الرياضيات - الصف السادس الابتدائي",
+    subject: "math",
+    grade: "الصف السادس الابتدائي",
+    timePerQuestion: 60,
+    questions: [
+      { type: 'mcq', difficulty: 'medium', text: 'القيمة المكانية للرقم 5 في العدد 3,567,890 هي:', options: ['5,000', '50,000', '500,000', '5,000,000'], answer: 2, lesson: 'القيمة المكانية' },
+      { type: 'mcq', difficulty: 'medium', text: 'العدد 4,080,000 يُكتب في الصورة اللفظية كالتالي:', options: ['أربعة ملايين وثمانون ألفًا', 'أربعة ملايين وثمانمائة ألف', 'أربعمائة وثمانية آلاف', 'أربعة ملايين وثمانية آلاف'], answer: 0, lesson: 'قراءة الأعداد' },
+      { type: 'mcq', difficulty: 'easy', text: 'ناتج جمع 3/5 + 1/5 =', options: ['4/10', '4/5', '2/5', '3/5'], answer: 1, lesson: 'جمع الكسور' },
+      { type: 'mcq', difficulty: 'medium', text: 'ناتج طرح 7/8 - 3/8 =', options: ['4/16', '1/2', '4/8', 'كل من (ب) و (ج) صحيحان'], answer: 3, lesson: 'طرح الكسور' },
+      { type: 'mcq', difficulty: 'medium', text: 'ناتج ضرب 2/3 × 3/4 =', options: ['6/12', '1/2', '5/7', '6/7'], answer: 1, lesson: 'ضرب الكسور' },
+      { type: 'mcq', difficulty: 'hard', text: 'ناتج قسمة 1/2 ÷ 1/4 =', options: ['1/8', '1/2', '2', '4'], answer: 2, lesson: 'قسمة الكسور' },
+      { type: 'mcq', difficulty: 'hard', text: 'إذا كان 15% من عدد يساوي 30، فإن العدد هو:', options: ['150', '200', '250', '300'], answer: 1, lesson: 'النسبة المئوية' },
+      { type: 'mcq', difficulty: 'easy', text: 'النسبة المئوية للكسر العشري 0.75 هي:', options: ['7.5%', '75%', '750%', '0.75%'], answer: 1, lesson: 'النسبة المئوية' },
+      { type: 'mcq', difficulty: 'easy', text: 'في المثلث، مجموع قياسات الزوايا يساوي:', options: ['90 درجة', '180 درجة', '270 درجة', '360 درجة'], answer: 1, lesson: 'الهندسة' },
+      { type: 'mcq', difficulty: 'easy', text: 'مساحة مستطيل طوله 8 سم وعرضه 5 سم تساوي:', options: ['13 سم²', '26 سم²', '40 سم²', '80 سم²'], answer: 2, lesson: 'المساحة' },
+      { type: 'mcq', difficulty: 'medium', text: 'حجم متوازي مستطيلات أبعاده 3 سم، 4 سم، 5 سم يساوي:', options: ['12 سم³', '20 سم³', '60 سم³', '120 سم³'], answer: 2, lesson: 'الحجم' },
+      { type: 'mcq', difficulty: 'hard', text: 'محيط دائرة نصف قطرها 7 سم (باستخدام ط = 22/7) يساوي:', options: ['22 سم', '44 سم', '154 سم', '49 سم'], answer: 1, lesson: 'المحيط' },
+      { type: 'mcq', difficulty: 'medium', text: 'العدد 36 يقبل القسمة على:', options: ['2 و 3 فقط', '2 و 4 و 6', '2 و 3 و 4 و 6 و 9', '5 و 10'], answer: 2, lesson: 'القسمة' },
+      { type: 'mcq', difficulty: 'easy', text: 'العدد الأولي من بين الأعداد التالية هو:', options: ['21', '27', '29', '33'], answer: 2, lesson: 'الأعداد الأولية' },
+      { type: 'mcq', difficulty: 'hard', text: 'إذا كان 3/4 من عدد يساوي 12، فإن العدد هو:', options: ['9', '12', '16', '20'], answer: 2, lesson: 'الكسور' },
+      { type: 'tf', difficulty: 'medium', text: 'العدد 1,000,000 يُكتب في الصورة الأسية كـ 10⁶.', answer: true, lesson: 'الأسس' },
+      { type: 'tf', difficulty: 'medium', text: 'الكسر 3/4 أكبر من الكسر 5/8.', answer: true, lesson: 'مقارنة الكسور' },
+      { type: 'tf', difficulty: 'easy', text: 'ناتج ضرب أي عدد في 1 يساوي العدد نفسه.', answer: true, lesson: 'الضرب' },
+      { type: 'tf', difficulty: 'easy', text: '25% تعني ربع العدد.', answer: true, lesson: 'النسبة المئوية' },
+      { type: 'tf', difficulty: 'easy', text: 'محيط المربع يساوي طول الضلع × 4.', answer: true, lesson: 'المحيط' },
+      { type: 'tf', difficulty: 'medium', text: 'مساحة المثلث = القاعدة × الارتفاع.', answer: false, lesson: 'المساحة' },
+      { type: 'tf', difficulty: 'medium', text: 'العدد 2 هو العدد الأولي الوحيد الزوجي.', answer: true, lesson: 'الأعداد الأولية' },
+      { type: 'tf', difficulty: 'easy', text: '0.5 أكبر من 1/2.', answer: false, lesson: 'الكسور' },
+      { type: 'tf', difficulty: 'easy', text: 'مجموع قياسات زوايا المربع يساوي 360 درجة.', answer: true, lesson: 'الهندسة' },
+      { type: 'tf', difficulty: 'medium', text: 'عند قسمة كسر على كسر آخر، نضرب الكسر الأول في مقلوب الكسر الثاني.', answer: true, lesson: 'قسمة الكسور' },
+      { type: 'fill', difficulty: 'medium', text: 'القيمة المكانية للرقم 7 في العدد 2,745,300 هي ..........', answer: '700,000', lesson: 'القيمة المكانية' },
+      { type: 'fill', difficulty: 'easy', text: 'الكسر المكافئ للكسر 2/3 هو .......... (اكتب كسرًا مكافئًا).', answer: '4/6', lesson: 'الكسور المتكافئة' },
+      { type: 'fill', difficulty: 'medium', text: 'ناتج جمع 1/4 + 1/2 = ..........', answer: '3/4', lesson: 'جمع الكسور' },
+      { type: 'fill', difficulty: 'easy', text: 'ناتج ضرب 3/5 × 10 = ..........', answer: '6', lesson: 'ضرب الكسور' },
+      { type: 'fill', difficulty: 'medium', text: '40% من 250 = ..........', answer: '100', lesson: 'النسبة المئوية' },
+      { type: 'fill', difficulty: 'easy', text: '0.6 في صورة نسبة مئوية يساوي .......... %.', answer: '60', lesson: 'النسبة المئوية' },
+      { type: 'fill', difficulty: 'easy', text: 'محيط مربع طول ضلعه 6 سم يساوي .......... سم.', answer: '24', lesson: 'المحيط' },
+      { type: 'fill', difficulty: 'medium', text: 'مساحة مثلث قاعدته 10 سم وارتفاعه 6 سم تساوي .......... سم².', answer: '30', lesson: 'المساحة' },
+      { type: 'fill', difficulty: 'easy', text: 'حجم مكعب طول حرفه 4 سم يساوي .......... سم³.', answer: '64', lesson: 'الحجم' },
+      { type: 'fill', difficulty: 'easy', text: 'الزاوية القائمة قياسها .......... درجة.', answer: '90', lesson: 'الهندسة' },
+      { type: 'fill', difficulty: 'easy', text: 'العدد الأولي الأصغر من 10 والأكبر من 5 هو ..........', answer: '7', lesson: 'الأعداد الأولية' },
+      { type: 'fill', difficulty: 'medium', text: 'القاسم المشترك الأكبر للعددين 12 و 18 هو ..........', answer: '6', lesson: 'ق.م.أ' },
+      { type: 'fill', difficulty: 'medium', text: 'المضاعف المشترك الأصغر للعددين 4 و 6 هو ..........', answer: '12', lesson: 'م.م.أ' },
+      { type: 'fill', difficulty: 'hard', text: 'إذا كان 1/3 من عدد يساوي 5، فإن العدد هو ..........', answer: '15', lesson: 'الكسور' },
+      { type: 'fill', difficulty: 'easy', text: '3/4 في صورة كسر عشري يساوي ..........', answer: '0.75', lesson: 'الكسور' }
+    ]
+  },
+  {
+    title: "اختبار العلوم - الصف السادس الابتدائي",
+    subject: "science",
+    grade: "الصف السادس الابتدائي",
+    timePerQuestion: 60,
+    questions: [
+      { type: 'mcq', difficulty: 'easy', text: 'الوحدة الأساسية لبناء الكائن الحي هي:', options: ['النسيج', 'الخلية', 'العضو', 'الجهاز'], answer: 1, lesson: 'الخلية' },
+      { type: 'mcq', difficulty: 'easy', text: 'العالم الذي اكتشف الخلية لأول مرة هو:', options: ['روبرت هوك', 'أنطوني فان ليفينهوك', 'روبرت براون', 'لويس باستور'], answer: 0, lesson: 'الخلية' },
+      { type: 'mcq', difficulty: 'easy', text: 'أي من التالي يعتبر من الكائنات الحية الدقيقة؟', options: ['البكتيريا', 'الفيروسات', 'الطحالب', 'جميع ما سبق'], answer: 3, lesson: 'الكائنات الدقيقة' },
+      { type: 'mcq', difficulty: 'easy', text: 'الجهاز المسؤول عن نقل المواد الغذائية والأكسجين إلى جميع أجزاء الجسم هو:', options: ['الجهاز الهضمي', 'الجهاز التنفسي', 'الجهاز الدوري', 'الجهاز العصبي'], answer: 2, lesson: 'أجهزة الجسم' },
+      { type: 'mcq', difficulty: 'easy', text: 'أي من التالي ليس من مكونات الدم؟', options: ['كريات الدم الحمراء', 'كريات الدم البيضاء', 'الصفائح الدموية', 'الأعصاب'], answer: 3, lesson: 'الدم' },
+      { type: 'mcq', difficulty: 'easy', text: 'الوحدة المستخدمة لقياس القوة هي:', options: ['النيوتن', 'الجول', 'الواط', 'الأمبير'], answer: 0, lesson: 'القوة' },
+      { type: 'mcq', difficulty: 'easy', text: 'القوة التي تجذب الأجسام نحو مركز الأرض تسمى:', options: ['قوة الاحتكاك', 'قوة الجاذبية', 'القوة المغناطيسية', 'القوة الكهربائية'], answer: 1, lesson: 'القوة' },
+      { type: 'mcq', difficulty: 'easy', text: 'أي من التالي يعتبر من أشكال الطاقة؟', options: ['الطاقة الحرارية', 'الطاقة الضوئية', 'الطاقة الكيميائية', 'جميع ما سبق'], answer: 3, lesson: 'الطاقة' },
+      { type: 'mcq', difficulty: 'medium', text: 'تحول الطاقة في المصباح الكهربائي هو:', options: ['من كهربائية إلى ضوئية', 'من ضوئية إلى حرارية', 'من كيميائية إلى كهربائية', 'من حرارية إلى ميكانيكية'], answer: 0, lesson: 'تحولات الطاقة' },
+      { type: 'mcq', difficulty: 'easy', text: 'أي من التالي يعتبر من الموارد الطبيعية المتجددة؟', options: ['الفحم', 'البترول', 'الطاقة الشمسية', 'الغاز الطبيعي'], answer: 2, lesson: 'الموارد الطبيعية' },
+      { type: 'mcq', difficulty: 'easy', text: 'العملية التي تقوم بها النباتات الخضراء لصنع الغذاء تسمى:', options: ['التنفس', 'البناء الضوئي', 'النتح', 'الانتشار'], answer: 1, lesson: 'البناء الضوئي' },
+      { type: 'mcq', difficulty: 'easy', text: 'أي من التالي يعتبر من العوامل المؤثرة في عملية البناء الضوئي؟', options: ['ضوء الشمس', 'الماء', 'ثاني أكسيد الكربون', 'جميع ما سبق'], answer: 3, lesson: 'البناء الضوئي' },
+      { type: 'mcq', difficulty: 'medium', text: 'الحمض النووي (DNA) يوجد في:', options: ['السيتوبلازم', 'النواة', 'الغشاء البلازمي', 'الجدار الخلوي'], answer: 1, lesson: 'الخلية' },
+      { type: 'mcq', difficulty: 'easy', text: 'أي من التالي يعتبر من طرق انتقال الحرارة؟', options: ['التوصيل', 'الحمل', 'الإشعاع', 'جميع ما سبق'], answer: 3, lesson: 'الحرارة' },
+      { type: 'mcq', difficulty: 'easy', text: 'في الدائرة الكهربائية، المادة التي تسمح بمرور التيار الكهربائي تسمى:', options: ['عازل', 'موصل', 'مقاومة', 'مولد'], answer: 1, lesson: 'الكهرباء' },
+      { type: 'tf', difficulty: 'easy', text: 'الخلية هي الوحدة الأساسية لبناء جميع الكائنات الحية.', answer: true, lesson: 'الخلية' },
+      { type: 'tf', difficulty: 'medium', text: 'الفيروسات كائنات حية دقيقة يمكنها الحياة خارج الخلية الحية.', answer: false, lesson: 'الكائنات الدقيقة' },
+      { type: 'tf', difficulty: 'medium', text: 'الجهاز الهضمي مسؤول عن نقل الدم إلى أجزاء الجسم.', answer: false, lesson: 'أجهزة الجسم' },
+      { type: 'tf', difficulty: 'medium', text: 'قوة الاحتكاك تعمل دائمًا على تسهيل الحركة.', answer: false, lesson: 'القوة' },
+      { type: 'tf', difficulty: 'easy', text: 'الطاقة لا تفنى ولا تستحدث ولكن تتحول من شكل لآخر.', answer: true, lesson: 'الطاقة' },
+      { type: 'tf', difficulty: 'medium', text: 'الفحم والبترول من الموارد الطبيعية المتجددة.', answer: false, lesson: 'الموارد الطبيعية' },
+      { type: 'tf', difficulty: 'easy', text: 'عملية البناء الضوئي تحدث في الخلايا الحيوانية.', answer: false, lesson: 'البناء الضوئي' },
+      { type: 'tf', difficulty: 'easy', text: 'النواة تحتوي على المادة الوراثية للخلية.', answer: true, lesson: 'الخلية' },
+      { type: 'tf', difficulty: 'easy', text: 'الحرارة تنتقل من الجسم الساخن إلى الجسم البارد.', answer: true, lesson: 'الحرارة' },
+      { type: 'tf', difficulty: 'medium', text: 'المعادن من المواد العازلة للكهرباء.', answer: false, lesson: 'الكهرباء' },
+      { type: 'fill', difficulty: 'easy', text: 'الوحدة الأساسية لبناء الكائن الحي هي ..........', answer: 'الخلية', lesson: 'الخلية' },
+      { type: 'fill', difficulty: 'medium', text: 'العالم الذي اكتشف الخلية هو ..........', answer: 'روبرت هوك', lesson: 'الخلية' },
+      { type: 'fill', difficulty: 'medium', text: 'الجهاز المسؤول عن توصيل الأكسجين والغذاء إلى خلايا الجسم هو ..........', answer: 'الجهاز الدوري', lesson: 'أجهزة الجسم' },
+      { type: 'fill', difficulty: 'easy', text: 'القوة التي تجذب الأجسام نحو الأرض تسمى ..........', answer: 'قوة الجاذبية', lesson: 'القوة' },
+      { type: 'fill', difficulty: 'easy', text: 'وحدة قياس القوة هي ..........', answer: 'النيوتن', lesson: 'القوة' },
+      { type: 'fill', difficulty: 'medium', text: 'تحول الطاقة في المصباح الكهربائي من طاقة .......... إلى طاقة ..........', answer: 'كهربائية / ضوئية', lesson: 'تحولات الطاقة' },
+      { type: 'fill', difficulty: 'easy', text: 'العملية التي تصنع بها النباتات غذاءها تسمى ..........', answer: 'البناء الضوئي', lesson: 'البناء الضوئي' },
+      { type: 'fill', difficulty: 'medium', text: 'من الموارد الطبيعية المتجددة .......... و ..........', answer: 'الطاقة الشمسية / طاقة الرياح', lesson: 'الموارد الطبيعية' },
+      { type: 'fill', difficulty: 'medium', text: 'تنتقل الحرارة بثلاث طرق هي: .......... و .......... و ..........', answer: 'التوصيل / الحمل / الإشعاع', lesson: 'الحرارة' },
+      { type: 'fill', difficulty: 'easy', text: 'المواد التي تسمح بمرور التيار الكهربائي تسمى ..........', answer: 'موصلات', lesson: 'الكهرباء' }
+    ]
+  },
+  {
+    title: "اختبار الدراسات الاجتماعية - الصف السادس الابتدائي",
+    subject: "social",
+    grade: "الصف السادس الابتدائي",
+    timePerQuestion: 60,
+    questions: [
+      { type: 'mcq', difficulty: 'easy', text: 'تقع مصر في قارة:', options: ['آسيا', 'أفريقيا', 'أوروبا', 'أستراليا'], answer: 1, lesson: 'جغرافيا مصر' },
+      { type: 'mcq', difficulty: 'easy', text: 'يحد مصر من الشمال:', options: ['البحر الأحمر', 'البحر المتوسط', 'المحيط الأطلسي', 'البحر الأسود'], answer: 1, lesson: 'جغرافيا مصر' },
+      { type: 'mcq', difficulty: 'easy', text: 'أطول نهر في العالم يمر بمصر هو:', options: ['نهر الأمازون', 'نهر النيل', 'نهر المسيسيبي', 'نهر الفرات'], answer: 1, lesson: 'نهر النيل' },
+      { type: 'mcq', difficulty: 'medium', text: 'أكبر محافظة في مصر من حيث المساحة هي:', options: ['القاهرة', 'الإسكندرية', 'الوادي الجديد', 'أسوان'], answer: 2, lesson: 'محافظات مصر' },
+      { type: 'mcq', difficulty: 'easy', text: 'من أهم المحاصيل الزراعية في مصر:', options: ['القطن', 'القمح', 'الأرز', 'جميع ما سبق'], answer: 3, lesson: 'الزراعة' },
+      { type: 'mcq', difficulty: 'easy', text: 'من أهم الصناعات في مصر:', options: ['صناعة الغزل والنسيج', 'صناعة الأسمنت', 'صناعة الأسمدة', 'جميع ما سبق'], answer: 3, lesson: 'الصناعة' },
+      { type: 'mcq', difficulty: 'easy', text: 'من أهم المعالم السياحية في مصر:', options: ['الأهرامات', 'معبد الكرنك', 'أبو سمبل', 'جميع ما سبق'], answer: 3, lesson: 'السياحة' },
+      { type: 'mcq', difficulty: 'medium', text: 'السد العالي يقع في محافظة:', options: ['الأقصر', 'أسوان', 'قنا', 'سوهاج'], answer: 1, lesson: 'السد العالي' },
+      { type: 'mcq', difficulty: 'medium', text: 'من أهم المشروعات القومية في مصر:', options: ['مشروع تنمية محور قناة السويس', 'مشروع العاصمة الإدارية الجديدة', 'مشروع الدلتا الجديدة', 'جميع ما سبق'], answer: 3, lesson: 'المشروعات القومية' },
+      { type: 'mcq', difficulty: 'easy', text: 'عدد محافظات مصر:', options: ['25 محافظة', '26 محافظة', '27 محافظة', '28 محافظة'], answer: 2, lesson: 'محافظات مصر' },
+      { type: 'mcq', difficulty: 'medium', text: 'المناخ السائد في مصر:', options: ['استوائي', 'صحراوي جاف', 'متوسطي', 'مداري'], answer: 1, lesson: 'المناخ' },
+      { type: 'mcq', difficulty: 'easy', text: 'من أهم المحميات الطبيعية في مصر:', options: ['محمية رأس محمد', 'محمية وادي دجلة', 'محمية نبق', 'جميع ما سبق'], answer: 3, lesson: 'المحميات الطبيعية' },
+      { type: 'mcq', difficulty: 'easy', text: 'قناة السويس تربط بين:', options: ['البحر الأحمر والبحر المتوسط', 'البحر الأحمر والمحيط الأطلسي', 'البحر المتوسط والبحر الأسود', 'البحر المتوسط والمحيط الهندي'], answer: 0, lesson: 'قناة السويس' },
+      { type: 'mcq', difficulty: 'easy', text: 'من أهم الثروات المعدنية في مصر:', options: ['الفوسفات', 'الحديد', 'الذهب', 'جميع ما سبق'], answer: 3, lesson: 'الثروات المعدنية' },
+      { type: 'mcq', difficulty: 'easy', text: 'من أهم المشاكل البيئية في مصر:', options: ['تلوث الهواء', 'تلوث المياه', 'التصحر', 'جميع ما سبق'], answer: 3, lesson: 'المشاكل البيئية' },
+      { type: 'tf', difficulty: 'easy', text: 'تقع مصر في الركن الشمالي الشرقي من قارة أفريقيا.', answer: true, lesson: 'جغرافيا مصر' },
+      { type: 'tf', difficulty: 'easy', text: 'نهر النيل هو أطول نهر في العالم.', answer: true, lesson: 'نهر النيل' },
+      { type: 'tf', difficulty: 'medium', text: 'محافظة القاهرة هي أكبر محافظة في مصر من حيث المساحة.', answer: false, lesson: 'محافظات مصر' },
+      { type: 'tf', difficulty: 'easy', text: 'قناة السويس تربط بين البحر الأحمر والبحر المتوسط.', answer: true, lesson: 'قناة السويس' },
+      { type: 'tf', difficulty: 'medium', text: 'السد العالي يقع في محافظة الأقصر.', answer: false, lesson: 'السد العالي' },
+      { type: 'tf', difficulty: 'easy', text: 'يحد مصر من الشرق البحر الأحمر.', answer: true, lesson: 'جغرافيا مصر' },
+      { type: 'tf', difficulty: 'easy', text: 'المناخ السائد في مصر هو المناخ الصحراوي الجاف.', answer: true, lesson: 'المناخ' },
+      { type: 'tf', difficulty: 'easy', text: 'عدد محافظات مصر 27 محافظة.', answer: true, lesson: 'محافظات مصر' },
+      { type: 'tf', difficulty: 'easy', text: 'القطن من أهم المحاصيل الزراعية في مصر.', answer: true, lesson: 'الزراعة' },
+      { type: 'tf', difficulty: 'easy', text: 'التصحر من المشاكل البيئية التي تواجه مصر.', answer: true, lesson: 'المشاكل البيئية' },
+      { type: 'fill', difficulty: 'easy', text: 'تقع مصر في قارة ..........', answer: 'أفريقيا', lesson: 'جغرافيا مصر' },
+      { type: 'fill', difficulty: 'easy', text: 'يحد مصر من الشمال ..........', answer: 'البحر المتوسط', lesson: 'جغرافيا مصر' },
+      { type: 'fill', difficulty: 'easy', text: 'أطول نهر في العالم يمر بمصر هو ..........', answer: 'نهر النيل', lesson: 'نهر النيل' },
+      { type: 'fill', difficulty: 'medium', text: 'أكبر محافظة في مصر من حيث المساحة هي ..........', answer: 'الوادي الجديد', lesson: 'محافظات مصر' },
+      { type: 'fill', difficulty: 'medium', text: 'السد العالي يقع في محافظة ..........', answer: 'أسوان', lesson: 'السد العالي' },
+      { type: 'fill', difficulty: 'easy', text: 'قناة السويس تربط بين .......... و ..........', answer: 'البحر الأحمر / البحر المتوسط', lesson: 'قناة السويس' },
+      { type: 'fill', difficulty: 'easy', text: 'عدد محافظات مصر .......... محافظة.', answer: '27', lesson: 'محافظات مصر' },
+      { type: 'fill', difficulty: 'easy', text: 'المناخ السائد في مصر هو ..........', answer: 'صحراوي جاف', lesson: 'المناخ' },
+      { type: 'fill', difficulty: 'medium', text: 'من أهم المحاصيل الزراعية في مصر .......... و ..........', answer: 'القطن / القمح', lesson: 'الزراعة' },
+      { type: 'fill', difficulty: 'medium', text: 'من أهم المشروعات القومية في مصر .......... و ..........', answer: 'مشروع تنمية محور قناة السويس / العاصمة الإدارية الجديدة', lesson: 'المشروعات القومية' }
+    ]
+  },
+  {
+    title: "اختبار اللغة العربية - الصف السادس الابتدائي",
+    subject: "arabic",
+    grade: "الصف السادس الابتدائي",
+    timePerQuestion: 60,
+    questions: [
+      { type: 'mcq', difficulty: 'easy', text: '"الوقتُ كالسيف إن لم تقطعه قطعك". هذا التعبير يدل على:', options: ['أهمية المال', 'أهمية تنظيم الوقت', 'صعوبة الحياة', 'ضرورة الراحة'], answer: 1, lesson: 'تنظيم الوقت' },
+      { type: 'mcq', difficulty: 'easy', text: 'في جملة "العلمُ نورٌ"، كلمة "العلم" اسم:', options: ['نكرة', 'معرفة', 'فعل', 'حرف'], answer: 1, lesson: 'المعرفة والنكرة' },
+      { type: 'mcq', difficulty: 'medium', text: '"أبوك رجل كريم". كلمة "أبوك" من:', options: ['الأسماء الخمسة', 'المثنى', 'جمع المذكر السالم', 'جمع المؤنث السالم'], answer: 0, lesson: 'الأسماء الخمسة' },
+      { type: 'mcq', difficulty: 'hard', text: '"سُئِلَ" كُتبت الهمزة المتوسطة على نبرة (ياء) لأن:', options: ['الهمزة مفتوحة وقبلها مضموم', 'الهمزة مكسورة', 'الهمزة ساكنة وقبلها مفتوح', 'الهمزة مفتوحة وقبلها ساكن'], answer: 1, lesson: 'الهمزة المتوسطة' },
+      { type: 'mcq', difficulty: 'medium', text: '"كأنّ التلميذين عالمٌ". "كأنّ" حرف ناسخ يفيد:', options: ['الترجي', 'التشبيه', 'التمني', 'التأكيد'], answer: 1, lesson: 'الحروف الناسخة' },
+      { type: 'mcq', difficulty: 'medium', text: '"إنّ النظافة من الإيمان". "النظافة" في الجملة:', options: ['مبتدأ مرفوع', 'اسم إنّ منصوب', 'خبر إنّ مرفوع', 'فاعل مرفوع'], answer: 1, lesson: 'الحروف الناسخة' },
+      { type: 'mcq', difficulty: 'easy', text: '"التخطيط الجيد" هو:', options: ['إضاعة الوقت', 'تنظيم الوقت وتحديد الأولويات', 'تأجيل الأعمال', 'التشتت بين المهام'], answer: 1, lesson: 'تنظيم الوقت' },
+      { type: 'mcq', difficulty: 'hard', text: '"المؤمنُ مرآةُ أخيه". كلمة "مرآة" كُتبت الهمزة فيها على:', options: ['الألف', 'الواو', 'الياء (نبرة)', 'السطر'], answer: 2, lesson: 'الهمزة المتوسطة' },
+      { type: 'mcq', difficulty: 'medium', text: '"سعادة الأوطان في عمرانها". "عمران" تعني:', options: ['الخراب', 'البناء والتعمير', 'الهدم', 'السفر'], answer: 1, lesson: 'المفردات' },
+      { type: 'mcq', difficulty: 'medium', text: '"كان الطريق مظلماً". "مظلماً" خبر كان نوعه:', options: ['مفرد', 'جملة اسمية', 'جملة فعلية', 'شبه جملة'], answer: 0, lesson: 'كان وأخواتها' },
+      { type: 'mcq', difficulty: 'hard', text: '"لعلّ أخاك ناجح". "أخاك" اسم "لعلّ" نوعه:', options: ['ضمير مستتر', 'اسم ظاهر', 'ضمير متصل', 'لا شيء مما سبق'], answer: 1, lesson: 'الحروف الناسخة' },
+      { type: 'mcq', difficulty: 'easy', text: '"الوقت من ذهب". نوع الأسلوب في العبارة:', options: ['أسلوب أمر', 'أسلوب نهي', 'أسلوب خبري (تقريري)', 'أسلوب استفهام'], answer: 2, lesson: 'الأساليب' },
+      { type: 'mcq', difficulty: 'easy', text: '"من جدّ وجد". هذا:', options: ['مثل شعبي', 'بيت شعر', 'حديث شريف', 'آية قرآنية'], answer: 0, lesson: 'الأمثال' },
+      { type: 'mcq', difficulty: 'medium', text: '"ذو العلم محبوب". "ذو" تعني:', options: ['صاحب', 'فم', 'أخ', 'أب'], answer: 0, lesson: 'الأسماء الخمسة' },
+      { type: 'mcq', difficulty: 'easy', text: '"الهمزة المتوسطة" تُكتب وفق قاعدة:', options: ['أقوى الحركات', 'أضعف الحركات', 'حركة الحرف الأول فقط', 'لا قاعدة لها'], answer: 0, lesson: 'الهمزة المتوسطة' },
+      { type: 'tf', difficulty: 'easy', text: 'تنظيم الوقت يساعد على تحقيق الأهداف.', answer: true, lesson: 'تنظيم الوقت' },
+      { type: 'tf', difficulty: 'medium', text: 'الاسم النكرة يدل على شيء محدد.', answer: false, lesson: 'المعرفة والنكرة' },
+      { type: 'tf', difficulty: 'medium', text: 'الأسماء الخمسة تُرفع بالواو وتُنصب بالألف وتُجر بالياء.', answer: true, lesson: 'الأسماء الخمسة' },
+      { type: 'tf', difficulty: 'hard', text: '"سؤال" كُتبت الهمزة فيها على الواو لأنها مفتوحة وقبلها مضموم.', answer: true, lesson: 'الهمزة المتوسطة' },
+      { type: 'tf', difficulty: 'easy', text: '"إنّ" و"كأنّ" و"لعلّ" من الحروف الناسخة.', answer: true, lesson: 'الحروف الناسخة' },
+      { type: 'tf', difficulty: 'medium', text: 'خبر "كان" وأخواتها يكون مرفوعاً دائماً.', answer: true, lesson: 'كان وأخواتها' },
+      { type: 'tf', difficulty: 'medium', text: '"الكاميرا" اخترعها العالم العربي الحسن بن الهيثم.', answer: true, lesson: 'العلماء العرب' },
+      { type: 'tf', difficulty: 'easy', text: '"الخيال" لا علاقة له بالعلم والاختراعات.', answer: false, lesson: 'الإبداع' },
+      { type: 'tf', difficulty: 'medium', text: '"الهمزة المتوسطة" تأتي في أول الكلمة.', answer: false, lesson: 'الهمزة المتوسطة' },
+      { type: 'tf', difficulty: 'hard', text: '"كان وأخواتها" تدخل على الجملة الاسمية فترفع المبتدأ وتنصب الخبر.', answer: false, lesson: 'كان وأخواتها' },
+      { type: 'fill', difficulty: 'easy', text: '"الوقت كالسيف إن لم تقطعه .........."', answer: 'قطعك', lesson: 'تنظيم الوقت' },
+      { type: 'fill', difficulty: 'hard', text: 'من أنواع المعارف: العلم، والضمير، واسم الإشارة، و..........', answer: 'الاسم الموصول', lesson: 'المعرفة والنكرة' },
+      { type: 'fill', difficulty: 'hard', text: '"ذو" و"أخو" و".........." و".........." و".........." هي الأسماء الخمسة.', answer: 'أبو / حمو / فو', lesson: 'الأسماء الخمسة' },
+      { type: 'fill', difficulty: 'medium', text: 'تُكتب الهمزة المتوسطة على .......... إذا كانت مفتوحة وقبلها حرف مضموم.', answer: 'الواو', lesson: 'الهمزة المتوسطة' },
+      { type: 'fill', difficulty: 'medium', text: '"لعلّ" حرف ناسخ يفيد ..........', answer: 'الترجي', lesson: 'الحروف الناسخة' },
+      { type: 'fill', difficulty: 'medium', text: 'من أخوات "إنّ": إنّ، وأنّ، وكأنّ، ولكنّ، و..........، و..........', answer: 'ليت / لعل', lesson: 'الحروف الناسخة' },
+      { type: 'fill', difficulty: 'easy', text: '"العلمُ .........." (أكمل بخبر مفرد).', answer: 'نورٌ', lesson: 'المبتدأ والخبر' },
+      { type: 'fill', difficulty: 'easy', text: '"الهمزة المتوسطة" هي الهمزة التي تُكتب في .......... الكلمة.', answer: 'وسط', lesson: 'الهمزة المتوسطة' },
+      { type: 'fill', difficulty: 'medium', text: 'العالم العربي الذي وضع أساس فكرة الكاميرا هو ..........', answer: 'الحسن بن الهيثم', lesson: 'العلماء العرب' },
+      { type: 'fill', difficulty: 'easy', text: '"الوقت من .........." عبارة تدل على أهمية الوقت.', answer: 'ذهب', lesson: 'تنظيم الوقت' }
+    ]
+  },
+  {
+    title: "اختبار اللغة الإنجليزية - Primary 6 (Term 1)",
+    subject: "english",
+    grade: "الصف السادس الابتدائي",
+    timePerQuestion: 60,
+    questions: [
+      { type: 'mcq', difficulty: 'easy', text: 'Ras Mohamed National Park is located in the ______ of Sinai.', options: ['north', 'east', 'south', 'west'], answer: 2, lesson: 'Places in Egypt' },
+      { type: 'mcq', difficulty: 'easy', text: 'Tourists come to Egypt to ______ the ancient sites.', options: ['buy', 'visit', 'make', 'play'], answer: 1, lesson: 'Tourism' },
+      { type: 'mcq', difficulty: 'easy', text: 'In Ras Mohamed, visitors can swim, snorkel, and ______.', options: ['ski', 'dive', 'skate', 'run'], answer: 1, lesson: 'Activities' },
+      { type: 'mcq', difficulty: 'medium', text: 'People from all over the world ______ Ras Mohamed every year.', options: ['visit', 'visits', 'visiting', 'visited'], answer: 0, lesson: 'Present Simple' },
+      { type: 'mcq', difficulty: 'medium', text: 'My uncle ______ to a different country every year.', options: ['travel', 'travels', 'traveling', 'traveled'], answer: 1, lesson: 'Present Simple' },
+      { type: 'mcq', difficulty: 'easy', text: "Fady's first subject at school is usually ______.", options: ['English', 'Arabic', 'Math', 'Science'], answer: 1, lesson: 'School Subjects' },
+      { type: 'mcq', difficulty: 'easy', text: 'At 10:15, students have a short ______.', options: ['lesson', 'class', 'walk', 'break'], answer: 3, lesson: 'School Life' },
+      { type: 'mcq', difficulty: 'easy', text: 'The weather in Alexandria is ______ and rainy.', options: ['hot', 'windy', 'sunny', 'dry'], answer: 1, lesson: 'Weather' },
+      { type: 'mcq', difficulty: 'easy', text: 'In Aswan, it is very ______.', options: ['cold', 'rainy', 'hot', 'snowy'], answer: 2, lesson: 'Weather' },
+      { type: 'mcq', difficulty: 'medium', text: 'Maged ______ tennis in the club now.', options: ['play', 'plays', 'is playing', 'played'], answer: 2, lesson: 'Present Continuous' },
+      { type: 'mcq', difficulty: 'easy', text: 'The Nile is the ______ river in the world.', options: ['shortest', 'longest', 'widest', 'smallest'], answer: 1, lesson: 'Superlatives' },
+      { type: 'mcq', difficulty: 'easy', text: '______ live in the Nile and they are very dangerous.', options: ['Fish', 'Birds', 'Crocodiles', 'Cats'], answer: 2, lesson: 'Animals' },
+      { type: 'mcq', difficulty: 'medium', text: 'A ______ brings food or packages to places.', options: ['mechanic', 'delivery person', 'tailor', 'architect'], answer: 1, lesson: 'Jobs' },
+      { type: 'mcq', difficulty: 'medium', text: 'Water resources engineers make sure people get ______ water.', options: ['dirty', 'clean', 'hot', 'cold'], answer: 1, lesson: 'Jobs' },
+      { type: 'mcq', difficulty: 'easy', text: 'The Proud Rose is a story that teaches us a ______.', options: ['song', 'moral', 'game', 'dance'], answer: 1, lesson: 'Stories' },
+      { type: 'tf', difficulty: 'medium', text: 'Ras Mohamed is in the north of Sinai.', answer: false, lesson: 'Places in Egypt' },
+      { type: 'tf', difficulty: 'easy', text: 'Visitors can snorkel and dive in the blue sea in Ras Mohamed.', answer: true, lesson: 'Activities' },
+      { type: 'tf', difficulty: 'medium', text: 'The weather in Cairo is rainy and windy today.', answer: false, lesson: 'Weather' },
+      { type: 'tf', difficulty: 'easy', text: 'The Nile flows from south to north.', answer: true, lesson: 'The Nile' },
+      { type: 'tf', difficulty: 'easy', text: 'Ancient Egyptians built temples near the Nile River.', answer: true, lesson: 'History' },
+      { type: 'tf', difficulty: 'easy', text: 'A mechanic fixes cars.', answer: true, lesson: 'Jobs' },
+      { type: 'tf', difficulty: 'medium', text: 'A tailor designs buildings.', answer: false, lesson: 'Jobs' },
+      { type: 'tf', difficulty: 'medium', text: 'The cactus in the story "The Proud Rose" had no water inside.', answer: false, lesson: 'Stories' },
+      { type: 'tf', difficulty: 'easy', text: 'Dr. Mostafa El-Sayed is an Egyptian scientist.', answer: true, lesson: 'Famous Egyptians' },
+      { type: 'tf', difficulty: 'easy', text: 'We should waste water because it is endless.', answer: false, lesson: 'Environment' },
+      { type: 'fill', difficulty: 'easy', text: 'People from all over the world ______ (visit) Ras Mohamed every year.', answer: 'visit', lesson: 'Present Simple' },
+      { type: 'fill', difficulty: 'easy', text: 'She always ______ (take) photos of nature.', answer: 'takes', lesson: 'Present Simple' },
+      { type: 'fill', difficulty: 'easy', text: 'Bedouins ______ (live) near Ras Mohamed.', answer: 'live', lesson: 'Present Simple' },
+      { type: 'fill', difficulty: 'easy', text: 'The weather in Alexandria is ______ and rainy.', answer: 'windy', lesson: 'Weather' },
+      { type: 'fill', difficulty: 'easy', text: 'The Nile is about 6,650 ______ long.', answer: 'kilometers', lesson: 'The Nile' },
+      { type: 'fill', difficulty: 'easy', text: 'Crocodiles live in the ______ and they are dangerous.', answer: 'Nile', lesson: 'Animals' },
+      { type: 'fill', difficulty: 'easy', text: 'A ______ makes clothes.', answer: 'tailor', lesson: 'Jobs' },
+      { type: 'fill', difficulty: 'easy', text: 'A ______ fixes vehicles.', answer: 'mechanic', lesson: 'Jobs' },
+      { type: 'fill', difficulty: 'easy', text: 'Water resources engineers provide ______ water.', answer: 'clean', lesson: 'Jobs' },
+      { type: 'fill', difficulty: 'medium', text: 'The moral of "The Proud Rose" is not to judge anyone by how they ______.', answer: 'look', lesson: 'Stories' },
+      { type: 'fill', difficulty: 'medium', text: 'Dr. Mostafa El-Sayed is an expert in ______ and nanoscience.', answer: 'chemistry', lesson: 'Famous Egyptians' },
+      { type: 'fill', difficulty: 'easy', text: 'We must ______ energy to protect our planet.', answer: 'save', lesson: 'Environment' },
+      { type: 'fill', difficulty: 'medium', text: 'The present continuous tense of "play" is ______.', answer: 'is playing / are playing', lesson: 'Present Continuous' },
+      { type: 'fill', difficulty: 'easy', text: 'The past simple tense of "go" is ______.', answer: 'went', lesson: 'Past Simple' },
+      { type: 'fill', difficulty: 'easy', text: 'The past simple tense of "visit" is ______.', answer: 'visited', lesson: 'Past Simple' }
+    ]
+  }
+];
+
+/* ═══════════════════════════════════════════════════════════
+   ✅ تحميل الاختبارات الجاهزة الحقيقية
    ═══════════════════════════════════════════════════════════ */
 async function seedDemoQuizzes() {
   if (!isAdmin(currentUser)) { alert('للأدمن فقط'); return; }
-  const grades = Object.values(STAGES).flat();
-  let totalQuizzes = 0;
-  grades.forEach(g => { totalQuizzes += getSubjectsForGrade(g).length * 3; });
-  if (!confirm(`⚠️ سيتم إضافة ${totalQuizzes} اختبار تجريبي.\n\n(${grades.length} صف × المواد الفعلية × 3 اختبارات)\n\nهل تريد المتابعة؟`)) return;
+  if (!confirm(`⚠️ سيتم إضافة ${REAL_DEMO_QUIZZES.length} اختبار جاهز كامل (بمحتواه الحقيقي).\n\nهل تريد المتابعة؟`)) return;
   showLoading();
   try {
     let added = 0;
-    for (const grade of grades) {
-      const subjects = getSubjectsForGrade(grade);
-      for (const subj of subjects) {
-        for (let testNum = 0; testNum < 3; testNum++) {
-          const quizId = uid();
-          const quizQuestions = [
-            { type: 'mcq', difficulty: 'easy', text: `سؤال تجريبي ${testNum + 1} في ${subj.name}`, options: ['أ', 'ب', 'ج', 'د'], answer: 0, image: null }
-          ];
-          const quiz = {
-            title: `اختبار تجريبي ${testNum + 1} - ${subj.name} (${grade})`,
-            subject: subj.id, grade: grade, timePerQuestion: 60,
-            questions: quizQuestions, teacherId: currentUser.id, teacherName: currentUser.name,
-            isDemo: true, isPublic: true, approved: true, createdAt: Date.now()
-          };
-          const saved = await dbSetNode('quizzes', quizId, quiz);
-          if (saved) added++;
-        }
-      }
+    for (const quizData of REAL_DEMO_QUIZZES) {
+      const quizId = uid();
+      const quiz = {
+        title: quizData.title,
+        subject: quizData.subject,
+        grade: quizData.grade,
+        timePerQuestion: quizData.timePerQuestion || 60,
+        questions: quizData.questions,
+        teacherId: currentUser.id,
+        teacherName: 'اختبار جاهز',
+        isDemo: true,
+        isPublic: true,
+        approved: true,
+        createdAt: Date.now()
+      };
+      const saved = await dbSetNode('quizzes', quizId, quiz);
+      if (saved) added++;
     }
     launchConfetti(100);
-    alert(`✅ تم إضافة ${added} اختبار تجريبي!`);
+    alert(`✅ تم إضافة ${added} اختبار جاهز بنجاح!`);
     renderAdminPublicQuizzes();
   } catch (e) {
     console.error('seedDemoQuizzes failed:', e);
     alert('فشل: ' + e.message);
-  } finally { 
-    hideLoading(); 
+  } finally {
+    hideLoading();
     const loadingEl = document.getElementById('loadingOverlay');
     if (loadingEl) loadingEl.innerHTML = '<div class="spinner"></div>';
   }
@@ -3606,7 +4343,6 @@ async function wipeDemoQuizzesOnly() {
     renderAdminPublicQuizzes();
   } finally { hideLoading(); }
 }
-
 /* ═══════════════════════════════════════════════════════════
    ADMIN: الإحصائيات
    ═══════════════════════════════════════════════════════════ */
@@ -3792,16 +4528,9 @@ async function wipeAllRewards() {
     let count = 0;
     for (const s of students) {
       await dbUpdateNode('users', s.id, {
-        xp: 0,
-        coins: 0,
-        badges: [],
-        streak: 0,
-        lastQuizDate: null,
-        ownedItems: [],
-        activeFrame: null,
-        activeTitle: null,
-        lastXpAt: null,
-        lastCoinAt: null,
+        xp: 0, coins: 0, badges: [], streak: 0, lastQuizDate: null,
+        ownedItems: [], activeFrame: null, activeTitle: null,
+        lastXpAt: null, lastCoinAt: null,
         pet: { stage: 0, health: 100, lastFeed: Date.now(), totalFed: 0, name: 'صديقي' }
       });
       count++;
@@ -4120,43 +4849,109 @@ async function renderSubjectStats() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ADMIN: الإعلانات + الإعدادات + السجل
+   ✅ ADMIN: الإعلانات — محرر كامل مع التحكم بالمدة
    ═══════════════════════════════════════════════════════════ */
 async function renderAdminAnnouncements() {
   showLoading();
   try {
     const announcements = await DB.get('announcements');
     _cachedAnnouncements = announcements;
+    const now = Date.now();
+    const rotateInterval = platformSettings.announcementRotateInterval || 8;
+    const autoRotate = platformSettings.announcementAutoRotate !== false;
+
+    let cardsHtml = '';
+    if (announcements.length === 0) {
+      cardsHtml = '<div class="card"><div class="empty-state"><div class="empty-state-icon">📢</div><h3>لا إعلانات</h3></div></div>';
+    } else {
+      const sorted = announcements.slice().sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      cardsHtml = sorted.map(function(a) {
+        let status = 'disabled';
+        let statusText = '⏸️ معطل';
+        let statusClass = 'ann-status-disabled';
+        if (a.enabled !== false) {
+          if (a.startDate && a.startDate > now) {
+            status = 'scheduled';
+            statusText = '🕐 مجدول';
+            statusClass = 'ann-status-scheduled';
+          } else if (a.endDate && a.endDate < now) {
+            status = 'expired';
+            statusText = '⏰ منتهي';
+            statusClass = 'ann-status-expired';
+          } else {
+            status = 'active';
+            statusText = '✅ نشط الآن';
+            statusClass = 'ann-status-active';
+          }
+        }
+        const borderColor = status === 'active' ? 'var(--success)' : status === 'expired' ? 'var(--danger)' : status === 'scheduled' ? 'var(--info)' : 'var(--border)';
+        const startText = a.startDate ? '🕐 البدء: ' + new Date(a.startDate).toLocaleString('ar-EG') : '🕐 البدء: فوراً';
+        const endText = a.endDate ? '⏰ الانتهاء: ' + new Date(a.endDate).toLocaleString('ar-EG') : '⏰ الانتهاء: بدون حد';
+        const hasImage = (a.imageUrl || a.imageData) ? '<span class="badge badge-purple">🖼️ صورة</span>' : '';
+        const orderBadge = a.order ? '<span class="badge badge-info">#' + a.order + '</span>' : '';
+        const toggleBtnClass = a.enabled === false ? 'success' : 'warning';
+        const toggleBtnText = a.enabled === false ? '▶️ تفعيل' : '⏸️ تعطيل';
+
+        return '<div class="card" style="border-right:4px solid ' + borderColor + ';">' +
+          '<div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">' +
+          '<span class="ann-status-badge ' + statusClass + '">' + statusText + '</span>' +
+          hasImage + orderBadge +
+          '</div>' +
+          '<h4 style="font-size:16px; font-weight:800; margin-bottom:6px;">' + (a.emoji || '📢') + ' ' + escapeHtml(a.title || '') + '</h4>' +
+          '<p style="font-size:14px; color:var(--text-light); line-height:1.6; margin-bottom:8px;">' + escapeHtml(a.text) + '</p>' +
+          '<div style="display:flex; gap:8px; flex-wrap:wrap; font-size:12px; color:var(--text-light); margin-bottom:12px;">' +
+          '<span>' + startText + '</span>' +
+          '<span>' + endText + '</span>' +
+          '</div>' +
+          '<div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">' +
+          '<button class="btn btn-sm btn-' + toggleBtnClass + '" onclick="toggleAnnouncement(\'' + a.id + '\')">' + toggleBtnText + '</button>' +
+          '<button class="btn btn-sm btn-outline" onclick="openAnnouncementEditor(\'' + a.id + '\')">✏️ تعديل</button>' +
+          '<button class="btn btn-sm btn-danger" onclick="deleteAnnouncement(\'' + a.id + '\')">🗑 حذف</button>' +
+          '</div>' +
+          '</div>';
+      }).join('');
+    }
+
     const container = document.getElementById('dashboardContent');
-    container.innerHTML = `
-      <div class="card" style="background: linear-gradient(135deg, #ec4899, #8b5cf6); color:#fff;">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <span style="font-size:48px;">📢</span>
-          <div><h2 style="font-size:24px; font-weight:900;">الإعلانات</h2><p style="opacity:0.9;">${announcements.length} إعلان</p></div>
-        </div>
-      </div>
-      <button class="btn btn-outline" onclick="renderAdminDashboard()" style="margin-bottom:16px;">← العودة</button>
-      <button class="btn btn-primary btn-full" onclick="openAnnouncementEditor()" style="margin-bottom:16px;">➕ إعلان جديد</button>
-      ${announcements.length === 0 ? `<div class="card"><div class="empty-state"><div class="empty-state-icon">📢</div><h3>لا إعلانات</h3></div></div>` :
-        announcements.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).map(a => {
-          const now = Date.now();
-          const isActive = a.enabled && (!a.startDate || a.startDate <= now) && (!a.endDate || a.endDate >= now);
-          return `<div class="card" style="border-right:4px solid ${isActive ? 'var(--success)' : 'var(--border)'};">
-            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
-              <span class="badge badge-${isActive ? 'success' : 'warning'}">${isActive ? '✅ نشط' : '⏸️ غير نشط'}</span>
-              <span class="badge badge-info">${a.type === 'banner' ? '🎨 بانر' : '📢 شريط'}</span>
-              ${(a.imageUrl || a.imageData) ? '<span class="badge badge-purple">🖼️ صورة</span>' : ''}
-            </div>
-            <h4 style="font-size:16px; font-weight:800; margin-bottom:6px;">${a.emoji || '📢'} ${escapeHtml(a.title || '')}</h4>
-            <p style="font-size:14px; color:var(--text-light); line-height:1.6;">${escapeHtml(a.text)}</p>
-            <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
-              <button class="btn btn-sm btn-${a.enabled ? 'warning' : 'success'}" onclick="toggleAnnouncement('${a.id}')">${a.enabled ? '⏸️ تعطيل' : '▶️ تفعيل'}</button>
-              <button class="btn btn-sm btn-outline" onclick="openAnnouncementEditor('${a.id}')">✏️ تعديل</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteAnnouncement('${a.id}')">🗑 حذف</button>
-            </div>
-          </div>`;
-        }).join('')}
-    `;
+    container.innerHTML =
+      '<div class="card" style="background: linear-gradient(135deg, #ec4899, #8b5cf6); color:#fff;">' +
+      '<div style="display:flex; align-items:center; gap:12px;">' +
+      '<span style="font-size:48px;">📢</span>' +
+      '<div><h2 style="font-size:24px; font-weight:900;">الإعلانات</h2><p style="opacity:0.9;">' + announcements.length + ' إعلان</p></div>' +
+      '</div>' +
+      '</div>' +
+      '<button class="btn btn-outline" onclick="renderAdminDashboard()" style="margin-bottom:16px;">← العودة</button>' +
+      '<div class="alert alert-info" style="margin-bottom:16px;">📌 الإعلانات تظهر في <strong>مكان واحد</strong> أعلى لوحة التحكم، وتتحرك تلقائياً إذا كان هناك أكثر من إعلان. يمكنك التحكم في <strong>مدة البدء والانتهاء</strong> لكل إعلان.</div>' +
+      '<div class="card" style="background: var(--info-light); border: 2px solid var(--info); margin-bottom:16px;">' +
+      '<h3 style="font-size:16px; font-weight:900; color:var(--info); margin-bottom:12px;">⚙️ إعدادات العرض</h3>' +
+      '<label class="checkbox-label" style="display:flex; justify-content:space-between; padding:10px; background:var(--card); border-radius:10px; margin-bottom:10px;">' +
+      '<span>🔄 تدوير تلقائي بين الإعلانات</span>' +
+      '<input type="checkbox" id="annAutoRotate" ' + (autoRotate ? 'checked' : '') + '>' +
+      '</label>' +
+      '<div class="form-group">' +
+      '<label class="form-label">⏱️ مدة عرض كل إعلان (ثانية)</label>' +
+      '<input type="number" class="form-input" id="annRotateInterval" value="' + rotateInterval + '" min="3" max="60">' +
+      '<p style="font-size:11px; color:var(--text-light); margin-top:4px;">من 3 إلى 60 ثانية — الافتراضي: 8</p>' +
+      '</div>' +
+      '<button class="btn btn-success btn-full" onclick="saveAnnouncementSettings()">💾 حفظ إعدادات العرض</button>' +
+      '</div>' +
+      '<button class="btn btn-primary btn-full" onclick="openAnnouncementEditor()" style="margin-bottom:16px;">➕ إعلان جديد</button>' +
+      cardsHtml;
+  } finally {
+    hideLoading();
+  }
+}
+async function saveAnnouncementSettings() {
+  platformSettings.announcementAutoRotate = document.getElementById('annAutoRotate').checked;
+  const interval = parseInt(document.getElementById('annRotateInterval').value) || 8;
+  platformSettings.announcementRotateInterval = Math.max(3, Math.min(60, interval));
+  showLoading();
+  try {
+    await savePlatformSettings();
+    await logActivity('تعديل إعدادات الإعلانات', `التدوير: ${platformSettings.announcementAutoRotate ? 'نعم' : 'لا'} • المدة: ${platformSettings.announcementRotateInterval}ث`);
+    renderAnnouncementEverywhere();
+    launchConfetti(20);
+    alert('✅ تم حفظ إعدادات العرض');
   } finally { hideLoading(); }
 }
 
@@ -4164,37 +4959,103 @@ async function openAnnouncementEditor(id = null) {
   const announcements = await DB.get('announcements');
   const a = id ? announcements.find(x => x.id === id) : null;
   _tempAnnImage = a?.imageData || null;
-  openModal(`<div class="modal-header"><h3 class="modal-title">${a ? '✏️ تعديل' : '➕ إعلان جديد'}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-    <div class="form-group"><label class="form-label">الإيموجي</label><input type="text" class="form-input" id="annEmoji" value="${escapeHtml(a?.emoji || '📢')}" maxlength="4" style="text-align:center;font-size:24px;"></div>
-    <div class="form-group"><label class="form-label">العنوان</label><input type="text" class="form-input auto-dir" id="annTitle" value="${escapeHtml(a?.title || '')}" dir="rtl"></div>
-    <div class="form-group"><label class="form-label">النص *</label><textarea class="form-textarea auto-dir" id="annText" dir="rtl">${escapeHtml(a?.text || '')}</textarea></div>
-    <div class="form-group"><label class="form-label">نص الرابط</label><input type="text" class="form-input auto-dir" id="annLinkText" value="${escapeHtml(a?.linkText || 'اعرف أكثر')}" dir="rtl"></div>
-    <div class="form-group"><label class="form-label">الرابط</label><input type="url" class="form-input" id="annLink" value="${escapeHtml(a?.link || '')}" dir="ltr"></div>
-    <div class="form-group">
-      <label class="form-label">🖼️ صورة الإعلان (اختياري)</label>
-      <input type="file" class="form-input" id="annImageFile" accept="image/*" onchange="handleAnnouncementImage(event)">
-      <p style="font-size:11px;color:var(--text-light);margin-top:4px;">💡 الحد الأقصى: 2MB • الأبعاد المثالية: 1200×400</p>
-      <div id="annImagePreview" style="margin-top:10px;">
-        ${(_tempAnnImage || a?.imageUrl) ? `<img src="${_tempAnnImage || a?.imageUrl}" class="ann-image-preview"><button class="btn btn-sm btn-danger" onclick="clearAnnouncementImage()" style="margin-top:8px;">🗑 حذف الصورة</button>` : ''}
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">أو رابط صورة مباشر</label>
-      <input type="url" class="form-input" id="annImageUrl" value="${escapeHtml(a?.imageUrl || '')}" placeholder="https://example.com/image.jpg" dir="ltr">
-    </div>
-    <div class="form-group">
-      <label class="form-label">ترتيب العرض</label>
-      <input type="number" class="form-input" id="annOrder" value="${a?.order || 0}" min="0" max="100">
-    </div>
-    <div class="form-group">
-      <label class="form-label">لون البداية</label>
-      <input type="color" class="form-input" id="annBgColor" value="${a?.bgColor || '#4f46e5'}" style="height:50px;padding:4px;">
-    </div>
-    <div class="form-group">
-      <label class="form-label">لون النهاية</label>
-      <input type="color" class="form-input" id="annBgColorEnd" value="${a?.bgColorEnd || '#8b5cf6'}" style="height:50px;padding:4px;">
-    </div>
-    <button class="btn btn-success btn-full btn-lg" onclick="saveAnnouncement('${id || ''}')">💾 حفظ</button>`);
+
+  // ✅ دالة تحويل التاريخ لصيغة datetime-local الصحيحة
+  const toLocalDatetime = (ts) => {
+    if (!ts) return '';
+    const d = new Date(ts);
+    if (isNaN(d.getTime())) return '';
+    const pad = (n) => String(n).padStart(2, '0');
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  };
+
+  const startVal = toLocalDatetime(a?.startDate);
+  const endVal = toLocalDatetime(a?.endDate);
+  const emojiVal = escapeHtml(a?.emoji || '📢');
+  const titleVal = escapeHtml(a?.title || '');
+  const textVal = escapeHtml(a?.text || '');
+  const linkTextVal = escapeHtml(a?.linkText || 'اعرف أكثر');
+  const linkVal = escapeHtml(a?.link || '');
+  const imageUrlVal = escapeHtml(a?.imageUrl || '');
+  const orderVal = (a?.order !== undefined && a?.order !== null) ? a.order : 0;
+  const bgColorVal = (a?.bgColor && /^#[0-9A-Fa-f]{6}$/.test(a.bgColor)) ? a.bgColor : '#4f46e5';
+  const bgColorEndVal = (a?.bgColorEnd && /^#[0-9A-Fa-f]{6}$/.test(a.bgColorEnd)) ? a.bgColorEnd : '#8b5cf6';
+
+  const existingImage = _tempAnnImage || a?.imageUrl || '';
+  const imagePreviewHtml = existingImage
+    ? '<img src="' + existingImage + '" class="ann-image-preview"><button class="btn btn-sm btn-danger" onclick="clearAnnouncementImage()" style="margin-top:8px;">🗑 حذف الصورة</button>'
+    : '';
+
+  const html = [
+    '<div class="modal-header"><h3 class="modal-title">' + (a ? '✏️ تعديل إعلان' : '➕ إعلان جديد') + '</h3><button class="modal-close" onclick="closeModal()">✕</button></div>',
+    '<div class="ann-section-title">📝 المحتوى</div>',
+    '<div class="form-group"><label class="form-label">الإيموجي</label><input type="text" class="form-input" id="annEmoji" value="' + emojiVal + '" maxlength="4" style="text-align:center;font-size:24px;"></div>',
+    '<div class="form-group"><label class="form-label">العنوان</label><input type="text" class="form-input auto-dir" id="annTitle" value="' + titleVal + '" dir="rtl"></div>',
+    '<div class="form-group"><label class="form-label">النص *</label><textarea class="form-textarea auto-dir" id="annText" dir="rtl">' + textVal + '</textarea></div>',
+    '<div class="form-group"><label class="form-label">نص الرابط</label><input type="text" class="form-input auto-dir" id="annLinkText" value="' + linkTextVal + '" dir="rtl"></div>',
+    '<div class="form-group"><label class="form-label">الرابط</label><input type="url" class="form-input" id="annLink" value="' + linkVal + '" dir="ltr"></div>',
+    '<div class="ann-section-title">🖼️ الصورة (اختياري)</div>',
+    '<div class="form-group">',
+    '<label class="form-label">رفع صورة</label>',
+    '<input type="file" class="form-input" id="annImageFile" accept="image/*" onchange="handleAnnouncementImage(event)">',
+    '<p style="font-size:11px;color:var(--text-light);margin-top:4px;">💡 الحد الأقصى: 2MB • الأبعاد المثالية: 1200×400</p>',
+    '<div id="annImagePreview" style="margin-top:10px;">' + imagePreviewHtml + '</div>',
+    '</div>',
+    '<div class="form-group"><label class="form-label">أو رابط صورة مباشر</label><input type="url" class="form-input" id="annImageUrl" value="' + imageUrlVal + '" placeholder="https://example.com/image.jpg" dir="ltr"></div>',
+    '<div class="ann-section-title">🎨 الألوان (إذا لم توجد صورة)</div>',
+    '<div class="ann-schedule-grid" style="margin-bottom:16px;">',
+    '<div class="form-group"><label class="form-label">لون البداية</label><input type="color" class="form-input" id="annBgColor" value="' + bgColorVal + '" style="height:50px;padding:4px;"></div>',
+    '<div class="form-group"><label class="form-label">لون النهاية</label><input type="color" class="form-input" id="annBgColorEnd" value="' + bgColorEndVal + '" style="height:50px;padding:4px;"></div>',
+    '</div>',
+    '<div class="ann-section-title">⏰ التحكم في المدة (متى يبدأ / متى ينتهي)</div>',
+    '<div class="ann-duration-note">💡 اترك الحقول فارغة إذا أردت أن يظهر الإعلان فوراً وبدون تاريخ انتهاء.</div>',
+    '<div class="ann-schedule-grid">',
+    '<div class="form-group">',
+    '<label class="form-label">🕐 تاريخ ووقت البدء</label>',
+    '<input type="datetime-local" class="form-input" id="annStartDate" value="' + startVal + '">',
+    '<div class="duration-preset-row">',
+    '<button type="button" class="duration-preset" onclick="setAnnPreset(\'start\', \'now\')">الآن</button>',
+    '<button type="button" class="duration-preset" onclick="setAnnPreset(\'start\', \'tomorrow\')">غداً</button>',
+    '<button type="button" class="duration-preset" onclick="setAnnPreset(\'start\', \'clear\')">مسح</button>',
+    '</div>',
+    '</div>',
+    '<div class="form-group">',
+    '<label class="form-label">⏰ تاريخ ووقت الانتهاء</label>',
+    '<input type="datetime-local" class="form-input" id="annEndDate" value="' + endVal + '">',
+    '<div class="duration-preset-row">',
+    '<button type="button" class="duration-preset" onclick="setAnnPreset(\'end\', \'1h\')">+ساعة</button>',
+    '<button type="button" class="duration-preset" onclick="setAnnPreset(\'end\', \'1d\')">+يوم</button>',
+    '<button type="button" class="duration-preset" onclick="setAnnPreset(\'end\', \'1w\')">+أسبوع</button>',
+    '<button type="button" class="duration-preset" onclick="setAnnPreset(\'end\', \'clear\')">مسح</button>',
+    '</div>',
+    '</div>',
+    '</div>',
+    '<div class="form-group" style="margin-top:12px;"><label class="form-label">ترتيب العرض (الأصغر يظهر أولاً)</label><input type="number" class="form-input" id="annOrder" value="' + orderVal + '" min="0" max="100"></div>',
+    '<button class="btn btn-success btn-full btn-lg" onclick="saveAnnouncement(\'' + (id || '') + '\')" style="margin-top:16px;">💾 حفظ الإعلان</button>'
+  ].join('');
+
+  openModal(html);
+}
+
+function setAnnPreset(field, preset) {
+  const inputId = field === 'start' ? 'annStartDate' : 'annEndDate';
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const pad = (n) => String(n).padStart(2, '0');
+  const toLocal = (d) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+  if (preset === 'clear') { input.value = ''; return; }
+  if (preset === 'now') { input.value = toLocal(new Date()); return; }
+  if (preset === 'tomorrow') {
+    const d = new Date(); d.setDate(d.getDate() + 1); d.setHours(0, 0, 0, 0);
+    input.value = toLocal(d); return;
+  }
+  const now = new Date();
+  let end;
+  if (preset === '1h') end = new Date(now.getTime() + 60 * 60 * 1000);
+  else if (preset === '1d') end = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  else if (preset === '1w') end = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  if (end) input.value = toLocal(end);
 }
 
 async function handleAnnouncementImage(e) {
@@ -4237,10 +5098,25 @@ async function saveAnnouncement(id) {
   const order = parseInt(document.getElementById('annOrder').value) || 0;
   const bgColor = document.getElementById('annBgColor').value;
   const bgColorEnd = document.getElementById('annBgColorEnd').value;
+
+  const startDateRaw = document.getElementById('annStartDate').value;
+  const endDateRaw = document.getElementById('annEndDate').value;
+  const startDate = startDateRaw ? new Date(startDateRaw).getTime() : null;
+  const endDate = endDateRaw ? new Date(endDateRaw).getTime() : null;
+
   if (!text) { alert('أدخل نص الإعلان'); return; }
+  if (startDate && endDate && endDate <= startDate) {
+    alert('⚠️ تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء');
+    return;
+  }
+  if (endDate && endDate < Date.now()) {
+    alert('⚠️ تاريخ الانتهاء في الماضي — الإعلان لن يظهر');
+  }
+
   const imageData = _tempAnnImage;
   const useUploadedImage = !!imageData;
   const hasAnyImage = useUploadedImage || !!imageUrl;
+
   showLoading();
   try {
     const dataToSave = {
@@ -4249,6 +5125,8 @@ async function saveAnnouncement(id) {
       imageData: useUploadedImage ? imageData : null,
       imageUrl: imageUrl || null,
       hasImage: hasAnyImage,
+      startDate: startDate || null,
+      endDate: endDate || null,
       updatedAt: Date.now()
     };
     if (id) {
@@ -4282,7 +5160,7 @@ async function toggleAnnouncement(id) {
     const announcements = await DB.get('announcements');
     const idx = announcements.findIndex(a => a.id === id);
     if (idx >= 0) {
-      await dbUpdateNode('announcements', id, { enabled: !announcements[idx].enabled });
+      await dbUpdateNode('announcements', id, { enabled: announcements[idx].enabled === false ? true : false });
       _cachedAnnouncements = await DB.get('announcements');
       stopAllAnnouncementTimers();
       renderAnnouncementEverywhere();
@@ -4304,6 +5182,9 @@ async function deleteAnnouncement(id) {
   } finally { hideLoading(); }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   ADMIN: الإعدادات + السجل + الشامل
+   ═══════════════════════════════════════════════════════════ */
 async function renderAdminSettings() {
   showLoading();
   try {
@@ -5111,7 +5992,7 @@ async function renderTeachersForParent() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   STUDENT DASHBOARD (مع الحيوان الأليف + التحليل + المسارات)
+   STUDENT DASHBOARD (كامل)
    ═══════════════════════════════════════════════════════════ */
 async function renderStudentDashboard() {
   showLoading();
@@ -5329,6 +6210,7 @@ async function renderAnsweredScreen(filterTab = 'all') {
     `;
   } finally { hideLoading(); }
 }
+
 /* ═══════════════════════════════════════════════════════════
    المتجر + الشهادات + التحليلات + المسابقات
    ═══════════════════════════════════════════════════════════ */
@@ -5624,6 +6506,7 @@ async function startQuizWithTournament(quiz, tournament) {
     renderCurrentQuestion();
   } finally { hideLoading(); }
 }
+
 async function renderParentDashboard() {
   showLoading();
   try {
@@ -5753,7 +6636,6 @@ async function openChildDetails(childId) {
   } finally { hideLoading(); }
 }
 
-/* ✅ تقرير ولي الأمر الشهري PDF */
 async function exportChildReportPDF(childId) {
   showLoading();
   try {
@@ -6119,7 +7001,7 @@ async function deleteQuiz(quizId) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   QUIZ TAKING مع الصعوبة المتغيرة (Adaptive)
+   QUIZ TAKING
    ═══════════════════════════════════════════════════════════ */
 async function startQuiz(quizId) {
   showLoading();
@@ -6503,7 +7385,10 @@ const globalFns = [
   calculateCoinsForAttempt, calculateXPForAttempt,
   launchConfetti, showLoading, hideLoading,
   getTodayKey,
-  handleAnnouncementImage, clearAnnouncementImage, nextAnnouncement, stopAllAnnouncementTimers,
+  handleAnnouncementImage, clearAnnouncementImage, nextAnnouncement, goToAnnouncement, 
+  stopAllAnnouncementTimers,
+  renderAnnouncementEverywhere, getActiveAnnouncementsList,
+  saveAnnouncementSettings, setAnnPreset,
   wipeStudentRewards, wipeAllRewards
 ];
 
