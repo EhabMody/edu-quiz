@@ -1021,6 +1021,15 @@ async function initFirebase() {
 
 async function dbSetNode(key, nodeId, data) {
   if (!key || !nodeId) { console.error('dbSetNode: key and nodeId required'); return false; }
+  
+  // ✅ التحقق من أن البيانات صالحة للـ JSON
+  try {
+    JSON.stringify(data);
+  } catch (e) {
+    console.error('❌ dbSetNode: data is not JSON-serializable:', e);
+    return false;
+  }
+  
   try {
     const d = localStorage.getItem('edu_' + key);
     const arr = d ? JSON.parse(d) : [];
@@ -1030,6 +1039,7 @@ async function dbSetNode(key, nodeId, data) {
     else arr.push(newItem);
     localStorage.setItem('edu_' + key, JSON.stringify(arr));
   } catch (e) { console.warn('localStorage write failed:', e); }
+  
   if (firebaseEnabled && fbDB) {
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
@@ -1038,6 +1048,11 @@ async function dbSetNode(key, nodeId, data) {
         return true;
       } catch (e) {
         console.error(`❌ Firebase set(${key}/${nodeId}) attempt ${attempt} failed:`, e.message, e.code);
+        if (attempt === 3) {
+          console.error('💡 تحقق من: 1) قواعد الأمان في Firebase Console → Realtime Database → Rules');
+          console.error('💡 2) المصادقة (auth.currentUser)');
+          console.error('💡 3) صحة مسار البيانات');
+        }
         await new Promise(r => setTimeout(r, 500 * attempt));
       }
     }
@@ -2275,11 +2290,31 @@ async function openNotifications() {
 }
 
 async function notifyStudents(quiz) {
-  const users = await DB.get('users');
-  const students = users.filter(u => u.role === 'student' && u.grade === quiz.grade);
-  for (const s of students) {
-    const notifId = uid();
-    await dbSetNode('notifications', notifId, { userId: s.id, title: 'اختبار جديد', body: `تم إضافة "${quiz.title}"`, createdAt: Date.now(), read: false });
+  if (!quiz || !quiz.grade) return;
+  try {
+    const users = await DB.get('users');
+    const students = users.filter(u => u.role === 'student' && u.grade === quiz.grade);
+    if (students.length === 0) return;
+    let sentCount = 0;
+    for (const s of students) {
+      try {
+        const notifId = uid();
+        const saved = await dbSetNode('notifications', notifId, { 
+          userId: s.id, 
+          title: 'اختبار جديد', 
+          body: `تم إضافة "${quiz.title}"`,
+          createdAt: Date.now(), 
+          read: false 
+        });
+        if (saved) sentCount++;
+      } catch (e) {
+        console.warn(`⚠️ Could not notify student ${s.id}:`, e.message);
+      }
+    }
+    console.log(`📢 Sent ${sentCount}/${students.length} notifications`);
+  } catch (e) {
+    console.error('❌ notifyStudents error:', e);
+    // لا نرفع الخطأ — الحفظ نجح بالفعل
   }
 }
 
@@ -5249,19 +5284,49 @@ async function openChildDetails(childId) {
 
 function openNewQuizModal() {
   editingQuizId = null;
-  newQuizData = { title: '', grade: '', subject: currentUser.subject, timePerQuestion: 30, questions: [] };
+  const isAdm = isAdmin(currentUser);
+  const defaultSubject = isAdm ? '' : (currentUser.subject || '');
+  newQuizData = { title: '', grade: '', subject: defaultSubject, timePerQuestion: 30, questions: [] };
+  const subjectField = isAdm ? `
+    <div class="form-group">
+      <label class="form-label">المادة *</label>
+      <select class="form-select" id="quizSubject" required>
+        <option value="">اختر المادة</option>
+        ${SUBJECTS.map(s => `<option value="${s.id}">${s.emoji} ${s.name}</option>`).join('')}
+      </select>
+    </div>
+  ` : '';
   openModal(`<div class="modal-header"><h3 class="modal-title">اختبار جديد</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
     <div class="form-group"><label class="form-label">العنوان</label><input type="text" class="form-input auto-dir" id="quizTitle" dir="rtl"></div>
+    ${subjectField}
     <div class="form-group"><label class="form-label">السنة</label><select class="form-select" id="quizGrade"><option value="">اختر</option>${Object.entries(STAGES).map(([s, gs]) => gs.map(g => `<option value="${g}">${g}</option>`).join('')).join('')}</select></div>
     <div class="form-group"><label class="form-label">⏱️ وقت كل سؤال (ث)</label><input type="number" class="form-input" id="quizTime" value="30" min="5" max="600"></div>
+    <div class="form-group">
+      <label class="checkbox-label" style="display:flex;align-items:center;gap:8px;">
+        <input type="checkbox" id="quizIsPublic" ${isAdm ? 'checked' : ''}>
+        <span>اختبار عام (يظهر لكل الطلاب)</span>
+      </label>
+    </div>
     <button class="btn btn-primary btn-full" onclick="continueToQuestions()">التالي</button>`);
 }
 function continueToQuestions() {
   const title = document.getElementById('quizTitle').value.trim();
   const grade = document.getElementById('quizGrade').value;
   const time = parseInt(document.getElementById('quizTime').value) || 30;
-  if (!title || !grade) { alert('أكمل'); return; }
-  newQuizData.title = title; newQuizData.grade = grade; newQuizData.timePerQuestion = time;
+  const subjectField = document.getElementById('quizSubject');
+  const subject = subjectField ? subjectField.value : (currentUser.subject || newQuizData.subject);
+  const isPublic = document.getElementById('quizIsPublic')?.checked || false;
+  
+  if (!title) { alert('أدخل عنوان الاختبار'); return; }
+  if (!grade) { alert('اختر السنة'); return; }
+  if (!subject) { alert('اختر المادة'); return; }
+  if (isNaN(time) || time < 5 || time > 600) { alert('وقت السؤال يجب أن يكون بين 5 و 600 ثانية'); return; }
+  
+  newQuizData.title = title;
+  newQuizData.grade = grade;
+  newQuizData.subject = subject;
+  newQuizData.timePerQuestion = time;
+  newQuizData.isPublic = isPublic;
   showQuestionsEditor();
 }
 function showQuestionsEditor() {
@@ -5347,30 +5412,114 @@ function addQuestion() {
 }
 function removeQuestion(i) { newQuizData.questions.splice(i, 1); showQuestionsEditor(); }
 async function saveQuiz() {
-  if (!newQuizData.questions.length) return;
+  if (!newQuizData || !newQuizData.questions || newQuizData.questions.length === 0) {
+    alert('أضف سؤالاً واحداً على الأقل');
+    return;
+  }
+  
+  // ✅ التحقق من البيانات الأساسية
+  if (!newQuizData.title || !newQuizData.title.trim()) { alert('أدخل عنوان الاختبار'); return; }
+  if (!newQuizData.grade) { alert('اختر السنة'); return; }
+  if (!newQuizData.subject) { alert('اختر المادة'); return; }
+  const time = parseInt(newQuizData.timePerQuestion);
+  if (isNaN(time) || time < 5 || time > 600) { alert('وقت السؤال غير صالح (5-600 ثانية)'); return; }
+  
+  // ✅ التحقق من صحة كل سؤال
+  for (let i = 0; i < newQuizData.questions.length; i++) {
+    const q = newQuizData.questions[i];
+    if (!q.text || !q.text.trim()) { alert(`السؤال رقم ${i+1} بدون نص`); return; }
+    if (q.type === 'mcq') {
+      if (!q.options || q.options.length < 2) { alert(`السؤال ${i+1}: يحتاج خيارين على الأقل`); return; }
+      if (typeof q.answer !== 'number' || q.answer < 0 || q.answer >= q.options.length) { 
+        alert(`السؤال ${i+1}: الإجابة الصحيحة غير محددة`); 
+        return; 
+      }
+    }
+    if (q.type === 'fill' && (!q.answer || !q.answer.trim())) { 
+      alert(`السؤال ${i+1}: أدخل الإجابة`); 
+      return; 
+    }
+  }
+  
   showLoading();
   try {
     if (editingQuizId) {
-      const updates = { title: newQuizData.title, grade: newQuizData.grade, timePerQuestion: newQuizData.timePerQuestion, questions: newQuizData.questions, updatedAt: Date.now() };
-      await dbUpdateNode('quizzes', editingQuizId, updates);
+      const updates = { 
+        title: newQuizData.title.trim(), 
+        grade: newQuizData.grade, 
+        subject: newQuizData.subject,
+        timePerQuestion: time, 
+        questions: newQuizData.questions, 
+        updatedAt: Date.now() 
+      };
+      const saved = await dbUpdateNode('quizzes', editingQuizId, updates);
+      if (!saved) { 
+        alert('⚠️ فشل حفظ التعديلات. تحقق من قواعد الأمان (Rules) في Firebase Console.'); 
+        console.error('❌ Save quiz failed: dbUpdateNode returned false');
+        return; 
+      }
       await logActivity('تعديل اختبار', newQuizData.title);
+      alert('✅ تم حفظ التعديلات بنجاح');
     } else {
       const quizId = uid();
       const quiz = { 
-        teacherId: currentUser.id, teacherName: currentUser.name,
-        title: newQuizData.title, subject: newQuizData.subject, grade: newQuizData.grade, 
-        timePerQuestion: newQuizData.timePerQuestion, questions: newQuizData.questions, 
-        createdAt: Date.now(), approved: true
+        teacherId: currentUser.id, 
+        teacherName: currentUser.name || 'غير معروف',
+        title: newQuizData.title.trim(), 
+        subject: newQuizData.subject, 
+        grade: newQuizData.grade, 
+        timePerQuestion: time, 
+        questions: newQuizData.questions, 
+        createdAt: Date.now(), 
+        approved: true,
+        isPublic: newQuizData.isPublic || false,
+        isDemo: false
       };
+      
+      console.log('💾 Saving quiz:', quizId, quiz.title);
       const saved = await dbSetNode('quizzes', quizId, quiz);
-      if (!saved) { alert('فشل'); return; }
-      await notifyStudents({ ...quiz, id: quizId });
+      
+      if (!saved) { 
+        alert('⚠️ فشل حفظ الاختبار. تحقق من:\n1. قواعد الأمان في Firebase (Rules)\n2. اتصال الإنترنت\n3. Console (F12) للأخطاء'); 
+        console.error('❌ Save quiz failed: dbSetNode returned false');
+        return; 
+      }
+      
+      // ✅ التحقق من أن الاختبار حُفظ فعلاً
+      const verifyQuizzes = await DB.get('quizzes');
+      const verified = verifyQuizzes.find(q => q.id === quizId);
+      if (!verified) {
+        console.warn('⚠️ Quiz not found after save, may be sync issue');
+      } else {
+        console.log('✅ Quiz verified in DB:', quizId);
+      }
+      
+      // ✅ إرسال الإشعارات داخل try/catch منفصل حتى لا تُفشل الحفظ
+      try {
+        await notifyStudents({ ...quiz, id: quizId });
+      } catch (notifErr) {
+        console.warn('⚠️ Failed to send notifications (quiz still saved):', notifErr);
+      }
+      
       await logActivity('إنشاء اختبار', newQuizData.title);
+      alert('✅ تم إنشاء الاختبار بنجاح');
     }
-    editingQuizId = null; newQuizData = null;
+    
+    editingQuizId = null; 
+    newQuizData = null;
     closeModal();
-    renderTeacherDashboard();
-  } finally { hideLoading(); }
+    
+    if (isAdmin(currentUser)) {
+      renderAdminDashboard();
+    } else {
+      renderTeacherDashboard();
+    }
+  } catch (err) {
+    console.error('❌ saveQuiz error:', err);
+    alert('❌ خطأ غير متوقع: ' + (err.message || 'حاول مرة أخرى'));
+  } finally { 
+    hideLoading(); 
+  }
 }
 async function openQuizManage(quizId) {
   showLoading();
