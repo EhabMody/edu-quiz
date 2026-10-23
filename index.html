@@ -435,27 +435,94 @@
   .daily-quest-reward { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; background: rgba(255,255,255,0.25); border-radius: 999px; font-size: 12px; font-weight: 800; }
   
   /* ═══════════════════════════════════════════════════════════
-     ✅ نظام الإعلانات المبسط - نافذة واحدة كبيرة متحركة فقط
+     ✅ جديد: لوحة الطالب المعرض للخطر
      ═══════════════════════════════════════════════════════════ */
-  .announcements-carousel { position: relative; overflow: hidden; border-radius: 0; margin-bottom: 0; }
-  .announcement-slide { display: none; animation: slideFadeIn 0.6s ease; }
-  .announcement-slide.active { display: block; }
-  @keyframes slideFadeIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-  .announcement-banner.with-image { position: relative; min-height: 320px; background-size: cover; background-position: center; background-repeat: no-repeat; color: #fff; display: flex; align-items: center; justify-content: center; padding: 40px 20px; overflow: hidden; }
-  .announcement-banner.with-image::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0,0,0,0.55), rgba(0,0,0,0.35)); z-index: 1; }
-  .announcement-banner.with-image .announcement-banner-inner { position: relative; z-index: 2; }
-  .announcement-banner.close-btn-visible { padding-top: 40px; }
-  .ann-image-preview { max-width: 100%; max-height: 150px; border-radius: 10px; margin-top: 10px; border: 2px solid var(--border); }
+  .at-risk-card {
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    border: 2px solid var(--danger);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  body.dark-mode .at-risk-card { background: linear-gradient(135deg, #450a0a, #7f1d1d); }
+  .at-risk-title { font-size: 18px; font-weight: 900; color: var(--danger); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .at-risk-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 16px; background: var(--card); border-radius: 12px;
+    margin-bottom: 8px; flex-wrap: wrap; gap: 8px;
+  }
+  .at-risk-item-info h4 { font-size: 14px; font-weight: 800; margin-bottom: 2px; }
+  .at-risk-item-info p { font-size: 12px; color: var(--text-light); }
+  .at-risk-reasons { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+  .at-risk-reason { padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; }
+  .at-risk-reason.declining { background: var(--danger-light); color: var(--danger); }
+  .at-risk-reason.inactive { background: var(--warning-light); color: var(--warning); }
+  .at-risk-reason.struggling { background: var(--info-light); color: var(--info); }
   
-  /* حاوية الإعلانات الموحدة في كل الشاشات - مخفية افتراضياً، تظهر فقط عند وجود إعلانات */
-  .global-announcement-container { 
-    position: relative;
-    z-index: 999;
-    width: 100%;
+  /* ═══════════════════════════════════════════════════════════
+     ✅ جديد: الحيوان الأليف
+     ═══════════════════════════════════════════════════════════ */
+  .pet-card {
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    border: 2px solid var(--success);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
   }
-  .global-announcement-container:empty {
-    display: none;
+  body.dark-mode .pet-card { background: linear-gradient(135deg, #064e3b, #065f46); }
+  .pet-emoji { font-size: 72px; margin-bottom: 8px; transition: transform 0.3s; }
+  .pet-emoji:hover { transform: scale(1.1); }
+  .pet-name { font-size: 18px; font-weight: 900; color: var(--success); margin-bottom: 4px; }
+  .pet-level { font-size: 13px; color: var(--text-light); font-weight: 600; margin-bottom: 12px; }
+  .pet-bar { height: 12px; background: var(--border); border-radius: 999px; overflow: hidden; margin-bottom: 8px; }
+  .pet-bar-fill { height: 100%; background: linear-gradient(90deg, #10b981, #34d399); transition: width 0.6s; border-radius: 999px; }
+  .pet-health { font-size: 12px; color: var(--text-light); font-weight: 600; }
+  .pet-sad { animation: petSad 2s infinite; }
+  @keyframes petSad { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
+  
+  /* ═══════════════════════════════════════════════════════════
+     ✅ جديد: مسارات التعلم الذكية
+     ═══════════════════════════════════════════════════════════ */
+  .learning-path-card {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border: 2px solid var(--info);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
   }
+  body.dark-mode .learning-path-card { background: linear-gradient(135deg, #1e3a8a, #1e40af); }
+  .learning-path-title { font-size: 16px; font-weight: 900; color: var(--info); margin-bottom: 12px; }
+  .learning-path-step {
+    display: flex; align-items: center; gap: 12px; padding: 12px;
+    background: var(--card); border-radius: 12px; margin-bottom: 8px;
+  }
+  .learning-path-number {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--info); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; flex-shrink: 0;
+  }
+  .learning-path-content { flex: 1; }
+  .learning-path-content h4 { font-size: 14px; font-weight: 800; margin-bottom: 2px; }
+  .learning-path-content p { font-size: 12px; color: var(--text-light); }
+  
+  /* ═══════════════════════════════════════════════════════════
+     ✅ جديد: إشعارات سلوكية
+     ═══════════════════════════════════════════════════════════ */
+  .behavioral-notif {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-right: 4px solid var(--warning);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  body.dark-mode .behavioral-notif { background: linear-gradient(135deg, #78350f, #92400e); }
+  .behavioral-notif-icon { font-size: 32px; flex-shrink: 0; }
+  .behavioral-notif-text { flex: 1; font-size: 14px; font-weight: 700; }
   
   @media (max-width: 600px) {
     .card { padding: 20px; } .auth-wrapper { margin: 20px auto; }
@@ -477,7 +544,6 @@
 <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
 <div class="confetti-container" id="confettiContainer"></div>
 
-<!-- ✅ حاوية الإعلانات الموحدة - تظهر في كل الشاشات -->
 <div id="globalAnnouncementContainer" class="global-announcement-container"></div>
 
 <section id="authScreen" class="screen active">
@@ -565,7 +631,7 @@
             <label class="form-label">اسم المدرسة <span style="color:var(--danger)">*</span></label>
             <input type="text" class="form-input auto-dir" id="regSchool" placeholder="اكتب اسم مدرستك" dir="rtl" style="text-align:right;">
           </div>
-          <div class="form-group"><label class="form-label">المرحلة</label><select class="form-select" id="regStage"><option value="">اختر</option><option value="ابتدائي">ابتدائي</option><option value="إعدادي">إعدادي</option><option value="ثانوي">ثانوي</option></select></div>
+          <div class="form-group"><label class="form-label">المرحلة</label><select class="form-select" id="regStage"><option value="">اختر المرحلة</option></select></div>
           <div class="form-group"><label class="form-label">السنة</label><select class="form-select" id="regGrade"><option value="">اختر</option></select></div>
           <div style="padding:12px;background:var(--info-light);border-radius:12px;margin-bottom:16px;">
             <p style="font-size:13px;font-weight:700;color:var(--info);margin-bottom:10px;">👨‍👩‍👦 بيانات ولي الأمر</p>
@@ -658,7 +724,7 @@
 
 <script>
 /* ═══════════════════════════════════════════════════════════
-   الجزء 1: الإعدادات والثوابت
+   الجزء 1: الإعدادات والثوابت (المحدثة)
    ═══════════════════════════════════════════════════════════ */
 
 const firebaseConfig = {
@@ -691,6 +757,7 @@ let editingQuizId = null;
 let currentUserTab = 'students';
 let currentTournament = null;
 let _adminUsersUnsub = null;
+let currentQuizDifficulty = 'medium';
 
 const PAGE_SIZE = 20;
 let paginationState = {
@@ -708,29 +775,88 @@ const THEMES = {
 };
 
 const STAGES = {
-  "ابتدائي": ["الصف الأول الابتدائي","الصف الثاني الابتدائي","الصف الثالث الابتدائي","الصف الرابع الابتدائي","الصف الخامس الابتدائي","الصف السادس الابتدائي"],
-  "إعدادي": ["الصف الأول الإعدادي","الصف الثاني الإعدادي","الصف الثالث الإعدادي"],
-  "ثانوي": ["الصف الأول الثانوي","الصف الثاني الثانوي","الصف الثالث الثانوي"]
+  "رياض أطفال": ["KG1", "KG2"],
+  "ابتدائي": [
+    "الصف الأول الابتدائي", "الصف الثاني الابتدائي", "الصف الثالث الابتدائي",
+    "الصف الرابع الابتدائي", "الصف الخامس الابتدائي", "الصف السادس الابتدائي"
+  ],
+  "إعدادي": ["الصف الأول الإعدادي", "الصف الثاني الإعدادي", "الصف الثالث الإعدادي"],
+  "ثانوي": ["الصف الأول الثانوي", "الصف الثاني الثانوي", "الصف الثالث الثانوي"],
+  "فني": ["الصف الأول الفني", "الصف الثاني الفني", "الصف الثالث الفني"],
+  "أزهري": ["أزهري ابتدائي", "أزهري إعدادي", "أزهري ثانوي"]
 };
 
 const SUBJECTS = [
-  {id:"arabic",name:"اللغة العربية",emoji:"📖"},
-  {id:"english",name:"اللغة الإنجليزية",emoji:"🔤"},
-  {id:"math",name:"الرياضيات",emoji:"🔢"},
-  {id:"science",name:"العلوم",emoji:"🔬"},
-  {id:"social",name:"الدراسات الاجتماعية",emoji:"🌍"},
-  {id:"physics",name:"الفيزياء",emoji:"⚛️"},
-  {id:"chemistry",name:"الكيمياء",emoji:"🧪"},
-  {id:"biology",name:"الأحياء",emoji:"🧬"},
-  {id:"philosophy",name:"الفلسفة",emoji:"💭"},
-  {id:"history",name:"التاريخ",emoji:"📜"},
-  {id:"geography",name:"الجغرافيا",emoji:"🗺️"},
-  {id:"computer",name:"الحاسب الآلي",emoji:"💻"}
+  { id: "kg_arabic", name: "اللغة العربية والتهيئة للقراءة والكتابة", emoji: "📖", stages: ["رياض أطفال"] },
+  { id: "kg_english", name: "اللغة الإنجليزية", emoji: "🔤", stages: ["رياض أطفال"] },
+  { id: "kg_math", name: "المفاهيم الرياضية والعددية", emoji: "🔢", stages: ["رياض أطفال"] },
+  { id: "kg_science", name: "المفاهيم العلمية والبيئية", emoji: "🔬", stages: ["رياض أطفال"] },
+  { id: "kg_arts", name: "الأنشطة الفنية والحركية والموسيقية", emoji: "🎨", stages: ["رياض أطفال"] },
+  { id: "kg_social", name: "الأنشطة الاجتماعية وتنمية المهارات والسلوكيات", emoji: "🌍", stages: ["رياض أطفال"] },
+  { id: "arabic", name: "اللغة العربية", emoji: "📖", stages: ["ابتدائي", "إعدادي", "ثانوي", "أزهري"] },
+  { id: "english", name: "اللغة الإنجليزية", emoji: "🔤", stages: ["ابتدائي", "إعدادي", "ثانوي", "أزهري"] },
+  { id: "math", name: "الرياضيات", emoji: "🔢", stages: ["ابتدائي", "إعدادي", "ثانوي", "أزهري"] },
+  { id: "religion", name: "التربية الدينية", emoji: "☪️", stages: ["ابتدائي", "إعدادي", "ثانوي", "أزهري"] },
+  { id: "pe", name: "التربية البدنية والصحية", emoji: "⚽", stages: ["ابتدائي"] },
+  { id: "tokkatsu", name: "أنشطة التوكاتسو", emoji: "🎯", stages: ["ابتدائي"] },
+  { id: "science", name: "العلوم", emoji: "🔬", stages: ["ابتدائي", "إعدادي"] },
+  { id: "social", name: "الدراسات الاجتماعية", emoji: "🌍", stages: ["ابتدائي", "إعدادي"] },
+  { id: "ict", name: "تكنولوجيا المعلومات والاتصالات", emoji: "💻", stages: ["ابتدائي", "إعدادي"] },
+  { id: "art", name: "التربية الفنية", emoji: "🎨", stages: ["ابتدائي", "إعدادي"] },
+  { id: "music", name: "التربية الموسيقية والمسرحية", emoji: "🎭", stages: ["ابتدائي"] },
+  { id: "agriculture", name: "مهارات الزراعة والصناعة وإدارة الأسرة", emoji: "🌱", stages: ["ابتدائي"] },
+  { id: "library", name: "المكتبات والإعلام التربوي", emoji: "📚", stages: ["ابتدائي"] },
+  { id: "connect_plus", name: "Connect Plus", emoji: "🔗", stages: ["ابتدائي"] },
+  { id: "physics", name: "الفيزياء", emoji: "⚛️", stages: ["إعدادي", "ثانوي"] },
+  { id: "chemistry", name: "الكيمياء", emoji: "🧪", stages: ["إعدادي", "ثانوي"] },
+  { id: "biology", name: "الأحياء", emoji: "🧬", stages: ["إعدادي", "ثانوي"] },
+  { id: "history", name: "التاريخ", emoji: "📜", stages: ["إعدادي", "ثانوي"] },
+  { id: "geography", name: "الجغرافيا", emoji: "🗺️", stages: ["إعدادي", "ثانوي"] },
+  { id: "computer", name: "الحاسب الآلي", emoji: "💻", stages: ["إعدادي", "ثانوي"] },
+  { id: "sports", name: "التربية الرياضية", emoji: "🏃", stages: ["إعدادي", "ثانوي"] },
+  { id: "philosophy", name: "الفلسفة", emoji: "💭", stages: ["ثانوي"] },
+  { id: "foreign_lang2", name: "اللغة الأجنبية الثانية", emoji: "🌐", stages: ["ثانوي"] },
+  { id: "technical_math", name: "الرياضيات الفنية", emoji: "🔢", stages: ["فني"] },
+  { id: "engineering_drawing", name: "الرسم الهندسي", emoji: "📐", stages: ["فني"] },
+  { id: "electricity", name: "الكهرباء", emoji: "⚡", stages: ["فني"] },
+  { id: "mechanics", name: "الميكانيكا", emoji: "⚙️", stages: ["فني"] },
+  { id: "manufacturing", name: "التصنيع", emoji: "🏭", stages: ["فني"] },
+  { id: "accounting", name: "المحاسبة", emoji: "📊", stages: ["فني"] },
+  { id: "management", name: "الإدارة", emoji: "📋", stages: ["فني"] },
+  { id: "economics", name: "الاقتصاد", emoji: "💹", stages: ["فني"] },
+  { id: "marketing", name: "التسويق", emoji: "📢", stages: ["فني"] },
+  { id: "insurance", name: "التأمين", emoji: "🛡️", stages: ["فني"] },
+  { id: "computer_apps", name: "تطبيقات الحاسب", emoji: "💻", stages: ["فني"] },
+  { id: "plant_production", name: "الإنتاج النباتي", emoji: "🌾", stages: ["فني"] },
+  { id: "animal_production", name: "الإنتاج الحيواني", emoji: "🐄", stages: ["فني"] },
+  { id: "soil", name: "التربة", emoji: "🌱", stages: ["فني"] },
+  { id: "irrigation", name: "الري", emoji: "💧", stages: ["فني"] },
+  { id: "agricultural_machinery", name: "الآلات الزراعية", emoji: "🚜", stages: ["فني"] },
+  { id: "food_processing", name: "التصنيع الزراعي", emoji: "🥫", stages: ["فني"] },
+  { id: "cooking", name: "الطهي", emoji: "🍳", stages: ["فني"] },
+  { id: "restaurant_service", name: "خدمة المطاعم", emoji: "🍽️", stages: ["فني"] },
+  { id: "housekeeping", name: "الإشراف الداخلي", emoji: "🏨", stages: ["فني"] },
+  { id: "reception", name: "الاستقبال", emoji: "🛎️", stages: ["فني"] },
+  { id: "tourism", name: "السياحة", emoji: "✈️", stages: ["فني"] },
+  { id: "languages", name: "اللغات", emoji: "🌐", stages: ["فني"] },
+  { id: "programming", name: "البرمجة", emoji: "💻", stages: ["فني"] },
+  { id: "electronics", name: "الإلكترونيات", emoji: "🔌", stages: ["فني"] },
+  { id: "quran", name: "القرآن الكريم والتجويد", emoji: "📖", stages: ["أزهري"] },
+  { id: "aqidah", name: "أصول الدين (تفسير - توحيد - حديث)", emoji: "☪️", stages: ["أزهري"] },
+  { id: "fiqh", name: "الفقه", emoji: "⚖️", stages: ["أزهري"] },
+  { id: "arabic_sciences", name: "العلوم العربية (نحو - صرف - بلاغة)", emoji: "📝", stages: ["أزهري"] },
+  { id: "islamic_culture", name: "الثقافة الإسلامية", emoji: "🕌", stages: ["أزهري"] },
+  { id: "general_sciences", name: "المواد العامة (رياضيات - علوم - لغات)", emoji: "🔬", stages: ["أزهري"] }
 ];
 
 const QUESTION_TYPES = {
   mcq:{name:'اختيار من متعدد',emoji:'📝'}, tf:{name:'صح / خطأ',emoji:'✅'},
   fill:{name:'إكمال',emoji:'✏️'}, essay:{name:'مقالي',emoji:'📄'}
+};
+const QUESTION_DIFFICULTY = {
+  easy: { name: 'سهل', emoji: '🟢', color: '#10b981' },
+  medium: { name: 'متوسط', emoji: '🟡', color: '#f59e0b' },
+  hard: { name: 'صعب', emoji: '🔴', color: '#ef4444' }
 };
 const LEVELS = [
   { name: 'مبتدئ', emoji: '🌱', minXP: 0, maxXP: 100 },
@@ -749,6 +875,18 @@ const BADGES = {
   streak_7: { name: 'مخلص', emoji: '🌟', desc: '7 أيام متتالية' },
   high_scorer: { name: 'نجم', emoji: '💫', desc: 'حصل على 800 نقطة' }
 };
+
+/* ✅ جديد: مراحل الحيوان الأليف */
+const PET_STAGES = [
+  { level: 0, emoji: '🥚', name: 'بيضة', minXP: 0 },
+  { level: 1, emoji: '🐣', name: 'فرخ صغير', minXP: 50 },
+  { level: 2, emoji: '🐥', name: 'كتكوت', minXP: 150 },
+  { level: 3, emoji: '🐤', name: 'طائر صغير', minXP: 300 },
+  { level: 4, emoji: '🐔', name: 'دجاجة', minXP: 500 },
+  { level: 5, emoji: '🦅', name: 'نسر', minXP: 800 },
+  { level: 6, emoji: '🦉', name: 'بومة حكيمة', minXP: 1200 },
+  { level: 7, emoji: '🦄', name: 'وحيد القرن السحري', minXP: 2000 }
+];
 
 const SHOP_ITEMS = [
   { id: 'frame_gold', type: 'frame', name: 'إطار ذهبي', emoji: '🟡', desc: 'إطار فاخر بلمسة ذهبية', price: 500, rarity: 'common', cssClass: 'avatar-frame-gold' },
@@ -783,6 +921,7 @@ const DEFAULT_PLATFORM_SETTINGS = {
   ratingsEnabled: true, leaderboardEnabled: true,
   coinsEnabled: true, shopEnabled: true, dailyQuestsEnabled: true,
   certificatesEnabled: true, tournamentsEnabled: true,
+  petEnabled: true, atRiskEnabled: true, adaptiveEnabled: true,
   footerText: 'EMAA.Tech', supportEmail: '', supportPhone: ''
 };
 let platformSettings = { ...DEFAULT_PLATFORM_SETTINGS };
@@ -895,7 +1034,7 @@ function switchAuthTab(tab) {
   document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
   document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
   document.getElementById('authAlert').innerHTML = '';
-  if (tab === 'register') pickRole(selectedRole || 'student');
+  if (tab === 'register') { pickRole(selectedRole || 'student'); initStageSelects(); }
 }
 function populateSubjectSelects() {
   const html = '<option value="">اختر المادة</option>' + 
@@ -915,9 +1054,56 @@ function pickRole(role) {
   document.getElementById('parentFields').style.display = role === 'parent' ? 'block' : 'none';
   if (role === 'teacher') { populateSubjectSelects(); }
 }
-document.getElementById('regStage').addEventListener('change', function() {
-  document.getElementById('regGrade').innerHTML='<option value="">اختر السنة</option>'+(STAGES[this.value]||[]).map(g=>`<option value="${g}">${g}</option>`).join('');
-});
+
+/* ✅ دوال المراحل والصفوف */
+function getStageFromGrade(grade) {
+  if (!grade) return null;
+  if (grade === 'KG1' || grade === 'KG2') return 'رياض أطفال';
+  for (const [stage, grades] of Object.entries(STAGES)) {
+    if (grades.includes(grade)) return stage;
+  }
+  return null;
+}
+function getSubjectsForGrade(grade) {
+  const stage = getStageFromGrade(grade);
+  if (!stage) return SUBJECTS;
+  return SUBJECTS.filter(s => s.stages && s.stages.includes(stage));
+}
+function populateStageSelect(selectId = 'regStage') {
+  const el = document.getElementById(selectId);
+  if (!el) return;
+  const currentValue = el.value;
+  el.innerHTML = '<option value="">اختر المرحلة</option>' + 
+    Object.keys(STAGES).map(stage => `<option value="${stage}">${stage}</option>`).join('');
+  if (currentValue && STAGES[currentValue]) el.value = currentValue;
+}
+function populateGradeSelect(stageSelectId = 'regStage', gradeSelectId = 'regGrade') {
+  const stageEl = document.getElementById(stageSelectId);
+  const gradeEl = document.getElementById(gradeSelectId);
+  if (!stageEl || !gradeEl) return;
+  const stage = stageEl.value;
+  if (!stage || !STAGES[stage]) {
+    gradeEl.innerHTML = '<option value="">اختر السنة</option>';
+    return;
+  }
+  gradeEl.innerHTML = '<option value="">اختر السنة</option>' + 
+    STAGES[stage].map(g => `<option value="${g}">${g}</option>`).join('');
+}
+function initStageSelects() {
+  populateStageSelect('regStage');
+  populateStageSelect('gStage');
+  const regStageEl = document.getElementById('regStage');
+  if (regStageEl && !regStageEl.dataset.bound) {
+    regStageEl.dataset.bound = '1';
+    regStageEl.addEventListener('change', () => populateGradeSelect('regStage', 'regGrade'));
+  }
+  const gStageEl = document.getElementById('gStage');
+  if (gStageEl && !gStageEl.dataset.bound) {
+    gStageEl.dataset.bound = '1';
+    gStageEl.addEventListener('change', () => populateGradeSelect('gStage', 'gGrade'));
+  }
+}
+
 function showLoading() { document.getElementById('loadingOverlay').classList.add('active'); }
 function hideLoading() { document.getElementById('loadingOverlay').classList.remove('active'); }
 function launchConfetti(count = 80) {
@@ -1021,15 +1207,7 @@ async function initFirebase() {
 
 async function dbSetNode(key, nodeId, data) {
   if (!key || !nodeId) { console.error('dbSetNode: key and nodeId required'); return false; }
-  
-  // ✅ التحقق من أن البيانات صالحة للـ JSON
-  try {
-    JSON.stringify(data);
-  } catch (e) {
-    console.error('❌ dbSetNode: data is not JSON-serializable:', e);
-    return false;
-  }
-  
+  try { JSON.stringify(data); } catch (e) { console.error('❌ Data not JSON-serializable:', e); return false; }
   try {
     const d = localStorage.getItem('edu_' + key);
     const arr = d ? JSON.parse(d) : [];
@@ -1039,7 +1217,6 @@ async function dbSetNode(key, nodeId, data) {
     else arr.push(newItem);
     localStorage.setItem('edu_' + key, JSON.stringify(arr));
   } catch (e) { console.warn('localStorage write failed:', e); }
-  
   if (firebaseEnabled && fbDB) {
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
@@ -1049,9 +1226,7 @@ async function dbSetNode(key, nodeId, data) {
       } catch (e) {
         console.error(`❌ Firebase set(${key}/${nodeId}) attempt ${attempt} failed:`, e.message, e.code);
         if (attempt === 3) {
-          console.error('💡 تحقق من: 1) قواعد الأمان في Firebase Console → Realtime Database → Rules');
-          console.error('💡 2) المصادقة (auth.currentUser)');
-          console.error('💡 3) صحة مسار البيانات');
+          console.error('💡 تحقق من: 1) قواعد الأمان 2) المصادقة 3) صحة البيانات');
         }
         await new Promise(r => setTimeout(r, 500 * attempt));
       }
@@ -1308,6 +1483,10 @@ async function awardXP(studentId, amount, reason) {
     await dbUpdateNode('users', studentId, { xp: newXP, lastXpReason: reason, lastXpAt: Date.now() });
     const notifId = uid();
     await dbSetNode('notifications', notifId, { userId: studentId, title: `+${amount} نقطة XP`, body: reason, createdAt: Date.now(), read: false });
+    // ✅ تحديث الحيوان الأليف تلقائياً
+    if (platformSettings.petEnabled) {
+      await updatePetGrowth(studentId, amount);
+    }
   } catch (e) { console.error('awardXP failed:', e); }
 }
 
@@ -1379,6 +1558,191 @@ function calculateCoinsForAttempt(attempt) {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   ✅ جديد: نظام الحيوان الأليف (Pet System)
+   ═══════════════════════════════════════════════════════════ */
+async function updatePetGrowth(studentId, xpAmount) {
+  try {
+    const users = await DB.get('users');
+    const idx = users.findIndex(u => u.id === studentId);
+    if (idx < 0) return;
+    const user = users[idx];
+    let pet = user.pet || { stage: 0, health: 100, lastFeed: Date.now(), totalFed: 0, name: 'صديقي' };
+    pet.health = Math.min(100, (pet.health || 100) + Math.round(xpAmount / 10));
+    pet.lastFeed = Date.now();
+    pet.totalFed = (pet.totalFed || 0) + 1;
+    const newStage = PET_STAGES.reduce((acc, s) => (user.xp || 0) >= s.minXP ? s.level : acc, 0);
+    pet.stage = newStage;
+    await dbUpdateNode('users', studentId, { pet });
+    if (currentUser && currentUser.id === studentId) currentUser.pet = pet;
+  } catch (e) { console.error('updatePetGrowth failed:', e); }
+}
+
+function getPetEmoji(pet, xp) {
+  if (!pet) return PET_STAGES[0].emoji;
+  const stage = PET_STAGES.find(s => s.level === (pet.stage || 0)) || PET_STAGES[0];
+  return stage.emoji;
+}
+
+function getPetHealthFromInactivity(pet) {
+  if (!pet || !pet.lastFeed) return 100;
+  const days = Math.floor((Date.now() - pet.lastFeed) / (1000 * 60 * 60 * 24));
+  if (days <= 1) return 100;
+  return Math.max(0, 100 - (days - 1) * 15);
+}
+
+async function renderPetCard(studentId, xp) {
+  const users = await DB.get('users');
+  const u = users.find(x => x.id === studentId);
+  if (!u) return '';
+  const pet = u.pet || { stage: 0, health: 100, lastFeed: Date.now(), totalFed: 0 };
+  const stage = PET_STAGES.find(s => s.level === (pet.stage || 0)) || PET_STAGES[0];
+  const health = getPetHealthFromInactivity(pet);
+  const nextStage = PET_STAGES.find(s => s.level === (stage.level + 1));
+  const xpToNext = nextStage ? nextStage.minXP - xp : 0;
+  return `<div class="pet-card">
+    <div class="pet-emoji ${health < 50 ? 'pet-sad' : ''}">${stage.emoji}</div>
+    <div class="pet-name">${stage.name}</div>
+    <div class="pet-level">المستوى ${stage.level} • ${xp} XP${nextStage ? ` • ${xpToNext} XP للمرحلة التالية` : ' • 👑 أعلى مرحلة!'}</div>
+    <div class="pet-bar"><div class="pet-bar-fill" style="width:${health}%;${health < 30 ? 'background:linear-gradient(90deg,#ef4444,#f87171);' : health < 60 ? 'background:linear-gradient(90deg,#f59e0b,#fbbf24);' : ''}"></div></div>
+    <div class="pet-health">${health >= 80 ? '😊 صحة ممتازة' : health >= 50 ? '😐 صحة متوسطة' : health >= 20 ? '😟 يحتاج للعناية' : '😢 يشعر بالحزن'}</div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ✅ جديد: تحليل نقاط الضعف (Weakness Analysis)
+   ═══════════════════════════════════════════════════════════ */
+function analyzeWeaknesses(attempts, quizzes) {
+  const wrongByLesson = {};
+  const wrongBySubject = {};
+  attempts.forEach(attempt => {
+    const quiz = quizzes.find(q => q.id === attempt.quizId);
+    if (!quiz || !attempt.results) return;
+    attempt.results.forEach(result => {
+      if (result.correct === false) {
+        const question = quiz.questions[result.questionIndex];
+        if (!question) return;
+        const lesson = question.lesson || question.unit || quiz.lesson || quiz.unit || 'عام';
+        const subject = quiz.subject;
+        if (!wrongByLesson[lesson]) wrongByLesson[lesson] = { count: 0, subject };
+        wrongByLesson[lesson].count++;
+        if (!wrongBySubject[subject]) wrongBySubject[subject] = { count: 0, total: 0 };
+        wrongBySubject[subject].count++;
+      }
+      if (!wrongBySubject[quiz.subject]) wrongBySubject[quiz.subject] = { count: 0, total: 0 };
+      wrongBySubject[quiz.subject].total++;
+    });
+  });
+  const weakLessons = Object.entries(wrongByLesson)
+    .map(([lesson, data]) => ({ lesson, ...data }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+  const weakSubjects = Object.entries(wrongBySubject)
+    .filter(([_, data]) => data.total > 0)
+    .map(([subject, data]) => ({ subject, ...data, pct: Math.round((data.count / data.total) * 100) }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+  return { weakLessons, weakSubjects };
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ✅ جديد: الطلاب المعرضون للخطر (At-Risk Students)
+   ═══════════════════════════════════════════════════════════ */
+async function getAtRiskStudents() {
+  const users = await DB.get('users');
+  const attempts = await DB.get('attempts');
+  const quizzes = await DB.get('quizzes');
+  const students = users.filter(u => u.role === 'student');
+  const twoWeeksAgo = Date.now() - (14 * 24 * 60 * 60 * 1000);
+  const atRisk = [];
+  students.forEach(student => {
+    const myAttempts = attempts
+      .filter(a => a.studentId === student.id)
+      .sort((a, b) => b.createdAt - a.createdAt);
+    if (myAttempts.length < 3) return;
+    const recent = myAttempts.slice(0, 3);
+    const recentPcts = recent.map(a => a.total > 0 ? (a.score / a.total) * 100 : 0);
+    const declining = recentPcts[0] < recentPcts[1] && recentPcts[1] < recentPcts[2];
+    const lastAttempt = myAttempts[0];
+    const inactive = lastAttempt.createdAt < twoWeeksAgo;
+    const avg = calculateAvg(myAttempts);
+    const struggling = avg < 50;
+    if (declining || inactive || struggling) {
+      atRisk.push({
+        ...student,
+        avg,
+        attemptCount: myAttempts.length,
+        lastAttemptAt: lastAttempt.createdAt,
+        reasons: { declining, inactive, struggling }
+      });
+    }
+  });
+  return atRisk;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ✅ جديد: المسارات الذكية (Smart Learning Paths)
+   ═══════════════════════════════════════════════════════════ */
+async function getSmartLearningPath(studentId, subjectId, lowPct) {
+  const users = await DB.get('users');
+  const student = users.find(u => u.id === studentId);
+  if (!student) return [];
+  const quizzes = await DB.get('quizzes');
+  const teachers = users.filter(u => u.role === 'teacher' && u.approved !== false && u.subject === subjectId);
+  const path = [];
+  if (lowPct < 50) {
+    teachers.forEach(teacher => {
+      (teacher.videoLinks || []).slice(0, 2).forEach(video => {
+        path.push({ type: 'video', title: video.title || 'فيديو شرح', url: video.url, teacherName: teacher.name, emoji: '🎥' });
+      });
+    });
+    (teachers || []).forEach(teacher => {
+      (teacher.materialFiles || []).slice(0, 1).forEach((mat, i) => {
+        path.push({ type: 'material', title: mat.name, teacherId: teacher.id, index: i, teacherName: teacher.name, emoji: '📄' });
+      });
+    });
+  }
+  const relatedQuizzes = quizzes.filter(q => q.subject === subjectId && q.grade === student.grade).slice(0, 2);
+  relatedQuizzes.forEach(q => {
+    path.push({ type: 'quiz', quizId: q.id, title: q.title, emoji: '📝' });
+  });
+  return path;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ✅ جديد: الإشعارات السلوكية
+   ═══════════════════════════════════════════════════════════ */
+async function generateBehavioralNotifications() {
+  if (!currentUser || currentUser.role !== 'student') return;
+  try {
+    const attempts = await DB.get('attempts');
+    const myAttempts = attempts
+      .filter(a => a.studentId === currentUser.id)
+      .sort((a, b) => b.createdAt - a.createdAt);
+    const notifs = [];
+    const oneWeekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+    if (myAttempts.length === 0) {
+      notifs.push({ icon: '🎯', text: 'مرحباً بك! ابدأ باختبارك الأول واكسب نقاط XP' });
+    } else if (myAttempts[0].createdAt < oneWeekAgo) {
+      notifs.push({ icon: '⏰', text: 'مر أسبوع على آخر اختبار! عد وحافظ على سلسلتك 🔥' });
+    }
+    const pet = currentUser.pet;
+    if (pet && pet.health !== undefined) {
+      const health = getPetHealthFromInactivity(pet);
+      if (health < 50) {
+        notifs.push({ icon: '🐾', text: 'حيوانك الأليف يحتاج للعناية! حل اختباراً لتعيد صحته' });
+      }
+    }
+    const users = await DB.get('users');
+    const myCoins = currentUser.coins || 0;
+    const cheapItems = SHOP_ITEMS.filter(i => i.price <= myCoins && !(currentUser.ownedItems || []).includes(i.id));
+    if (cheapItems.length > 0) {
+      notifs.push({ icon: '🛒', text: `يمكنك شراء "${cheapItems[0].name}" الآن! لديك ${myCoins} 🪙` });
+    }
+    return notifs;
+  } catch (e) { return []; }
+}
+
+/* ═══════════════════════════════════════════════════════════
    Platform Settings
    ═══════════════════════════════════════════════════════════ */
 async function loadPlatformSettings() {
@@ -1432,7 +1796,7 @@ function applyThemeColors(key) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ✅ الإعلانات - نافذة واحدة كبيرة متحركة على كل الشاشات
+   الإعلانات - نافذة واحدة كبيرة متحركة
    ═══════════════════════════════════════════════════════════ */
 let _cachedAnnouncements = [];
 let _announcementUnsubscribe = null;
@@ -1482,7 +1846,6 @@ function renderAnnouncementEverywhere() {
     container.innerHTML = '';
     return;
   }
-  // نعرض فقط البانر الكبير المتحرك
   container.innerHTML = `<div class="announcements-carousel" data-key="global">
     ${activeAnnouncements.map((a, i) => {
       const hasImage = a.imageUrl || a.imageData;
@@ -1577,7 +1940,8 @@ async function handleRegister(e) {
   const profile = { 
     name, email, role: selectedRole, createdAt: Date.now(), provider: 'email', 
     xp: 0, coins: 50, badges: [], streak: 0, friends: [], following: [],
-    needsProfileCompletion: false, ownedItems: [], activeFrame: null, activeTitle: null
+    needsProfileCompletion: false, ownedItems: [], activeFrame: null, activeTitle: null,
+    pet: { stage: 0, health: 100, lastFeed: Date.now(), totalFed: 0, name: 'صديقي' }
   };
   
   if (selectedRole === 'student') {
@@ -1800,7 +2164,8 @@ async function ensureUserProfile(fbUser, existingProfile) {
     role: 'student', provider: 'google', photoURL: fbUser.photoURL || null,
     createdAt: Date.now(), needsProfileCompletion: !isName3,
     xp: 0, coins: 50, badges: [], streak: 0, lastQuizDate: null, friends: [], following: [],
-    ownedItems: [], activeFrame: null, activeTitle: null
+    ownedItems: [], activeFrame: null, activeTitle: null,
+    pet: { stage: 0, health: 100, lastFeed: Date.now(), totalFed: 0, name: 'صديقي' }
   };
   if (fbUser.email && fbUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
     fallback.role = 'admin'; fallback.approved = true; fallback.needsProfileCompletion = false;
@@ -1909,7 +2274,7 @@ function openProfileCompletionModal(isExisting = false) {
     <div id="gStudentFields" style="display:none;">
       <div class="form-group"><label class="form-label">المحافظة</label><select class="form-select" id="gGovernorate"><option value="">اختر المحافظة</option>${Object.entries(GOVERNORATES_MAP).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select></div>
       <div class="form-group"><label class="form-label">المدرسة</label><input type="text" class="form-input auto-dir" id="gSchool" dir="rtl"></div>
-      <div class="form-group"><label class="form-label">المرحلة</label><select class="form-select" id="gStage"><option value="">اختر</option><option value="ابتدائي">ابتدائي</option><option value="إعدادي">إعدادي</option><option value="ثانوي">ثانوي</option></select></div>
+      <div class="form-group"><label class="form-label">المرحلة</label><select class="form-select" id="gStage"><option value="">اختر المرحلة</option></select></div>
       <div class="form-group"><label class="form-label">السنة</label><select class="form-select" id="gGrade"><option value="">اختر</option></select></div>
     </div>
     <div id="gTeacherFields" style="display:none;">
@@ -1923,10 +2288,7 @@ function openProfileCompletionModal(isExisting = false) {
       <button class="btn btn-success" onclick="completeGoogleProfile()" style="flex:2;">✅ إكمال</button>
     </div>`);
   setTimeout(() => {
-    const s = document.getElementById('gStage');
-    if (s) s.addEventListener('change', function() {
-      document.getElementById('gGrade').innerHTML = '<option value="">اختر السنة</option>' + (STAGES[this.value] || []).map(g => `<option value="${g}">${g}</option>`).join('');
-    });
+    initStageSelects();
   }, 50);
 }
 
@@ -1962,7 +2324,8 @@ async function completeGoogleProfile() {
     photoURL: pendingGoogleUser.photoURL, 
     createdAt: Date.now(),
     xp: 0, coins: 50, badges: [], streak: 0, friends: [], following: [],
-    needsProfileCompletion: false, ownedItems: [], activeFrame: null, activeTitle: null
+    needsProfileCompletion: false, ownedItems: [], activeFrame: null, activeTitle: null,
+    pet: { stage: 0, health: 100, lastFeed: Date.now(), totalFed: 0, name: 'صديقي' }
   };
   
   if (pendingGoogleUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) { 
@@ -2008,8 +2371,6 @@ async function completeGoogleProfile() {
     const verified = verifyUsers.find(u => u.id === uid || u.email === profile.email);
     if (!verified) {
       console.warn('⚠️ User not found after save');
-    } else {
-      console.log('✅ Google user profile verified in DB');
     }
     profile.id = uid;
     currentUser = profile;
@@ -2043,7 +2404,7 @@ function openProfileCompletionForExisting() {
     <div id="gStudentFields" style="display:none;">
       <div class="form-group"><label class="form-label">المحافظة</label><select class="form-select" id="gGovernorate"><option value="">اختر المحافظة</option>${Object.entries(GOVERNORATES_MAP).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select></div>
       <div class="form-group"><label class="form-label">المدرسة</label><input type="text" class="form-input auto-dir" id="gSchool" dir="rtl"></div>
-      <div class="form-group"><label class="form-label">المرحلة</label><select class="form-select" id="gStage"><option value="">اختر</option><option value="ابتدائي">ابتدائي</option><option value="إعدادي">إعدادي</option><option value="ثانوي">ثانوي</option></select></div>
+      <div class="form-group"><label class="form-label">المرحلة</label><select class="form-select" id="gStage"><option value="">اختر المرحلة</option></select></div>
       <div class="form-group"><label class="form-label">السنة</label><select class="form-select" id="gGrade"><option value="">اختر السنة</option></select></div>
     </div>
     <div id="gTeacherFields" style="display:none;">
@@ -2053,12 +2414,7 @@ function openProfileCompletionForExisting() {
     </div>
     <div id="gParentFields" style="display:none;"><div class="alert alert-info">يمكنك ربط أبنائك لاحقاً.</div></div>
     <button class="btn btn-success btn-full" onclick="saveExistingProfile()" style="margin-top:16px;">✅ حفظ</button>`);
-  setTimeout(() => {
-    const s = document.getElementById('gStage');
-    if (s) s.addEventListener('change', function() {
-      document.getElementById('gGrade').innerHTML = '<option value="">اختر السنة</option>' + (STAGES[this.value] || []).map(g => `<option value="${g}">${g}</option>`).join('');
-    });
-  }, 50);
+  setTimeout(() => { initStageSelects(); }, 50);
 }
 
 async function saveExistingProfile() {
@@ -2276,12 +2632,21 @@ function startNotificationsListener() {
 function stopNotificationsListener() { if (notifUnsubscribe) { try { notifUnsubscribe(); } catch {} notifUnsubscribe = null; } }
 async function openNotifications() {
   const notifs = (await DB.get('notifications')).filter(n => n.userId === currentUser.id).sort((a,b) => b.createdAt - a.createdAt);
+  const behavioral = await generateBehavioralNotifications();
   const unread = notifs.filter(n => !n.read);
   if (unread.length > 0) {
     for (const n of unread) await dbUpdateNode('notifications', n.id, { read: true });
     updateNotifBadge();
   }
   openModal(`<div class="modal-header"><h3 class="modal-title">🔔 الإشعارات (${notifs.length})</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    ${behavioral && behavioral.length > 0 ? `
+      <h4 style="font-size:14px;font-weight:800;margin-bottom:8px;color:var(--warning);">💡 إشعارات ذكية</h4>
+      ${behavioral.map(b => `<div class="behavioral-notif">
+        <span class="behavioral-notif-icon">${b.icon}</span>
+        <span class="behavioral-notif-text">${escapeHtml(b.text)}</span>
+      </div>`).join('')}
+    ` : ''}
+    <h4 style="font-size:14px;font-weight:800;margin:16px 0 8px;">📬 جميع الإشعارات</h4>
     ${notifs.length === 0 ? `<div class="empty-state"><div class="empty-state-icon">🔔</div><h3>لا إشعارات</h3></div>` : notifs.slice(0, 50).map(n => `
       <div class="history-item" style="${n.read?'opacity:0.6':''}">
         <div class="history-info"><h4>${escapeHtml(n.title)}</h4><p>${escapeHtml(n.body)}</p><p style="font-size:11px;">${new Date(n.createdAt).toLocaleString('ar-EG')}</p></div>
@@ -2290,32 +2655,16 @@ async function openNotifications() {
 }
 
 async function notifyStudents(quiz) {
-  if (!quiz || !quiz.grade) return;
   try {
     const users = await DB.get('users');
     const students = users.filter(u => u.role === 'student' && u.grade === quiz.grade);
-    if (students.length === 0) return;
-    let sentCount = 0;
     for (const s of students) {
       try {
         const notifId = uid();
-        const saved = await dbSetNode('notifications', notifId, { 
-          userId: s.id, 
-          title: 'اختبار جديد', 
-          body: `تم إضافة "${quiz.title}"`,
-          createdAt: Date.now(), 
-          read: false 
-        });
-        if (saved) sentCount++;
-      } catch (e) {
-        console.warn(`⚠️ Could not notify student ${s.id}:`, e.message);
-      }
+        await dbSetNode('notifications', notifId, { userId: s.id, title: 'اختبار جديد', body: `تم إضافة "${quiz.title}"`, createdAt: Date.now(), read: false });
+      } catch (e) {}
     }
-    console.log(`📢 Sent ${sentCount}/${students.length} notifications`);
-  } catch (e) {
-    console.error('❌ notifyStudents error:', e);
-    // لا نرفع الخطأ — الحفظ نجح بالفعل
-  }
+  } catch (e) {}
 }
 
 function openModal(html) { 
@@ -2347,8 +2696,6 @@ function startRealtimeAnalytics() {
     _realtimeUnsubs.push(DB.subscribe('attempts', (attempts) => {
       const liveAttempts = document.getElementById('liveAttemptsCount');
       if (liveAttempts) liveAttempts.textContent = attempts.length;
-      const liveAvg = document.getElementById('liveAvgScore');
-      if (liveAvg) liveAvg.textContent = calculateAvg(attempts) + '%';
     }));
     _realtimeUnsubs.push(DB.subscribe('quizzes', (quizzes) => {
       const liveQuizzes = document.getElementById('liveQuizzesCount');
@@ -2725,6 +3072,7 @@ async function renderAdminDashboard() {
     const publicQuizzes = allQuizzes.filter(q => q.isPublic || q.isDemo);
     const demoQuizzes = allQuizzes.filter(q => q.isDemo === true);
     const activeChallenges = allChallenges.filter(c => c.status === 'pending' || c.status === 'accepted').length;
+    const atRisk = await getAtRiskStudents();
     
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
@@ -2755,6 +3103,24 @@ async function renderAdminDashboard() {
         <div class="stat-card"><div class="stat-icon info">📝</div><div class="stat-info"><h4 id="liveQuizzesCount">${allQuizzes.length}</h4><p>اختبارات</p></div></div>
         <div class="stat-card"><div class="stat-icon warning">✅</div><div class="stat-info"><h4 id="liveAttemptsCount">${allAttempts.length}</h4><p>محاولات</p></div></div>
       </div>
+      ${atRisk.length > 0 ? `<div class="at-risk-card">
+        <div class="at-risk-title">⚠️ طلاب معرضون للخطر (${atRisk.length})</div>
+        ${atRisk.slice(0, 5).map(s => {
+          const reasons = [];
+          if (s.reasons.declining) reasons.push({ text: '📉 درجات منخفضة', cls: 'declining' });
+          if (s.reasons.inactive) reasons.push({ text: '😴 غير نشط', cls: 'inactive' });
+          if (s.reasons.struggling) reasons.push({ text: '📚 أداء ضعيف', cls: 'struggling' });
+          return `<div class="at-risk-item">
+            <div class="at-risk-item-info">
+              <h4>${escapeHtml(s.name)}</h4>
+              <p>${escapeHtml(s.grade || '')} • متوسط ${s.avg}% • ${s.attemptCount} محاولة</p>
+              <div class="at-risk-reasons">${reasons.map(r => `<span class="at-risk-reason ${r.cls}">${r.text}</span>`).join('')}</div>
+            </div>
+            <button class="btn btn-sm btn-outline" onclick="openStudentGamificationDetails('${s.id}')">👁️</button>
+          </div>`;
+        }).join('')}
+        ${atRisk.length > 5 ? `<button class="btn btn-outline btn-sm btn-full" onclick="renderAtRiskList()">عرض الكل (${atRisk.length})</button>` : ''}
+      </div>` : ''}
       ${publicQuizzes.length === 0 ? `<div class="card" style="border-right:4px solid var(--info); background: var(--info-light);">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
           <div><h3 style="font-size:16px; font-weight:900; color:var(--info);">🌐 لا يوجد اختبارات عامة</h3><p style="font-size:12px;">أضف اختبارات عامة ليراها كل الطلاب</p></div>
@@ -2796,6 +3162,68 @@ async function renderAdminDashboard() {
       <div class="card" id="usersListContainer">${renderUsersListForTab(allUsers, allAttempts, currentUserTab)}</div>
     `;
     startRealtimeAnalytics();
+  } finally { hideLoading(); }
+}
+
+async function renderAtRiskList() {
+  showLoading();
+  try {
+    const atRisk = await getAtRiskStudents();
+    const container = document.getElementById('dashboardContent');
+    container.innerHTML = `
+      <div class="card" style="background: linear-gradient(135deg, #dc2626, #b91c1c); color:#fff;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="font-size:48px;">⚠️</span>
+          <div><h2 style="font-size:24px; font-weight:900;">الطلاب المعرضون للخطر</h2><p style="opacity:0.9;">${atRisk.length} طالب يحتاج متابعة</p></div>
+        </div>
+      </div>
+      <button class="btn btn-outline" onclick="renderAdminDashboard()" style="margin-bottom:16px;">← العودة</button>
+      ${atRisk.length === 0 ? `<div class="card"><div class="empty-state"><div class="empty-state-icon">✅</div><h3>لا طلاب معرضون للخطر</h3><p>كل الطلاب بأداء جيد!</p></div></div>` :
+        atRisk.map(s => {
+          const reasons = [];
+          if (s.reasons.declining) reasons.push({ text: '📉 درجات منخفضة (3 اختبارات متتالية)', cls: 'declining' });
+          if (s.reasons.inactive) reasons.push({ text: '😴 غير نشط (أكثر من أسبوعين)', cls: 'inactive' });
+          if (s.reasons.struggling) reasons.push({ text: '📚 أداء ضعيف (متوسط < 50%)', cls: 'struggling' });
+          return `<div class="card" style="border-right:4px solid var(--danger);">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+              <div style="flex:1;min-width:200px;">
+                <h3 style="font-size:17px;font-weight:800;margin-bottom:4px;">${escapeHtml(s.name)}</h3>
+                <p style="font-size:13px;color:var(--text-light);">${escapeHtml(s.grade || '')} • ${escapeHtml(s.school || '')} • ${escapeHtml(s.governorateName || '')}</p>
+                <p style="font-size:12px;color:var(--text-light);margin-top:4px;">متوسط ${s.avg}% • ${s.attemptCount} محاولة • آخر محاولة: ${s.lastAttemptAt ? new Date(s.lastAttemptAt).toLocaleDateString('ar-EG') : 'لم يحل'}</p>
+                <div class="at-risk-reasons" style="margin-top:8px;">${reasons.map(r => `<span class="at-risk-reason ${r.cls}">${r.text}</span>`).join('')}</div>
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <button class="btn btn-sm btn-outline" onclick="openStudentGamificationDetails('${s.id}')">👁️</button>
+                <button class="btn btn-sm btn-primary" onclick="sendMotivationToStudent('${s.id}')">💬 تحفيز</button>
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+    `;
+  } finally { hideLoading(); }
+}
+
+async function sendMotivationToStudent(studentId) {
+  const messages = [
+    '💪 أنت قادر على النجاح! عد وحل اختباراً جديداً',
+    '🌟 نحن نفتقدك! عد لتحافظ على سلسلتك',
+    '🎯 كل خطوة صغيرة تقربك من هدفك',
+    '🏆 لا تستسلم! الأبطال يعودون دائماً',
+    '📚 المعرفة كنز! عد لاكتشافه'
+  ];
+  const msg = messages[Math.floor(Math.random() * messages.length)];
+  showLoading();
+  try {
+    const notifId = uid();
+    await dbSetNode('notifications', notifId, { 
+      userId: studentId, 
+      title: '💬 رسالة تحفيز', 
+      body: msg, 
+      createdAt: Date.now(), 
+      read: false 
+    });
+    launchConfetti(20);
+    alert('✅ تم إرسال رسالة تحفيز');
   } finally { hideLoading(); }
 }
 
@@ -2945,7 +3373,7 @@ async function wipeQuizData() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ADMIN: الاختبارات العامة + الأدوات
+   ADMIN: الاختبارات العامة
    ═══════════════════════════════════════════════════════════ */
 async function renderAdminPublicQuizzes() {
   showLoading();
@@ -3085,11 +3513,13 @@ async function viewQuizDetails(quizId) {
     <h4 style="margin:16px 0 12px;">📋 الأسئلة</h4>
     ${quiz.questions.map((q, i) => {
       const ti = QUESTION_TYPES[q.type] || QUESTION_TYPES.mcq;
+      const diff = QUESTION_DIFFICULTY[q.difficulty] || QUESTION_DIFFICULTY.medium;
       const dir = detectDirection(q.text);
       return `<div class="question-item">
         <div class="question-item-header">
           <span style="font-weight:900;color:var(--primary);">س${i + 1}</span>
           <span class="question-type-badge qtype-${q.type}">${ti.emoji} ${ti.name}</span>
+          <span class="badge" style="background:${diff.color}20;color:${diff.color};">${diff.emoji} ${diff.name}</span>
         </div>
         <div class="question-item-text" dir="${dir}" style="text-align:${dir === 'ltr' ? 'left' : 'right'};">${escapeHtml(q.text)}</div>
       </div>`;
@@ -3120,23 +3550,23 @@ async function adminDeleteQuiz(quizId) {
 async function seedDemoQuizzes() {
   if (!isAdmin(currentUser)) { alert('للأدمن فقط'); return; }
   const grades = Object.values(STAGES).flat();
-  const subjects = SUBJECTS.map(s => s.id);
-  const testsPerSubject = 3;
-  const totalQuizzes = grades.length * subjects.length * testsPerSubject;
-  if (!confirm(`⚠️ سيتم إضافة ${totalQuizzes} اختبار تجريبي.\n\nهل تريد المتابعة؟`)) return;
+  let totalQuizzes = 0;
+  grades.forEach(g => { totalQuizzes += getSubjectsForGrade(g).length * 3; });
+  if (!confirm(`⚠️ سيتم إضافة ${totalQuizzes} اختبار تجريبي.\n\n(${grades.length} صف × المواد الفعلية × 3 اختبارات)\n\nهل تريد المتابعة؟`)) return;
   showLoading();
   try {
     let added = 0;
     for (const grade of grades) {
-      for (const subjectId of subjects) {
-        for (let testNum = 0; testNum < testsPerSubject; testNum++) {
+      const subjects = getSubjectsForGrade(grade);
+      for (const subj of subjects) {
+        for (let testNum = 0; testNum < 3; testNum++) {
           const quizId = uid();
           const quizQuestions = [
-            { type: 'mcq', text: `سؤال تجريبي ${testNum + 1} في ${getSubjectName(subjectId)}`, options: ['أ', 'ب', 'ج', 'د'], answer: 0, image: null }
+            { type: 'mcq', difficulty: 'easy', text: `سؤال تجريبي ${testNum + 1} في ${subj.name}`, options: ['أ', 'ب', 'ج', 'د'], answer: 0, image: null }
           ];
           const quiz = {
-            title: `اختبار تجريبي ${testNum + 1} - ${getSubjectName(subjectId)} (${grade})`,
-            subject: subjectId, grade: grade, timePerQuestion: 60,
+            title: `اختبار تجريبي ${testNum + 1} - ${subj.name} (${grade})`,
+            subject: subj.id, grade: grade, timePerQuestion: 60,
             questions: quizQuestions, teacherId: currentUser.id, teacherName: currentUser.name,
             isDemo: true, isPublic: true, approved: true, createdAt: Date.now()
           };
@@ -3282,12 +3712,13 @@ async function renderAdminGamification() {
         <div class="stat-card"><div class="stat-icon purple">⭐</div><div class="stat-info"><h4>${students.reduce((s, u) => s + (u.xp || 0), 0)}</h4><p>XP</p></div></div>
         <div class="stat-card"><div class="stat-icon warning">🪙</div><div class="stat-info"><h4>${students.reduce((s, u) => s + (u.coins || 0), 0).toLocaleString()}</h4><p>عملات</p></div></div>
         <div class="stat-card"><div class="stat-icon success">🏆</div><div class="stat-info"><h4>${students.reduce((s, u) => s + (u.badges || []).length, 0)}</h4><p>شارات</p></div></div>
+        <div class="stat-card"><div class="stat-icon info">🐾</div><div class="stat-info"><h4>${students.filter(u => u.pet && u.pet.stage > 0).length}</h4><p>حيوانات نشطة</p></div></div>
       </div>
       <div class="card" style="border-right:4px solid var(--danger); background: var(--danger-light); margin-top:24px;">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
           <div>
             <h3 style="font-size:16px; font-weight:900; color:var(--danger);">🗑 مسح جميع المكافآت</h3>
-            <p style="font-size:12px;margin-top:4px;">مسح XP + عملات + شارات لجميع الطلاب</p>
+            <p style="font-size:12px;margin-top:4px;">مسح XP + عملات + شارات + حيوانات لجميع الطلاب</p>
           </div>
           <button class="btn btn-danger" onclick="wipeAllRewards()">🗑 مسح جميع المكافآت</button>
         </div>
@@ -3306,9 +3737,10 @@ async function renderAdminGamification() {
       <div class="card">
         ${students.length === 0 ? `<div class="empty-state"><h3>لا طلاب</h3></div>` : paged.items.map(u => {
           const lvl = getLevel(u.xp || 0);
+          const petEmoji = u.pet ? getPetEmoji(u.pet, u.xp) : '🥚';
           return `<div class="gamify-student-row">
             <div class="gamify-student-info">
-              <h4>${escapeHtml(u.name)} <span class="badge badge-purple">${lvl.emoji} ${lvl.name}</span></h4>
+              <h4>${escapeHtml(u.name)} <span class="badge badge-purple">${lvl.emoji} ${lvl.name}</span> <span style="font-size:20px;">${petEmoji}</span></h4>
               <p>${escapeHtml(u.email)} • ${u.grade || ''} • ${u.xp || 0} XP • 🪙 ${u.coins || 0} • 🏆 ${(u.badges || []).length}</p>
             </div>
             <div class="gamify-actions">
@@ -3326,9 +3758,8 @@ async function renderAdminGamification() {
 }
 window.changeGamifyPage = (p) => { paginationState.students = p; renderAdminGamification(); };
 
-/* ✅ جديد: مسح مكافآت طالب واحد (XP + عملات + شارات) */
 async function wipeStudentRewards(studentId) {
-  if (!confirm('⚠️ سيتم مسح XP والعملات والشارات لهذا الطالب. هل أنت متأكد؟')) return;
+  if (!confirm('⚠️ سيتم مسح XP والعملات والشارات والحيوان الأليف لهذا الطالب. هل أنت متأكد؟')) return;
   showLoading();
   try {
     await dbUpdateNode('users', studentId, {
@@ -3341,7 +3772,8 @@ async function wipeStudentRewards(studentId) {
       activeFrame: null,
       activeTitle: null,
       lastXpAt: null,
-      lastCoinAt: null
+      lastCoinAt: null,
+      pet: { stage: 0, health: 100, lastFeed: Date.now(), totalFed: 0, name: 'صديقي' }
     });
     await logActivity('مسح مكافآت طالب', studentId);
     launchConfetti(20);
@@ -3350,9 +3782,8 @@ async function wipeStudentRewards(studentId) {
   } finally { hideLoading(); }
 }
 
-/* ✅ جديد: مسح مكافآت جميع الطلاب (XP + عملات + شارات) */
 async function wipeAllRewards() {
-  if (!confirm('⚠️ سيتم مسح XP والعملات والشارات لجميع الطلاب!\n\nهل أنت متأكد؟')) return;
+  if (!confirm('⚠️ سيتم مسح XP والعملات والشارات والحيوانات لجميع الطلاب!\n\nهل أنت متأكد؟')) return;
   if (prompt('اكتب "حذف" للتأكيد:') !== 'حذف') { alert('ألغي'); return; }
   showLoading();
   try {
@@ -3370,7 +3801,8 @@ async function wipeAllRewards() {
         activeFrame: null,
         activeTitle: null,
         lastXpAt: null,
-        lastCoinAt: null
+        lastCoinAt: null,
+        pet: { stage: 0, health: 100, lastFeed: Date.now(), totalFed: 0, name: 'صديقي' }
       });
       count++;
     }
@@ -3430,8 +3862,10 @@ async function openStudentGamificationDetails(studentId) {
   const badges = u.badges || [];
   const allBadges = Object.keys(BADGES);
   const ownedItems = u.ownedItems || [];
+  const pet = u.pet || { stage: 0, health: 100 };
+  const petStage = PET_STAGES.find(s => s.level === (pet.stage || 0)) || PET_STAGES[0];
   openModal(`<div class="modal-header"><h3 class="modal-title">${escapeHtml(u.name)}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-    <div class="alert alert-info">${lvl.emoji} <strong>${lvl.name}</strong> • ${u.xp || 0} XP • 🪙 ${u.coins || 0}<br>🔥 ${u.streak || 0} • 🏆 ${badges.length}${next ? `<br>⏭️ ${next.emoji} ${next.name} (${next.minXP} XP)` : '<br>👑 وصل للأعلى!'}</div>
+    <div class="alert alert-info">${lvl.emoji} <strong>${lvl.name}</strong> • ${u.xp || 0} XP • 🪙 ${u.coins || 0}<br>🔥 ${u.streak || 0} • 🏆 ${badges.length} • 🐾 ${petStage.emoji} ${petStage.name}</div>
     <div style="display:flex;gap:8px;margin-bottom:16px;">
       <button class="btn btn-sm btn-success" onclick="closeModal();openGrantXPModal('${u.id}')">➕ XP</button>
       <button class="btn btn-sm btn-warning" onclick="closeModal();openGrantCoinsModal('${u.id}')">🪙 عملات</button>
@@ -3507,7 +3941,6 @@ async function renderAdminTournaments() {
   showLoading();
   try {
     const tournaments = await DB.get('tournaments');
-    const users = await DB.get('users');
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
       <div class="card" style="background: linear-gradient(135deg, #dc2626, #f97316); color:#fff;">
@@ -3645,7 +4078,11 @@ async function renderSubjectStats() {
     const allAttempts = await DB.get('attempts');
     const allQuizzes = await DB.get('quizzes');
     const stats = {};
-    SUBJECTS.forEach(s => { stats[s.id] = { name: s.name, emoji: s.emoji, attempts: 0, totalScore: 0, totalQ: 0, quizzes: 0 }; });
+    SUBJECTS.forEach(s => { 
+      if (s.stages && s.stages.length > 0) {
+        stats[s.id] = { name: s.name, emoji: s.emoji, attempts: 0, totalScore: 0, totalQ: 0, quizzes: 0, stages: s.stages }; 
+      }
+    });
     allQuizzes.forEach(q => { if (stats[q.subject]) stats[q.subject].quizzes++; });
     allAttempts.forEach(a => {
       const quiz = allQuizzes.find(q => q.id === a.quizId);
@@ -3661,7 +4098,7 @@ async function renderSubjectStats() {
       </div>
       <button class="btn btn-outline" onclick="renderAdminDashboard()" style="margin-bottom:16px;">← العودة</button>
       <div class="stat-breakdown-grid">
-        ${Object.values(stats).map(s => {
+        ${Object.entries(stats).map(([subjId, s]) => {
           const avg = s.totalQ > 0 ? Math.round((s.totalScore / s.totalQ) * 100) : 0;
           const cls = avg >= 80 ? 'excellent' : avg >= 60 ? 'good' : avg >= 40 ? 'average' : 'weak';
           return `<div class="stat-breakdown-card ${cls}">
@@ -3669,6 +4106,7 @@ async function renderSubjectStats() {
             <h5>${avg}%</h5>
             <p>${s.name}</p>
             <p style="font-size:11px;">${s.attempts} محاولة • ${s.quizzes} اختبار</p>
+            <p style="font-size:10px;color:var(--text-light);">${s.stages?.join(' • ') || ''}</p>
           </div>`;
         }).join('')}
       </div>
@@ -3682,7 +4120,7 @@ async function renderSubjectStats() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ADMIN: الإعلانات + الإعدادات + السجل + الإشعار الشامل
+   ADMIN: الإعلانات + الإعدادات + السجل
    ═══════════════════════════════════════════════════════════ */
 async function renderAdminAnnouncements() {
   showLoading();
@@ -3727,14 +4165,13 @@ async function openAnnouncementEditor(id = null) {
   const a = id ? announcements.find(x => x.id === id) : null;
   _tempAnnImage = a?.imageData || null;
   openModal(`<div class="modal-header"><h3 class="modal-title">${a ? '✏️ تعديل' : '➕ إعلان جديد'}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-    <div class="alert alert-info">📌 يمكنك إضافة صورة للإعلان (ستظهر كخلفية للبانر) أو استخدام رابط صورة.</div>
     <div class="form-group"><label class="form-label">الإيموجي</label><input type="text" class="form-input" id="annEmoji" value="${escapeHtml(a?.emoji || '📢')}" maxlength="4" style="text-align:center;font-size:24px;"></div>
     <div class="form-group"><label class="form-label">العنوان</label><input type="text" class="form-input auto-dir" id="annTitle" value="${escapeHtml(a?.title || '')}" dir="rtl"></div>
     <div class="form-group"><label class="form-label">النص *</label><textarea class="form-textarea auto-dir" id="annText" dir="rtl">${escapeHtml(a?.text || '')}</textarea></div>
     <div class="form-group"><label class="form-label">نص الرابط</label><input type="text" class="form-input auto-dir" id="annLinkText" value="${escapeHtml(a?.linkText || 'اعرف أكثر')}" dir="rtl"></div>
     <div class="form-group"><label class="form-label">الرابط</label><input type="url" class="form-input" id="annLink" value="${escapeHtml(a?.link || '')}" dir="ltr"></div>
     <div class="form-group">
-      <label class="form-label">🖼️ صورة الإعلان (اختياري - للبانر)</label>
+      <label class="form-label">🖼️ صورة الإعلان (اختياري)</label>
       <input type="file" class="form-input" id="annImageFile" accept="image/*" onchange="handleAnnouncementImage(event)">
       <p style="font-size:11px;color:var(--text-light);margin-top:4px;">💡 الحد الأقصى: 2MB • الأبعاد المثالية: 1200×400</p>
       <div id="annImagePreview" style="margin-top:10px;">
@@ -3746,22 +4183,15 @@ async function openAnnouncementEditor(id = null) {
       <input type="url" class="form-input" id="annImageUrl" value="${escapeHtml(a?.imageUrl || '')}" placeholder="https://example.com/image.jpg" dir="ltr">
     </div>
     <div class="form-group">
-      <label class="form-label">ترتيب العرض (الأصغر أولاً)</label>
+      <label class="form-label">ترتيب العرض</label>
       <input type="number" class="form-input" id="annOrder" value="${a?.order || 0}" min="0" max="100">
     </div>
     <div class="form-group">
-      <label class="form-label">نوع العرض</label>
-      <select class="form-select" id="annType">
-        <option value="bar" ${a?.type === 'bar' ? 'selected' : ''}>📢 شريط (بار)</option>
-        <option value="banner" ${a?.type === 'banner' ? 'selected' : ''}>🎨 بانر (مع صورة)</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">لون البداية (بدون صورة)</label>
+      <label class="form-label">لون البداية</label>
       <input type="color" class="form-input" id="annBgColor" value="${a?.bgColor || '#4f46e5'}" style="height:50px;padding:4px;">
     </div>
     <div class="form-group">
-      <label class="form-label">لون النهاية (بدون صورة)</label>
+      <label class="form-label">لون النهاية</label>
       <input type="color" class="form-input" id="annBgColorEnd" value="${a?.bgColorEnd || '#8b5cf6'}" style="height:50px;padding:4px;">
     </div>
     <button class="btn btn-success btn-full btn-lg" onclick="saveAnnouncement('${id || ''}')">💾 حفظ</button>`);
@@ -3805,7 +4235,6 @@ async function saveAnnouncement(id) {
   const linkText = document.getElementById('annLinkText').value.trim();
   const imageUrl = document.getElementById('annImageUrl').value.trim();
   const order = parseInt(document.getElementById('annOrder').value) || 0;
-  const type = document.getElementById('annType').value;
   const bgColor = document.getElementById('annBgColor').value;
   const bgColorEnd = document.getElementById('annBgColorEnd').value;
   if (!text) { alert('أدخل نص الإعلان'); return; }
@@ -3815,7 +4244,7 @@ async function saveAnnouncement(id) {
   showLoading();
   try {
     const dataToSave = {
-      emoji, title, text, link, linkText, order, type,
+      emoji, title, text, link, linkText, order,
       bgColor, bgColorEnd,
       imageData: useUploadedImage ? imageData : null,
       imageUrl: imageUrl || null,
@@ -3827,7 +4256,7 @@ async function saveAnnouncement(id) {
     } else {
       const annId = uid();
       await dbSetNode('announcements', annId, {
-        ...dataToSave, enabled: true, createdAt: Date.now()
+        ...dataToSave, enabled: true, createdAt: Date.now(), type: 'banner'
       });
     }
     _cachedAnnouncements = await DB.get('announcements');
@@ -3892,20 +4321,19 @@ async function renderAdminSettings() {
         <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;">🎨 الهوية</h3>
         <div class="form-group"><label class="form-label">اسم المنصة</label><input type="text" class="form-input auto-dir" id="setName" value="${escapeHtml(s.platformName)}" dir="rtl"></div>
         <div class="form-group"><label class="form-label">الوصف</label><input type="text" class="form-input auto-dir" id="setTagline" value="${escapeHtml(s.platformTagline)}" dir="rtl"></div>
-        <div class="form-group"><label class="form-label">الإيموجي</label><input type="text" class="form-input" id="setLogo" value="${escapeHtml(s.platformLogo)}"></div>
       </div>
       <div class="card">
         <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;">🔐 الوصول</h3>
         <label class="checkbox-label" style="display:flex; justify-content:space-between; padding:12px; background:var(--bg); border-radius:10px; margin-bottom:10px;"><span>✅ تفعيل التسجيل</span><input type="checkbox" id="setRegistration" ${s.registrationEnabled ? 'checked' : ''}></label>
         <label class="checkbox-label" style="display:flex; justify-content:space-between; padding:12px; background:var(--bg); border-radius:10px; margin-bottom:10px;"><span>🔧 وضع الصيانة</span><input type="checkbox" id="setMaintenance" ${s.maintenanceMode ? 'checked' : ''}></label>
-        <div class="form-group"><label class="form-label">رسالة الصيانة</label><textarea class="form-textarea auto-dir" id="setMaintenanceMsg" dir="rtl">${escapeHtml(s.maintenanceMessage)}</textarea></div>
       </div>
       <div class="card">
         <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;">🆕 المميزات</h3>
         <label class="checkbox-label" style="display:flex; justify-content:space-between; padding:12px; background:var(--bg); border-radius:10px; margin-bottom:10px;"><span>🪙 نظام العملات</span><input type="checkbox" id="setCoins" ${s.coinsEnabled ? 'checked' : ''}></label>
         <label class="checkbox-label" style="display:flex; justify-content:space-between; padding:12px; background:var(--bg); border-radius:10px; margin-bottom:10px;"><span>🛒 المتجر</span><input type="checkbox" id="setShop" ${s.shopEnabled ? 'checked' : ''}></label>
-        <label class="checkbox-label" style="display:flex; justify-content:space-between; padding:12px; background:var(--bg); border-radius:10px; margin-bottom:10px;"><span>🎯 Daily Quests</span><input type="checkbox" id="setQuests" ${s.dailyQuestsEnabled ? 'checked' : ''}></label>
-        <label class="checkbox-label" style="display:flex; justify-content:space-between; padding:12px; background:var(--bg); border-radius:10px; margin-bottom:10px;"><span>📜 الشهادات</span><input type="checkbox" id="setCertificates" ${s.certificatesEnabled ? 'checked' : ''}></label>
+        <label class="checkbox-label" style="display:flex; justify-content:space-between; padding:12px; background:var(--bg); border-radius:10px; margin-bottom:10px;"><span>🐾 الحيوان الأليف</span><input type="checkbox" id="setPet" ${s.petEnabled ? 'checked' : ''}></label>
+        <label class="checkbox-label" style="display:flex; justify-content:space-between; padding:12px; background:var(--bg); border-radius:10px; margin-bottom:10px;"><span>⚠️ لوحة الطلاب المعرضين للخطر</span><input type="checkbox" id="setAtRisk" ${s.atRiskEnabled ? 'checked' : ''}></label>
+        <label class="checkbox-label" style="display:flex; justify-content:space-between; padding:12px; background:var(--bg); border-radius:10px; margin-bottom:10px;"><span>🎯 التخصيص التكيفي</span><input type="checkbox" id="setAdaptive" ${s.adaptiveEnabled ? 'checked' : ''}></label>
         <label class="checkbox-label" style="display:flex; justify-content:space-between; padding:12px; background:var(--bg); border-radius:10px; margin-bottom:10px;"><span>🏆 المسابقات</span><input type="checkbox" id="setTournaments" ${s.tournamentsEnabled ? 'checked' : ''}></label>
       </div>
       <button class="btn btn-success btn-full btn-lg" onclick="savePlatformSettingsForm()">💾 حفظ</button>
@@ -3916,14 +4344,13 @@ async function renderAdminSettings() {
 async function savePlatformSettingsForm() {
   platformSettings.platformName = document.getElementById('setName').value.trim() || 'عِلْم';
   platformSettings.platformTagline = document.getElementById('setTagline').value.trim();
-  platformSettings.platformLogo = document.getElementById('setLogo').value.trim() || '📖';
   platformSettings.registrationEnabled = document.getElementById('setRegistration').checked;
   platformSettings.maintenanceMode = document.getElementById('setMaintenance').checked;
-  platformSettings.maintenanceMessage = document.getElementById('setMaintenanceMsg').value.trim();
   platformSettings.coinsEnabled = document.getElementById('setCoins').checked;
   platformSettings.shopEnabled = document.getElementById('setShop').checked;
-  platformSettings.dailyQuestsEnabled = document.getElementById('setQuests').checked;
-  platformSettings.certificatesEnabled = document.getElementById('setCertificates').checked;
+  platformSettings.petEnabled = document.getElementById('setPet').checked;
+  platformSettings.atRiskEnabled = document.getElementById('setAtRisk').checked;
+  platformSettings.adaptiveEnabled = document.getElementById('setAdaptive').checked;
   platformSettings.tournamentsEnabled = document.getElementById('setTournaments').checked;
   showLoading();
   try {
@@ -4684,7 +5111,7 @@ async function renderTeachersForParent() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   STUDENT DASHBOARD
+   STUDENT DASHBOARD (مع الحيوان الأليف + التحليل + المسارات)
    ═══════════════════════════════════════════════════════════ */
 async function renderStudentDashboard() {
   showLoading();
@@ -4716,8 +5143,16 @@ async function renderStudentDashboard() {
     const tournaments = await DB.get('tournaments');
     const activeTournaments = tournaments.filter(t => t.status === 'active' && t.endDate > Date.now() && (!t.grade || t.grade === currentUser.grade));
     const teachersHtml = await renderTeachersForStudents();
+    const petHtml = platformSettings.petEnabled ? await renderPetCard(currentUser.id, currentUser.xp || 0) : '';
+    const behavioralNotifs = await generateBehavioralNotifications();
+    const { weakLessons, weakSubjects } = analyzeWeaknesses(myAttempts, allQuizzes);
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
+      ${behavioralNotifs.length > 0 ? `
+        <div style="margin-bottom:16px;">
+          ${behavioralNotifs.map(b => `<div class="behavioral-notif"><span class="behavioral-notif-icon">${b.icon}</span><span class="behavioral-notif-text">${escapeHtml(b.text)}</span></div>`).join('')}
+        </div>
+      ` : ''}
       <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
         <button class="btn btn-warning" onclick="openFriendsModal()">
           👥 الأصدقاء والتحديات ${totalActiveChallenges > 0 ? `<span class="badge badge-danger">${totalActiveChallenges}</span>` : ''}
@@ -4727,6 +5162,7 @@ async function renderStudentDashboard() {
         ${platformSettings.tournamentsEnabled && activeTournaments.length > 0 ? `<button class="btn btn-danger" onclick="renderTournaments()">🏆 المسابقات (${activeTournaments.length})</button>` : ''}
         <button class="btn btn-outline" onclick="exportResultsPDF()">📄 PDF</button>
       </div>
+      ${petHtml}
       <div class="xp-bar-container">
         <div class="xp-bar-header">
           <div class="xp-level">
@@ -4755,6 +5191,15 @@ async function renderStudentDashboard() {
             </div>
           </div>
         `).join('')}
+      ` : ''}
+      ${weakLessons.length > 0 ? `
+        <div class="section-header"><div><h2 class="section-title">🎯 نقاط تحتاج تركيز</h2></div></div>
+        <div class="card">
+          ${weakLessons.map(w => `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg);border-radius:8px;margin-bottom:6px;flex-wrap:wrap;gap:8px;">
+            <span>${getSubjectEmoji(w.subject)} ${escapeHtml(w.lesson)}</span>
+            <span class="badge badge-danger">${w.count} أخطاء</span>
+          </div>`).join('')}
+        </div>
       ` : ''}
       ${activeTournaments.length > 0 && platformSettings.tournamentsEnabled ? `
         <div class="tournament-banner">
@@ -4884,6 +5329,9 @@ async function renderAnsweredScreen(filterTab = 'all') {
     `;
   } finally { hideLoading(); }
 }
+/* ═══════════════════════════════════════════════════════════
+   المتجر + الشهادات + التحليلات + المسابقات
+   ═══════════════════════════════════════════════════════════ */
 async function openShop() {
   if (!currentUser || currentUser.role !== 'student') { alert('للطلاب فقط'); return; }
   if (!platformSettings.shopEnabled) { alert('المتجر معطل'); return; }
@@ -4908,6 +5356,8 @@ async function openShop() {
         const canAfford = coins >= item.price;
         const isActive = currentUser.activeFrame === item.id || currentUser.activeTitle === item.id;
         return `<div class="shop-item ${owned ? 'owned' : ''} ${!canAfford && !owned ? 'locked' : ''}" onclick="buyShopItem('${item.id}')">
+          ${item.rarity === 'legendary' ? '<span class="shop-item-badge legendary">أسطوري</span>' : ''}
+          ${item.rarity === 'rare' ? '<span class="shop-item-badge rare">نادر</span>' : ''}
           <div class="shop-item-preview">${item.emoji}</div>
           <div class="shop-item-name">${escapeHtml(item.name)}</div>
           <div class="shop-item-desc">${escapeHtml(item.desc)}</div>
@@ -5044,6 +5494,7 @@ async function renderStudentAnalytics() {
       subjectAvg[quiz.subject].total += a.total;
       subjectAvg[quiz.subject].count++;
     });
+    const { weakLessons, weakSubjects } = analyzeWeaknesses(myAttempts, allQuizzes);
     const container = document.getElementById('dashboardContent');
     container.innerHTML = `
       <div class="card" style="background: linear-gradient(135deg, #06b6d4, #0891b2); color:#fff;">
@@ -5058,6 +5509,15 @@ async function renderStudentAnalytics() {
         <div class="stat-card"><div class="stat-icon success">📈</div><div class="stat-info"><h4>${calculateAvg(myAttempts)}%</h4><p>المتوسط</p></div></div>
         <div class="stat-card"><div class="stat-icon purple">🏆</div><div class="stat-info"><h4>${(currentUser.badges || []).length}</h4><p>شارات</p></div></div>
       </div>
+      ${weakLessons.length > 0 ? `
+        <div class="card" style="border-right:4px solid var(--danger); background: var(--danger-light);">
+          <h3 style="font-size:18px; font-weight:900; color:var(--danger); margin-bottom:12px;">🎯 نقاط تحتاج تركيز</h3>
+          ${weakLessons.map(w => `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--card);border-radius:8px;margin-bottom:6px;flex-wrap:wrap;gap:8px;">
+            <span>${getSubjectEmoji(w.subject)} ${escapeHtml(w.lesson)}</span>
+            <span class="badge badge-danger">${w.count} أخطاء</span>
+          </div>`).join('')}
+        </div>
+      ` : ''}
       ${Object.keys(subjectAvg).length > 0 ? `<div class="chart-container" style="height:340px;"><canvas id="analyticsRadar"></canvas></div>` : '<div class="card"><div class="empty-state"><h3>لا بيانات بعد</h3></div></div>'}
       <div class="chart-container" style="height:340px;"><canvas id="analyticsTrend"></canvas></div>
     `;
@@ -5216,7 +5676,10 @@ async function renderParentDashboard() {
               <div class="parent-child-stat"><h5>${cAvg}%</h5><p>المتوسط</p></div>
               <div class="parent-child-stat"><h5>${(child.badges || []).length}</h5><p>شارات</p></div>
             </div>
-            <button class="btn btn-outline btn-full btn-sm" onclick="openChildDetails('${child.id}')">👁️ التفاصيل</button>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-outline btn-full btn-sm" onclick="openChildDetails('${child.id}')" style="flex:1;">👁️ التفاصيل</button>
+              <button class="btn btn-success btn-sm" onclick="exportChildReportPDF('${child.id}')" style="flex:1;">📄 تقرير PDF</button>
+            </div>
           </div>`;
         }).join('')}
       ${teachersHtml}
@@ -5266,8 +5729,16 @@ async function openChildDetails(childId) {
     const ca = allAttempts.filter(a => a.studentId === childId).sort((a, b) => b.createdAt - a.createdAt);
     const avg = ca.length ? calculateAvg(ca) : 0;
     const lvl = getLevel(child.xp || 0);
+    const { weakLessons } = analyzeWeaknesses(ca, allQuizzes);
     openModal(`<div class="modal-header"><h3 class="modal-title">👨‍🎓 ${escapeHtml(child.name)}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
       <div class="alert alert-info">📚 ${escapeHtml(child.grade || '')}<br>${lvl.emoji} ${lvl.name} • ${child.xp || 0} XP<br>📊 المتوسط: ${avg}% • ${ca.length} اختبار</div>
+      ${weakLessons.length > 0 ? `
+        <h4 style="margin:16px 0 12px;">🎯 نقاط تحتاج تركيز</h4>
+        ${weakLessons.map(w => `<div style="display:flex;justify-content:space-between;padding:8px;background:var(--bg);border-radius:8px;margin-bottom:6px;">
+          <span>${getSubjectEmoji(w.subject)} ${escapeHtml(w.lesson)}</span>
+          <span class="badge badge-danger">${w.count} أخطاء</span>
+        </div>`).join('')}
+      ` : ''}
       <h4 style="margin:16px 0 12px;">📝 النتائج (${ca.length})</h4>
       ${ca.slice(0, 10).map(a => {
         const quiz = allQuizzes.find(q => q.id === a.quizId);
@@ -5282,24 +5753,101 @@ async function openChildDetails(childId) {
   } finally { hideLoading(); }
 }
 
+/* ✅ تقرير ولي الأمر الشهري PDF */
+async function exportChildReportPDF(childId) {
+  showLoading();
+  try {
+    const users = await DB.get('users');
+    const allAttempts = await DB.get('attempts');
+    const allQuizzes = await DB.get('quizzes');
+    const child = users.find(u => u.id === childId);
+    if (!child) return;
+    const ca = allAttempts.filter(a => a.studentId === childId).sort((a, b) => b.createdAt - a.createdAt);
+    const avg = ca.length ? calculateAvg(ca) : 0;
+    const lvl = getLevel(child.xp || 0);
+    const { weakLessons } = analyzeWeaknesses(ca, allQuizzes);
+    const lastMonth = ca.filter(a => a.createdAt > Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', format: 'a4' });
+    doc.setFillColor(79, 70, 229);
+    doc.rect(0, 0, 210, 40, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Student Monthly Report', 105, 20, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text(platformSettings.platformName, 105, 30, { align: 'center' });
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(14);
+    doc.text(`Name: ${child.name}`, 20, 55);
+    doc.text(`Grade: ${child.grade || '-'}`, 20, 65);
+    doc.text(`School: ${child.school || '-'}`, 20, 75);
+    doc.text(`Level: ${lvl.name} - ${child.xp || 0} XP`, 20, 85);
+    doc.text(`Coins: ${child.coins || 0}`, 20, 95);
+    doc.text(`Badges: ${(child.badges || []).length}`, 20, 105);
+    doc.text(`Total Attempts: ${ca.length}`, 20, 115);
+    doc.text(`Average Score: ${avg}%`, 20, 125);
+    doc.text(`Last Month Attempts: ${lastMonth.length}`, 20, 135);
+    if (weakLessons.length > 0) {
+      doc.setFontSize(12);
+      doc.setTextColor(220, 38, 38);
+      doc.text('Weak Areas:', 20, 150);
+      doc.setTextColor(0, 0, 0);
+      weakLessons.slice(0, 5).forEach((w, i) => {
+        doc.text(`${i+1}. ${w.lesson} - ${w.count} mistakes`, 25, 160 + i * 8);
+      });
+    }
+    doc.setFontSize(10);
+    doc.setTextColor(120, 120, 120);
+    doc.text(`Generated on: ${new Date().toLocaleDateString('en-GB')}`, 105, 280, { align: 'center' });
+    doc.text(platformSettings.footerText || 'EMAA.Tech', 105, 287, { align: 'center' });
+    doc.save(`report_${child.name.replace(/\s+/g, '_')}.pdf`);
+    launchConfetti(30);
+    alert('✅ تم تصدير التقرير');
+  } catch (err) { alert('فشل: ' + err.message); }
+  finally { hideLoading(); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   QUIZ CREATION
+   ═══════════════════════════════════════════════════════════ */
 function openNewQuizModal() {
   editingQuizId = null;
   const isAdm = isAdmin(currentUser);
   const defaultSubject = isAdm ? '' : (currentUser.subject || '');
   newQuizData = { title: '', grade: '', subject: defaultSubject, timePerQuestion: 30, questions: [] };
-  const subjectField = isAdm ? `
+  const adminFields = isAdm ? `
     <div class="form-group">
-      <label class="form-label">المادة *</label>
-      <select class="form-select" id="quizSubject" required>
-        <option value="">اختر المادة</option>
-        ${SUBJECTS.map(s => `<option value="${s.id}">${s.emoji} ${s.name}</option>`).join('')}
+      <label class="form-label">المرحلة *</label>
+      <select class="form-select" id="quizStage" onchange="onQuizStageChange()">
+        <option value="">اختر المرحلة</option>
+        ${Object.keys(STAGES).map(s => `<option value="${s}">${s}</option>`).join('')}
       </select>
     </div>
-  ` : '';
+    <div class="form-group">
+      <label class="form-label">الصف *</label>
+      <select class="form-select" id="quizGrade" disabled>
+        <option value="">اختر المرحلة أولاً</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">المادة *</label>
+      <select class="form-select" id="quizSubject" disabled>
+        <option value="">اختر الصف أولاً</option>
+      </select>
+    </div>
+  ` : `
+    <div class="form-group">
+      <label class="form-label">السنة</label>
+      <select class="form-select" id="quizGrade">
+        <option value="">اختر</option>
+        ${Object.entries(STAGES).map(([s, gs]) => gs.map(g => `<option value="${g}">${g}</option>`).join('')).join('')}
+      </select>
+    </div>
+  `;
   openModal(`<div class="modal-header"><h3 class="modal-title">اختبار جديد</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
     <div class="form-group"><label class="form-label">العنوان</label><input type="text" class="form-input auto-dir" id="quizTitle" dir="rtl"></div>
-    ${subjectField}
-    <div class="form-group"><label class="form-label">السنة</label><select class="form-select" id="quizGrade"><option value="">اختر</option>${Object.entries(STAGES).map(([s, gs]) => gs.map(g => `<option value="${g}">${g}</option>`).join('')).join('')}</select></div>
+    ${adminFields}
     <div class="form-group"><label class="form-label">⏱️ وقت كل سؤال (ث)</label><input type="number" class="form-input" id="quizTime" value="30" min="5" max="600"></div>
     <div class="form-group">
       <label class="checkbox-label" style="display:flex;align-items:center;gap:8px;">
@@ -5309,6 +5857,39 @@ function openNewQuizModal() {
     </div>
     <button class="btn btn-primary btn-full" onclick="continueToQuestions()">التالي</button>`);
 }
+function onQuizStageChange() {
+  const stage = document.getElementById('quizStage').value;
+  const gradeSelect = document.getElementById('quizGrade');
+  const subjectSelect = document.getElementById('quizSubject');
+  if (!gradeSelect) return;
+  if (!stage) {
+    gradeSelect.innerHTML = '<option value="">اختر المرحلة أولاً</option>';
+    gradeSelect.disabled = true;
+  } else {
+    gradeSelect.innerHTML = '<option value="">اختر الصف</option>' + 
+      (STAGES[stage] || []).map(g => `<option value="${g}">${g}</option>`).join('');
+    gradeSelect.disabled = false;
+    gradeSelect.onchange = onQuizGradeChange;
+  }
+  if (subjectSelect) {
+    subjectSelect.innerHTML = '<option value="">اختر الصف أولاً</option>';
+    subjectSelect.disabled = true;
+  }
+}
+function onQuizGradeChange() {
+  const grade = document.getElementById('quizGrade').value;
+  const subjectSelect = document.getElementById('quizSubject');
+  if (!subjectSelect) return;
+  if (!grade) {
+    subjectSelect.innerHTML = '<option value="">اختر الصف أولاً</option>';
+    subjectSelect.disabled = true;
+  } else {
+    const subjects = getSubjectsForGrade(grade);
+    subjectSelect.innerHTML = '<option value="">اختر المادة</option>' + 
+      subjects.map(s => `<option value="${s.id}">${s.emoji} ${s.name}</option>`).join('');
+    subjectSelect.disabled = false;
+  }
+}
 function continueToQuestions() {
   const title = document.getElementById('quizTitle').value.trim();
   const grade = document.getElementById('quizGrade').value;
@@ -5316,12 +5897,10 @@ function continueToQuestions() {
   const subjectField = document.getElementById('quizSubject');
   const subject = subjectField ? subjectField.value : (currentUser.subject || newQuizData.subject);
   const isPublic = document.getElementById('quizIsPublic')?.checked || false;
-  
   if (!title) { alert('أدخل عنوان الاختبار'); return; }
   if (!grade) { alert('اختر السنة'); return; }
   if (!subject) { alert('اختر المادة'); return; }
   if (isNaN(time) || time < 5 || time > 600) { alert('وقت السؤال يجب أن يكون بين 5 و 600 ثانية'); return; }
-  
   newQuizData.title = title;
   newQuizData.grade = grade;
   newQuizData.subject = subject;
@@ -5332,6 +5911,7 @@ function continueToQuestions() {
 function showQuestionsEditor() {
   const qHtml = newQuizData.questions.map((q, i) => {
     const ti = QUESTION_TYPES[q.type] || QUESTION_TYPES.mcq;
+    const diff = QUESTION_DIFFICULTY[q.difficulty] || QUESTION_DIFFICULTY.medium;
     let body = '';
     if (q.type === 'mcq') body = `<div class="question-item-options">${q.options.map((o, oi) => `<div class="question-option-line ${oi === q.answer ? 'correct' : ''}">${oi === q.answer ? '✓' : ''} ${escapeHtml(o)}</div>`).join('')}</div>`;
     else if (q.type === 'tf') body = `<div class="question-item-options"><div class="question-option-line ${q.answer === true ? 'correct' : ''}">${q.answer === true ? '✓' : ''} صح</div><div class="question-option-line ${q.answer === false ? 'correct' : ''}">${q.answer === false ? '✓' : ''} خطأ</div></div>`;
@@ -5341,9 +5921,11 @@ function showQuestionsEditor() {
       <div class="question-item-header">
         <span style="font-weight:900;color:var(--primary);">س${i + 1}</span>
         <span class="question-type-badge qtype-${q.type}">${ti.emoji} ${ti.name}</span>
-        <div class="question-item-text">${escapeHtml(q.text)}</div>
+        <span class="badge" style="background:${diff.color}20;color:${diff.color};">${diff.emoji} ${diff.name}</span>
         <button class="icon-btn icon-btn-danger" onclick="removeQuestion(${i})">🗑</button>
-      </div>${body}</div>`;
+      </div>
+      <div class="question-item-text">${escapeHtml(q.text)}</div>
+      ${body}</div>`;
   }).join('');
   const title = editingQuizId ? 'تعديل: ' + escapeHtml(newQuizData.title) : escapeHtml(newQuizData.title);
   openModal(`<div class="modal-header"><h3 class="modal-title">${title}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
@@ -5365,6 +5947,16 @@ function renderAddQuestionForm() {
   else fieldsHtml = `<div class="alert alert-info">📄 سؤال مقالي</div>`;
   openModal(`<div class="modal-header"><h3 class="modal-title">سؤال جديد</h3><button class="modal-close" onclick="showQuestionsEditor()">✕</button></div>
     <div class="form-group"><label class="form-label">النوع</label><div class="qtype-picker">${Object.entries(QUESTION_TYPES).map(([k, v]) => `<button type="button" class="qtype-option ${k === selectedQuestionType ? 'active' : ''}" onclick="changeQType('${k}')"><span class="emoji">${v.emoji}</span><span class="label">${v.name}</span></button>`).join('')}</div></div>
+    <div class="form-group"><label class="form-label">الصعوبة</label>
+      <select class="form-select" id="qDifficulty">
+        <option value="easy">🟢 سهل</option>
+        <option value="medium" selected>🟡 متوسط</option>
+        <option value="hard">🔴 صعب</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">الوحدة/الدرس (لتحليل نقاط الضعف)</label>
+      <input type="text" class="form-input auto-dir" id="qLesson" placeholder="مثال: الكسور العشرية" dir="rtl">
+    </div>
     <div class="form-group"><label class="form-label">نص السؤال</label><textarea class="form-textarea auto-dir" id="qText" dir="rtl"></textarea></div>
     <div class="form-group"><label class="form-label">🖼️ صورة</label><input type="file" class="form-input" accept="image/*" id="qImageFile" onchange="handleImageUpload(event)"><div id="imagePreview" style="margin-top:10px;">${uploadedImageData ? `<img src="${uploadedImageData}" style="max-width:100%;max-height:160px;border-radius:10px;"><button class="btn btn-sm btn-danger" onclick="clearImage()" style="margin-top:6px;">🗑</button>` : ''}</div></div>
     ${fieldsHtml}
@@ -5393,8 +5985,10 @@ async function handleImageUpload(e) {
 function clearImage() { uploadedImageData = null; document.getElementById('imagePreview').innerHTML = ''; }
 function addQuestion() {
   const text = document.getElementById('qText').value.trim();
+  const difficulty = document.getElementById('qDifficulty').value || 'medium';
+  const lesson = document.getElementById('qLesson').value.trim() || '';
   if (!text) { alert('أدخل السؤال'); return; }
-  const q = { type: selectedQuestionType, text, image: uploadedImageData || null };
+  const q = { type: selectedQuestionType, text, image: uploadedImageData || null, difficulty, lesson };
   if (selectedQuestionType === 'mcq') {
     const opts = [0, 1, 2, 3].map(i => document.getElementById(`opt${i}`).value.trim());
     if (opts.some(o => !o)) { alert('أدخل الخيارات'); return; }
@@ -5413,113 +6007,61 @@ function addQuestion() {
 function removeQuestion(i) { newQuizData.questions.splice(i, 1); showQuestionsEditor(); }
 async function saveQuiz() {
   if (!newQuizData || !newQuizData.questions || newQuizData.questions.length === 0) {
-    alert('أضف سؤالاً واحداً على الأقل');
-    return;
+    alert('أضف سؤالاً واحداً على الأقل'); return;
   }
-  
-  // ✅ التحقق من البيانات الأساسية
   if (!newQuizData.title || !newQuizData.title.trim()) { alert('أدخل عنوان الاختبار'); return; }
   if (!newQuizData.grade) { alert('اختر السنة'); return; }
   if (!newQuizData.subject) { alert('اختر المادة'); return; }
   const time = parseInt(newQuizData.timePerQuestion);
   if (isNaN(time) || time < 5 || time > 600) { alert('وقت السؤال غير صالح (5-600 ثانية)'); return; }
-  
-  // ✅ التحقق من صحة كل سؤال
   for (let i = 0; i < newQuizData.questions.length; i++) {
     const q = newQuizData.questions[i];
     if (!q.text || !q.text.trim()) { alert(`السؤال رقم ${i+1} بدون نص`); return; }
     if (q.type === 'mcq') {
       if (!q.options || q.options.length < 2) { alert(`السؤال ${i+1}: يحتاج خيارين على الأقل`); return; }
       if (typeof q.answer !== 'number' || q.answer < 0 || q.answer >= q.options.length) { 
-        alert(`السؤال ${i+1}: الإجابة الصحيحة غير محددة`); 
-        return; 
+        alert(`السؤال ${i+1}: الإجابة الصحيحة غير محددة`); return; 
       }
     }
     if (q.type === 'fill' && (!q.answer || !q.answer.trim())) { 
-      alert(`السؤال ${i+1}: أدخل الإجابة`); 
-      return; 
+      alert(`السؤال ${i+1}: أدخل الإجابة`); return; 
     }
   }
-  
   showLoading();
   try {
     if (editingQuizId) {
       const updates = { 
-        title: newQuizData.title.trim(), 
-        grade: newQuizData.grade, 
-        subject: newQuizData.subject,
-        timePerQuestion: time, 
-        questions: newQuizData.questions, 
-        updatedAt: Date.now() 
+        title: newQuizData.title.trim(), grade: newQuizData.grade, subject: newQuizData.subject,
+        timePerQuestion: time, questions: newQuizData.questions, updatedAt: Date.now() 
       };
       const saved = await dbUpdateNode('quizzes', editingQuizId, updates);
-      if (!saved) { 
-        alert('⚠️ فشل حفظ التعديلات. تحقق من قواعد الأمان (Rules) في Firebase Console.'); 
-        console.error('❌ Save quiz failed: dbUpdateNode returned false');
-        return; 
-      }
+      if (!saved) { alert('⚠️ فشل حفظ التعديلات. تحقق من قواعد الأمان.'); return; }
       await logActivity('تعديل اختبار', newQuizData.title);
       alert('✅ تم حفظ التعديلات بنجاح');
     } else {
       const quizId = uid();
       const quiz = { 
-        teacherId: currentUser.id, 
-        teacherName: currentUser.name || 'غير معروف',
-        title: newQuizData.title.trim(), 
-        subject: newQuizData.subject, 
-        grade: newQuizData.grade, 
-        timePerQuestion: time, 
-        questions: newQuizData.questions, 
-        createdAt: Date.now(), 
-        approved: true,
-        isPublic: newQuizData.isPublic || false,
-        isDemo: false
+        teacherId: currentUser.id, teacherName: currentUser.name || 'غير معروف',
+        title: newQuizData.title.trim(), subject: newQuizData.subject, grade: newQuizData.grade, 
+        timePerQuestion: time, questions: newQuizData.questions, 
+        createdAt: Date.now(), approved: true,
+        isPublic: newQuizData.isPublic || false, isDemo: false
       };
-      
       console.log('💾 Saving quiz:', quizId, quiz.title);
       const saved = await dbSetNode('quizzes', quizId, quiz);
-      
-      if (!saved) { 
-        alert('⚠️ فشل حفظ الاختبار. تحقق من:\n1. قواعد الأمان في Firebase (Rules)\n2. اتصال الإنترنت\n3. Console (F12) للأخطاء'); 
-        console.error('❌ Save quiz failed: dbSetNode returned false');
-        return; 
-      }
-      
-      // ✅ التحقق من أن الاختبار حُفظ فعلاً
-      const verifyQuizzes = await DB.get('quizzes');
-      const verified = verifyQuizzes.find(q => q.id === quizId);
-      if (!verified) {
-        console.warn('⚠️ Quiz not found after save, may be sync issue');
-      } else {
-        console.log('✅ Quiz verified in DB:', quizId);
-      }
-      
-      // ✅ إرسال الإشعارات داخل try/catch منفصل حتى لا تُفشل الحفظ
-      try {
-        await notifyStudents({ ...quiz, id: quizId });
-      } catch (notifErr) {
-        console.warn('⚠️ Failed to send notifications (quiz still saved):', notifErr);
-      }
-      
+      if (!saved) { alert('⚠️ فشل حفظ الاختبار. تحقق من قواعد الأمان.'); return; }
+      try { await notifyStudents({ ...quiz, id: quizId }); } catch (notifErr) { console.warn('Notify failed:', notifErr); }
       await logActivity('إنشاء اختبار', newQuizData.title);
       alert('✅ تم إنشاء الاختبار بنجاح');
     }
-    
-    editingQuizId = null; 
-    newQuizData = null;
+    editingQuizId = null; newQuizData = null;
     closeModal();
-    
-    if (isAdmin(currentUser)) {
-      renderAdminDashboard();
-    } else {
-      renderTeacherDashboard();
-    }
+    if (isAdmin(currentUser)) renderAdminDashboard();
+    else renderTeacherDashboard();
   } catch (err) {
     console.error('❌ saveQuiz error:', err);
     alert('❌ خطأ غير متوقع: ' + (err.message || 'حاول مرة أخرى'));
-  } finally { 
-    hideLoading(); 
-  }
+  } finally { hideLoading(); }
 }
 async function openQuizManage(quizId) {
   showLoading();
@@ -5575,6 +6117,10 @@ async function deleteQuiz(quizId) {
     renderTeacherDashboard();
   } finally { hideLoading(); }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   QUIZ TAKING مع الصعوبة المتغيرة (Adaptive)
+   ═══════════════════════════════════════════════════════════ */
 async function startQuiz(quizId) {
   showLoading();
   try {
@@ -5590,8 +6136,10 @@ async function startQuiz(quizId) {
     currentAnswers = [];
     selectedAnswerIndex = null; 
     tfSelected = null;
+    currentQuizDifficulty = 'medium';
     window._currentChallenge = null;
     window._currentTournament = null;
+    window._consecutiveCorrect = 0;
     showScreen('quiz');
     renderCurrentQuestion();
   } finally { hideLoading(); }
@@ -5599,6 +6147,7 @@ async function startQuiz(quizId) {
 function renderCurrentQuestion() {
   const q = currentQuiz.questions[currentQuestionIndex];
   const ti = QUESTION_TYPES[q.type] || QUESTION_TYPES.mcq;
+  const diff = QUESTION_DIFFICULTY[q.difficulty] || QUESTION_DIFFICULTY.medium;
   const dir = detectDirection(q.text);
   document.getElementById('quizProgressText').textContent = `${currentQuestionIndex + 1} / ${currentQuiz.questions.length}`;
   document.getElementById('quizProgressFill').style.width = `${((currentQuestionIndex + 1) / currentQuiz.questions.length) * 100}%`;
@@ -5613,7 +6162,11 @@ function renderCurrentQuestion() {
   document.getElementById('quizContent').innerHTML = `
     ${window._currentChallenge ? `<div class="alert alert-warning" style="margin-bottom:16px;">⚔️ <strong>وضع التحدي</strong> ضد ${escapeHtml(window._currentChallenge.fromName)}</div>` : ''}
     ${window._currentTournament ? `<div class="alert alert-danger" style="margin-bottom:16px;">🏆 <strong>مسابقة:</strong> ${escapeHtml(window._currentTournament.name)}</div>` : ''}
-    <div class="question-type-badge qtype-${q.type}">${ti.emoji} ${ti.name}</div>
+    <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+      <span class="question-type-badge qtype-${q.type}">${ti.emoji} ${ti.name}</span>
+      <span class="badge" style="background:${diff.color}20;color:${diff.color};">${diff.emoji} ${diff.name}</span>
+      ${(window._consecutiveCorrect || 0) >= 2 ? `<span class="badge badge-success">🔥 ${window._consecutiveCorrect} صحيحة متتالية</span>` : ''}
+    </div>
     ${q.image ? `<img src="${q.image}" class="question-image">` : ''}
     <div style="background:var(--primary-light);padding:20px;border-radius:14px;margin-bottom:20px;border-right:4px solid var(--primary);">
       <h3 dir="${dir}" style="font-size:18px;font-weight:800;text-align:${dir === 'ltr' ? 'left' : 'right'};">${escapeHtml(q.text)}</h3>
@@ -5655,6 +6208,7 @@ function handleTimeout() {
   } else currentAnswers.push(selectedAnswerIndex);
   selectedAnswerIndex = null; 
   tfSelected = null;
+  window._consecutiveCorrect = 0;
   currentQuestionIndex++;
   if (currentQuestionIndex >= currentQuiz.questions.length) finishQuiz();
   else renderCurrentQuestion();
@@ -5682,6 +6236,14 @@ function nextQuizQuestion() {
   else if (q.type === 'fill') a = document.getElementById('fillInput').value.trim();
   else if (q.type === 'essay') a = document.getElementById('essayInput').value.trim();
   currentAnswers.push(a);
+  if (q.type === 'mcq' || q.type === 'tf' || q.type === 'fill') {
+    const correct = checkAnswer(q, a);
+    if (correct === true) {
+      window._consecutiveCorrect = (window._consecutiveCorrect || 0) + 1;
+    } else {
+      window._consecutiveCorrect = 0;
+    }
+  }
   selectedAnswerIndex = null; 
   tfSelected = null;
   currentQuestionIndex++;
@@ -5735,6 +6297,10 @@ async function finishQuiz() {
     if (pct >= 90) await updateDailyQuestProgress(currentUser.id, 'high_score');
     if (pct === 100) await updateDailyQuestProgress(currentUser.id, 'perfect');
     const newBadges = await checkAndAwardBadges(currentUser.id);
+    let learningPath = [];
+    if (platformSettings.adaptiveEnabled && pct < 50) {
+      learningPath = await getSmartLearningPath(currentUser.id, currentQuiz.subject, pct);
+    }
     if (window._currentChallenge) {
       const challenges = await DB.get('challenges');
       const challenge = challenges.find(c => c.id === window._currentChallenge.id);
@@ -5774,6 +6340,24 @@ async function finishQuiz() {
     else if (pct >= 50) { emoji = '👍'; title = 'جيد جداً'; color = 'var(--primary)'; }
     else { emoji = '💪'; title = 'حاول مرة أخرى'; color = 'var(--danger)'; }
     const certificateBtn = (platformSettings.certificatesEnabled && !hasEssay && pct >= 50) ? `<button class="btn btn-success btn-lg" onclick="generateCertificate('${attemptId}')" style="margin-top:16px;">🎓 شهادة</button>` : '';
+    let learningPathHtml = '';
+    if (learningPath.length > 0) {
+      learningPathHtml = `<div class="learning-path-card" style="margin-top:20px;text-align:right;">
+        <div class="learning-path-title">📚 مسار تعلم مقترح (لأن درجتك < 50%)</div>
+        ${learningPath.map((step, i) => `
+          <div class="learning-path-step">
+            <div class="learning-path-number">${i+1}</div>
+            <div class="learning-path-content">
+              <h4>${step.emoji} ${escapeHtml(step.title)}</h4>
+              <p>${step.teacherName ? `من: ${escapeHtml(step.teacherName)}` : ''}</p>
+            </div>
+            ${step.type === 'video' ? `<a href="${escapeHtml(step.url)}" target="_blank" class="btn btn-sm btn-primary">▶️ شاهد</a>` : ''}
+            ${step.type === 'material' ? `<button class="btn btn-sm btn-primary" onclick="downloadTeacherMaterial('${step.teacherId}', ${step.index})">⬇️ تحميل</button>` : ''}
+            ${step.type === 'quiz' ? `<button class="btn btn-sm btn-success" onclick="closeModal();exitQuiz();setTimeout(()=>startQuiz('${step.quizId}'),500);">📝 ابدأ</button>` : ''}
+          </div>
+        `).join('')}
+      </div>`;
+    }
     document.getElementById('quizContent').innerHTML = `
       <div style="text-align:center;padding:20px 0;">
         <div style="font-size:80px;margin-bottom:16px;">${emoji}</div>
@@ -5782,6 +6366,7 @@ async function finishQuiz() {
         <p style="font-size:20px;font-weight:700;color:var(--text-light);">${pct !== null ? pct + '%' : 'سيتم تصحيح قريباً'}</p>
         <div class="alert alert-success" style="margin-top:16px;">🎉 <strong>+${xpGain} XP</strong>${platformSettings.coinsEnabled ? ` • <strong>+${coinsGain} 🪙</strong>` : ''}<br>${currentUser.xp || 0} XP • 🪙 ${currentUser.coins || 0}</div>
         ${newBadges.length > 0 ? `<div class="alert alert-warning">🏆 ${newBadges.map(b => `${BADGES[b].emoji} ${BADGES[b].name}`).join(' • ')}</div>` : ''}
+        ${learningPathHtml}
         <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:20px;">
           ${certificateBtn}
           <button class="btn btn-primary btn-lg" onclick="exitQuiz()">🏠 العودة</button>
@@ -5802,6 +6387,7 @@ function exitQuiz() {
   tfSelected = null;
   window._currentChallenge = null;
   window._currentTournament = null;
+  window._consecutiveCorrect = 0;
   enterDashboard();
 }
 
@@ -5811,6 +6397,7 @@ function exitQuiz() {
 window.addEventListener('DOMContentLoaded', async () => {
   console.log('🚀 عِلْم - جارٍ التحميل...');
   loadDarkMode();
+  initStageSelects();
   const devYearEl = document.getElementById('devYear');
   if (devYearEl) devYearEl.textContent = new Date().getFullYear();
   _autoDirObserver.observe(document.body, { childList: true, subtree: true });
@@ -5866,9 +6453,11 @@ const globalFns = [
   handleForgotPassword, logout, toggleDarkMode, pickGoogleRole, 
   completeGoogleProfile, cancelGoogleProfile, saveExistingProfile, 
   handleTeacherCardUpload, populateSubjectSelects, openProfileCompletionForExisting,
+  initStageSelects, populateStageSelect, populateGradeSelect, getStageFromGrade, getSubjectsForGrade,
   openNotifications, closeModal, openGlobalSearch, performGlobalSearch, 
   openThemePicker, applyTheme,
   openNewQuizModal, continueToQuestions, showQuestionsEditor, openAddQuestionForm,
+  onQuizStageChange, onQuizGradeChange,
   changeQType, pickTFAnswer, handleImageUpload, clearImage, addQuestion, 
   removeQuestion, saveQuiz, openQuizManage, editQuiz, deleteQuiz,
   startQuiz, selectMcqAnswer, selectTfAnswer, onFillInput, onEssayInput,
@@ -5878,7 +6467,7 @@ const globalFns = [
   renderAdminDashboard, renderAdminQuizzes, filterAdminQuizzes, viewQuizDetails, 
   adminDeleteQuiz, renderAdminStats, renderAuditLog, openAdminBroadcast, 
   sendAdminBroadcast, renderAdminGamification, openGrantXPModal, grantXpToStudent,
-  openGrantCoinsModal, grantCoinsToStudent,
+  openGrantCoinsModal, grantCoinsToStudent, renderAtRiskList, sendMotivationToStudent,
   openStudentGamificationDetails, renderAdminAnnouncements, openAnnouncementEditor, 
   saveAnnouncement, toggleAnnouncement, deleteAnnouncement, renderAdminSettings, 
   savePlatformSettingsForm, dismissAnnouncement, renderAdminChallenges, 
@@ -5902,7 +6491,9 @@ const globalFns = [
   renderTournaments, joinTournament, playTournamentRound,
   awardCoins, spendCoins, updateCoinsDisplay,
   generateDailyQuestsForUser, updateDailyQuestProgress, claimDailyQuest,
-  searchChild, removeChild, openChildDetails,
+  updatePetGrowth, getPetEmoji, getPetHealthFromInactivity, renderPetCard,
+  analyzeWeaknesses, getAtRiskStudents, getSmartLearningPath, generateBehavioralNotifications,
+  searchChild, removeChild, openChildDetails, exportChildReportPDF,
   startAnnouncementsListener, stopAnnouncementsListener,
   startChallengesListener, stopChallengesListener,
   startNotificationsListener, stopNotificationsListener,
